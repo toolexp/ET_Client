@@ -61,14 +61,14 @@ class FormChildDG:
         frm_aux2 = Frame(self.frm_child_crud)
         lbl_name = Label(frm_aux1, text='Name')
         lbl_name.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=100, sticky=W)
+        lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(frm_aux1, text='Description')
         lbl_description.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_description.grid(pady=10, padx=100, sticky=W)
+        lbl_description.grid(pady=10, padx=50, sticky=NW)
         self.txt_name = Entry(frm_aux1)
-        self.txt_name.grid(row=0, column=1, padx=100)
-        self.txt_description = Entry(frm_aux1)
-        self.txt_description.grid(row=1, column=1, padx=100)
+        self.txt_name.grid(row=0, column=1, padx=50, sticky=W)
+        self.txt_description = Text(frm_aux1, height=6, width=60)
+        self.txt_description.grid(row=1, column=1, padx=50, sticky=W)
         lbl_available_d = Label(frm_aux2, text='Available designers')
         lbl_available_d.config(fg="#222cb3", font=LABEL_FONT)
         lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
@@ -97,8 +97,8 @@ class FormChildDG:
         Button(frm_aux2, text='Remove', command=self.click_remove).grid(row=5, column=1)
         Button(self.frm_child_crud, text='Save', command=self.click_save).grid(row=4, column=5, padx=25)
         Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=5, column=5, padx=25)
-        frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5,rowspan=5)
-        frm_aux2.grid(row=8, column=0, columnspan=5, rowspan=10)
+        frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5, rowspan=5)
+        frm_aux2.grid(row=8, column=0, pady=20, padx=40, columnspan=5, rowspan=10)
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -134,7 +134,7 @@ class FormChildDG:
         self.decide = True
         self.frm_child_list.grid_forget()
         self.txt_name.delete(0, END)
-        self.txt_description.delete(0, END)
+        self.txt_description.delete('1.0', 'end-1c')
         msg = Message(action=22, information=[])
         self.connection.create_message(msg)
         self.connection.send_message()
@@ -156,8 +156,8 @@ class FormChildDG:
             self.connection.receive_message()
             self.txt_name.delete(0, END)
             self.txt_name.insert(0, self.connection.message.information[0])
-            self.txt_description.delete(0, END)
-            self.txt_description.insert(0, self.connection.message.information[1])
+            self.txt_description.delete('1.0', 'end-1c')
+            self.txt_description.insert('1.0', self.connection.message.information[1])
             s_designers = self.connection.message.information[2]
             msg = Message(action=22, information=[])
             self.connection.create_message(msg)
@@ -204,7 +204,7 @@ class FormChildDG:
     def click_save(self):
         if self.validate_fields():
             name_aux = self.txt_name.get()
-            description_aux = self.txt_description.get()
+            description_aux = self.txt_description.get('1.0', 'end-1c')
             if self.decide:
                 msg = Message(action=26, information=[name_aux, description_aux, []])
                 for item in self.trv_selected_designers.get_children():
@@ -221,12 +221,12 @@ class FormChildDG:
 
     def click_cancel(self):
         self.txt_name.delete(0, END)
-        self.txt_description.delete(0, END)
+        self.txt_description.delete('1.0', 'end-1c')
         self.frm_child_crud.grid_forget()
         self.show_frm()
 
     def validate_fields(self):
-        if len(self.txt_name.get()) != 0 and len(self.txt_description.get()) != 0:
+        if len(self.txt_name.get()) != 0 and len(self.txt_description.get('1.0', 'end-1c')) != 0:
             if len(self.trv_selected_designers.get_children()) != 0:
                 return True
             else:

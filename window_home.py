@@ -7,6 +7,7 @@ from Modules.Forms.form_designers_groups import FormParentDG
 from Modules.Forms.form_problems import FormParentProblem
 from Modules.Forms.form_templates import FormParentTemplate
 from Modules.Forms.form_sections import FormParentSection
+from Modules.Forms.form_patterns import FormParentPattern
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 65450        # The port used by the server
@@ -28,12 +29,17 @@ class WindowHome:
         menu_bar = Menu(self.window)
         self.window.config(menu=menu_bar)
         administration_menu = Menu(menu_bar)
-        administration_menu.add_command(label='Administrators', command=self.click_administrators)
-        administration_menu.add_command(label='Experimenters', command=self.click_experimenters)
-        administration_menu.add_command(label='Designers', command=self.click_designers)
+        users_menu = Menu(administration_menu)
+        users_menu.add_command(label='Administrators', command=self.click_administrators)
+        users_menu.add_command(label='Experimenters', command=self.click_experimenters)
+        users_menu.add_command(label='Designers', command=self.click_designers)
+        administration_menu.add_cascade(label='Users', menu=users_menu)
         administration_menu.add_command(label='Designers Groups', command=self.click_designers_groups)
-        administration_menu.add_command(label='Templates', command=self.click_templates)
-        administration_menu.add_command(label='Template Sections', command=self.click_sections)
+        template_menu = Menu(administration_menu)
+        template_menu.add_command(label='Sections', command=self.click_sections)
+        template_menu.add_command(label='Templates', command=self.click_templates)
+        administration_menu.add_cascade(label='Templates', menu=template_menu)
+        administration_menu.add_command(label='Patterns', command=self.click_patterns)
         administration_menu.add_command(label='Problems', command=self.click_problems)
         experiment_menu = Menu(administration_menu)
         experiment_menu.add_command(label='Experiment administration')
@@ -50,6 +56,7 @@ class WindowHome:
         self.frm_parent_template = FormParentTemplate(self.window, connection)
         self.frm_parent_section = FormParentSection(self.window, connection)
         self.frm_parent_problem = FormParentProblem(self.window,connection)
+        self.frm_parent_pattern = FormParentPattern(self.window, connection)
 
     def click_experimenters(self):
         self.frm_parent_designer.hide_frm()
@@ -57,6 +64,8 @@ class WindowHome:
         self.frm_parent_designers_group.hide_frm()
         self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
+        self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_experimenter.hide_frm()
         self.frm_parent_experimenter.show_frm()
 
@@ -67,6 +76,7 @@ class WindowHome:
         self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_designer.hide_frm()
         self.frm_parent_designer.show_frm()
 
@@ -77,6 +87,7 @@ class WindowHome:
         self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_administrator.hide_frm()
         self.frm_parent_administrator.show_frm()
 
@@ -87,6 +98,7 @@ class WindowHome:
         self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_designers_group.hide_frm()
         self.frm_parent_designers_group.show_frm()
 
@@ -97,6 +109,7 @@ class WindowHome:
         self.frm_parent_designers_group.hide_frm()
         self.frm_parent_problem.hide_frm()
         self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_template.show_frm()
 
@@ -107,8 +120,20 @@ class WindowHome:
         self.frm_parent_designers_group.hide_frm()
         self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_section.show_frm()
+
+    def click_patterns(self):
+        self.frm_parent_experimenter.hide_frm()
+        self.frm_parent_designer.hide_frm()
+        self.frm_parent_administrator.hide_frm()
+        self.frm_parent_designers_group.hide_frm()
+        self.frm_parent_problem.hide_frm()
+        self.frm_parent_template.hide_frm()
+        self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
+        self.frm_parent_pattern.show_frm()
 
     def click_problems(self):
         self.frm_parent_experimenter.hide_frm()
@@ -117,6 +142,7 @@ class WindowHome:
         self.frm_parent_designers_group.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
+        self.frm_parent_pattern.hide_frm()
         self.frm_parent_problem.hide_frm()
         self.frm_parent_problem.show_frm()
 
