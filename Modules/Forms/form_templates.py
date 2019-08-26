@@ -35,6 +35,7 @@ class FormChildProblem:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
+        self.frm_child_section = LabelFrame(frm_parent)
         self.initialize_components()
 
     def initialize_components(self):
@@ -99,6 +100,31 @@ class FormChildProblem:
         frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5, rowspan=5)
         frm_aux2.grid(row=8, column=0, padx=40, columnspan=5, rowspan=10)
 
+        # Components for CRUD section
+        frm_aux = Frame(self.frm_child_section)
+        lbl_name = Label(frm_aux, text='Name')
+        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_name.grid(pady=10, padx=50, sticky=W)
+        lbl_description = Label(frm_aux, text='Description')
+        lbl_description.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_description.grid(pady=10, padx=50, sticky=W)
+        lbl_type = Label(frm_aux, text='Data type')
+        lbl_type.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_type.grid(row=7, column=0, pady=10, padx=50, sticky=W)
+        self.var_check = IntVar()
+        self.check_optional = Checkbutton(frm_aux, text="This section is optional", variable=self.var_check)
+        self.check_optional.grid(row=8, column=0, pady=20, padx=50, sticky=W)
+        self.txt_name_section = Text(frm_aux, height=1, width=60)
+        self.txt_name_section.grid(row=0, column=1, padx=10, sticky=W)
+        self.txt_description_section = Text(frm_aux, height=6, width=60)
+        self.txt_description_section.grid(row=1, column=1, padx=10, rowspan=6, pady=10, sticky=W)
+        self.cbx_data = ttk.Combobox(frm_aux, state="readonly")
+        self.cbx_data['values'] = ['Text', 'URL', 'Image']
+        self.cbx_data.grid(row=7, column=1, pady=10, padx=10, sticky=W)
+        Button(frm_aux, text='Save', command=self.click_save_section).grid(row=7, column=3, padx=40)
+        Button(frm_aux, text='Cancel', command=self.click_cancel_section).grid(row=8, column=3, padx=40)
+        frm_aux.grid(row=1, column=0, pady=20, padx=10, columnspan=5, rowspan=10)
+
     def retrieve_list(self):
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
@@ -108,7 +134,7 @@ class FormChildProblem:
         self.connection.send_message()
         self.connection.receive_message()
         for i in range(0, len(self.connection.message.information)):
-            elements = self.connection.message.information[i].split(':')
+            elements = self.connection.message.information[i].split('¥')
             self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2]))
 
     def show_frm(self):
@@ -118,6 +144,7 @@ class FormChildProblem:
     def hide_frm(self):
         self.frm_child_list.grid_forget()
         self.frm_child_crud.grid_forget()
+        self.frm_child_list.grid_forget()
 
     def click_delete(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
@@ -170,10 +197,10 @@ class FormChildProblem:
             if item in a_sections:
                 a_sections.remove(item)
         for i in range(0, len(a_sections)):
-            elements = a_sections[i].split(':')
+            elements = a_sections[i].split('¥')
             self.trv_available_sections.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
         for i in range(0, len(s_sections)):
-            elements = s_sections[i].split(':')
+            elements = s_sections[i].split('¥')
             self.trv_selected_sections.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
 
     def click_add(self):
@@ -223,7 +250,38 @@ class FormChildProblem:
         self.show_frm()
 
     def click_new_section(self):
-        pass
+        self.frm_child_crud.grid_forget()
+        self.frm_child_section.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        self.txt_name_section.focus_set()
+
+    def click_cancel_section(self):
+        self.txt_name_section.delete('1.0', 'end-1c')
+        self.txt_description_section.delete('1.0', 'end-1c')
+        self.frm_child_section.grid_forget()
+        self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        self.txt_name.focus_set()
+
+    def click_save_section(self):
+        if self.validate_fields_section():
+            if self.var_check.get() == 1:
+                aux_option = False
+            else:
+                aux_option = True
+            msg = Message(action=31, information=[self.txt_name_section.get('1.0', 'end-1c'),
+                                                  self.txt_description_section.get('1.0', 'end-1c'), self.cbx_data.get(),
+                                                  aux_option])
+            self.connection.create_message(msg)
+            self.connection.send_message()
+            self.connection.receive_message()
+            elements = self.connection.message.information[0].split('¥')
+            self.trv_selected_sections.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
+            self.txt_name_section.delete('1.0', 'end-1c')
+            self.txt_description_section.delete('1.0', 'end-1c')
+            self.cbx_data.set('')
+            self.var_check.set(0)
+            self.frm_child_section.grid_forget()
+            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+            self.txt_name.focus_set()
 
     def validate_fields(self):
         if len(self.txt_name.get('1.0','end-1c')) != 0 and len(self.txt_description.get('1.0','end-1c')) != 0:
@@ -231,5 +289,12 @@ class FormChildProblem:
                 return True
             else:
                 return False
+        else:
+            return False
+
+    def validate_fields_section(self):
+        if len(self.txt_name_section.get('1.0','end-1c')) != 0 and \
+                len(self.txt_description_section.get('1.0','end-1c')) != 0 and len(self.cbx_data.get()) != 0:
+            return True
         else:
             return False

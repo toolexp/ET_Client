@@ -98,7 +98,7 @@ class FormChildAED:
         self.connection.send_message()
         self.connection.receive_message()
         for i in range(0, len(self.connection.message.information)):
-            elements = self.connection.message.information[i].split(':')
+            elements = self.connection.message.information[i].split('¥')
             self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2]))
 
     def show_frm(self):

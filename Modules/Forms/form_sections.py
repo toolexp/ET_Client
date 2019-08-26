@@ -88,7 +88,7 @@ class FormChildSection:
         self.connection.send_message()
         self.connection.receive_message()
         for i in range(0, len(self.connection.message.information)):
-            elements = self.connection.message.information[i].split(':')
+            elements = self.connection.message.information[i].split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
 
     def show_frm(self):
@@ -151,7 +151,7 @@ class FormChildSection:
             self.connection.receive_message()
             self.txt_name.delete('1.0', 'end-1c')
             self.txt_description.delete('1.0', 'end-1c')
-            self.set_cbx_data('Text')
+            self.cbx_data.set('')
             self.var_check.set(0)
             self.frm_child_crud.grid_forget()
             self.show_frm()
@@ -159,7 +159,7 @@ class FormChildSection:
     def click_cancel(self):
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
-        self.set_cbx_data('Text')
+        self.cbx_data.set('')
         self.var_check.set(0)
         self.frm_child_crud.grid_forget()
         self.show_frm()

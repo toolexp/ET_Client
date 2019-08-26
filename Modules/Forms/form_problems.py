@@ -105,7 +105,7 @@ class FormChildProblem:
         self.connection.send_message()
         self.connection.receive_message()
         for i in range(0, len(self.connection.message.information)):
-            elements = self.connection.message.information[i].split(':')
+            elements = self.connection.message.information[i].split('¥')
             self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2]))
 
     def show_frm(self):
@@ -176,10 +176,10 @@ class FormChildProblem:
             if item in a_designers:
                 a_designers.remove(item)
         for i in range(0, len(a_designers)):
-            elements = a_designers[i].split(':')
+            elements = a_designers[i].split('¥')
             self.trv_available_designers.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
         for i in range(0, len(s_designers)):
-            elements = s_designers[i].split(':')
+            elements = s_designers[i].split('¥')
             self.trv_selected_designers.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
 
     def click_add(self):
