@@ -56,7 +56,7 @@ class FormChildExSC:
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
         self.trv_available.heading('#3', text='Active', anchor=CENTER)
         self.trv_available.heading('#4', text='Available', anchor=CENTER)
-        self.trv_available.column('#0', width=50, minwidth=50, stretch=NO)
+        self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.column('#3', width=100, minwidth=100, stretch=NO)

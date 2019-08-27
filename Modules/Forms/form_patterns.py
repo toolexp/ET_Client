@@ -49,8 +49,8 @@ class FormChildPattern:
         self.trv_available = ttk.Treeview(self.frm_child_list, height=20, columns='Name')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
-        self.trv_available.column('#0', width=50, minwidth=50, stretch=NO)
-        self.trv_available.column('#1', width=400, minwidth=400, stretch=NO)
+        self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
+        self.trv_available.column('#1', width=500, minwidth=500, stretch=NO)
         self.trv_available.grid(row=2, column=1, columnspan=5, rowspan=10, sticky=W, padx=100)
         Button(self.frm_child_list, text='New', command=self.click_new).grid(row=2, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
@@ -105,7 +105,8 @@ class FormChildPattern:
         self.connection.receive_message()
         for i in range(0, len(self.connection.message.information)):
             elements = self.connection.message.information[i].split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=elements[1])
+            print(elements[1])
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1],))
 
     def show_frm(self):
         self.retrieve_list()

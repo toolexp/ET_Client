@@ -46,7 +46,7 @@ class FormChildSection:
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
-        self.trv_available.column('#0', width=50, minwidth=50, stretch=NO)
+        self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.grid(row=2, column=1, columnspan=5, rowspan=10, sticky=W, padx=100)
