@@ -1,7 +1,7 @@
 from tkinter import ttk
 from tkinter import *
 from Modules.Config.Connection import Connection
-from Modules.Config.Message import Message
+from Modules.Config.Data import Message
 from Modules.Forms.form_AED import FormParentAED
 from Modules.Forms.form_designers_groups import FormParentDG
 from Modules.Forms.form_problems import FormParentProblem
@@ -21,7 +21,8 @@ class WindowHome:
         self.window = Tk()
         self.window.title('Tool for experimenting')
         #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
-        self.window.geometry('%dx%d+0+0' % (1024, 778))
+        #self.window.geometry('%dx%d+0+0' % (1024, 778))
+        self.window.geometry('%dx%d+0+0' % (1500, 778))
         #self.window.geometry('%dx%d+0+0' % (w, h))
         self.window.resizable(0, 0)
 

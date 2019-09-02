@@ -1,11 +1,12 @@
-from tkinter import ttk
-from tkinter import *
-from Modules.Config.Message import Message
+from tkinter import Label, LabelFrame, Frame, Text, Button, Entry
+from tkinter.constants import *
+from tkinter.ttk import Treeview
+from Modules.Config.Data import Message
 
-TITLE_FONT = ("Arial", 14, "bold")
-SUBTITLE_FONT = ("Arial", 12, "bold")
-ERROR_FONT = ("Arial", 10, "italic")
+TITLE_FONT = ("Arial", 18)
+SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
+TEXT_FONT = ("Arial", 10)
 
 
 class FormParentDG:
@@ -39,10 +40,10 @@ class FormChildDG:
 
     def initialize_components(self):
         # Components for List FRM
-        lbl_available = Label(self.frm_child_list, text='Available designers groups')
+        '''lbl_available = Label(self.frm_child_list, text='Designers groups')
         lbl_available.config(fg="#222cb3", font=SUBTITLE_FONT)
-        lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)
-        self.trv_available = ttk.Treeview(self.frm_child_list, height=20, columns=('Name', 'Description', '# members'))
+        lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)'''
+        self.trv_available = Treeview(self.frm_child_list, height=20, columns=('Name', 'Description', '# members'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
@@ -51,7 +52,7 @@ class FormChildDG:
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.column('#3', width=100, minwidth=100, stretch=NO)
-        self.trv_available.grid(row=2, column=1, columnspan=5, rowspan=10, sticky=W, padx=50)
+        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=100, pady=100)
         Button(self.frm_child_list, text='New', command=self.click_new).grid(row=2, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
@@ -75,7 +76,7 @@ class FormChildDG:
         lbl_selected_d = Label(frm_aux2, text='Selected designers')
         lbl_selected_d.config(fg="#222cb3", font=LABEL_FONT)
         lbl_selected_d.grid(row=0, column=2, pady=10, sticky=W)
-        self.trv_available_designers = ttk.Treeview(frm_aux2, height=15, columns=('Name', 'Surname'))
+        self.trv_available_designers = Treeview(frm_aux2, height=15, columns=('Name', 'Surname'))
         self.trv_available_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_designers.heading('#1', text='Name', anchor=CENTER)
         self.trv_available_designers.heading('#2', text='Surname', anchor=CENTER)
@@ -84,7 +85,7 @@ class FormChildDG:
         self.trv_available_designers.column('#2', width=150, minwidth=150, stretch=NO)
         self.trv_available_designers.bind("<Button-1>", self.click_trv_adesigners)
         self.trv_available_designers.grid(row=1, column=0, rowspan=10, sticky=W, padx=10)
-        self.trv_selected_designers = ttk.Treeview(frm_aux2, height=15, columns=('Name', 'Surname'))
+        self.trv_selected_designers = Treeview(frm_aux2, height=15, columns=('Name', 'Surname'))
         self.trv_selected_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_designers.heading('#1', text='Name', anchor=CENTER)
         self.trv_selected_designers.heading('#2', text='Surname', anchor=CENTER)

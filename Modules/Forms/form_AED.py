@@ -1,11 +1,12 @@
-from tkinter import ttk
-from tkinter import *
-from Modules.Config.Message import Message
+from tkinter import Label, LabelFrame, Frame, Entry, Button
+from tkinter.constants import *
+from tkinter.ttk import Treeview
+from Modules.Config.Data import Message
 
-TITLE_FONT = ("Arial", 14, "bold")
-SUBTITLE_FONT = ("Arial", 12, "bold")
-ERROR_FONT = ("Arial", 10, "italic")
+TITLE_FONT = ("Arial", 18)
+SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
+TEXT_FONT = ("Arial", 10)
 
 
 class FormParentAED:
@@ -37,21 +38,22 @@ class FormChildAED:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
+        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
         # Components for List FRM
-        lbl_available = Label(self.frm_child_list, text='Available ' + self.title.lower() + 's')
+        '''lbl_available = Label(self.frm_child_list, text= self.title + 's')
         lbl_available.config(fg="#222cb3", font=SUBTITLE_FONT)
-        lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)
-        self.trv_available = ttk.Treeview(self.frm_child_list, height=20, columns=('Name', 'Surname'))
+        lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)'''
+        self.trv_available = Treeview(self.frm_child_list, height=20, columns=('Name', 'Surname'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Surname', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
-        self.trv_available.grid(row=2, column=1, columnspan=5, rowspan=10, sticky=W, padx=100)
+        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=100, pady=100)
         Button(self.frm_child_list, text='New', command=self.click_new).grid(row=2, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
@@ -129,6 +131,7 @@ class FormChildAED:
     def click_new(self):
         self.decide = True
         self.frm_child_list.grid_forget()
+        self.frm_child_crud['text'] = 'New ' + self.title.lower()
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
@@ -137,6 +140,7 @@ class FormChildAED:
             self.id_selected = item['text']
             self.decide = False
             self.frm_child_list.grid_forget()
+            self.frm_child_crud['text'] = 'Update ' + self.title.lower()
             self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
             if self.title == 'Experimenter':
                 msg = Message(action=20, information=[int(self.id_selected)])

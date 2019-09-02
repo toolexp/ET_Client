@@ -1,11 +1,12 @@
-from tkinter import ttk
-from tkinter import *
-from Modules.Config.Message import Message
+from tkinter import Label, LabelFrame, Text, Button, IntVar, Checkbutton
+from tkinter.constants import *
+from tkinter.ttk import Treeview
+from Modules.Config.Data import Message
 
-TITLE_FONT = ("Arial", 14, "bold")
-SUBTITLE_FONT = ("Arial", 12, "bold")
-ERROR_FONT = ("Arial", 10, "italic")
+TITLE_FONT = ("Arial", 18)
+SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
+TEXT_FONT = ("Arial", 10)
 
 
 class FormParentProblem:
@@ -41,10 +42,10 @@ class FormChildProblem:
 
     def initialize_components(self):
         # Components for List FRM
-        lbl_available = Label(self.frm_child_list, text='Available problems')
+        lbl_available = Label(self.frm_child_list, text='Design problems')
         lbl_available.config(fg="#222cb3", font=SUBTITLE_FONT)
         lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)
-        self.trv_available = ttk.Treeview(self.frm_child_list, height=20, columns=('Name', 'Description'))
+        self.trv_available = Treeview(self.frm_child_list, height=20, columns=('Name', 'Description'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
@@ -55,9 +56,6 @@ class FormChildProblem:
         Button(self.frm_child_list, text='New', command=self.click_new).grid(row=2, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
-        self.lbl_mensaje = Label(self.frm_child_list, text='')
-        self.lbl_mensaje.config(fg="red", font=ERROR_FONT)
-        self.lbl_mensaje.grid(row=0, column=5, columnspan=4, rowspan=2)
 
         # Components for CRUD_SOL FRM
         frm_aux1 = LabelFrame(self.frm_child_crud_sol, text='Problem')
@@ -90,9 +88,6 @@ class FormChildProblem:
         self.check_diagram.grid(sticky=W)
         Button(self.frm_child_crud_sol, text='Next', command=self.click_next1).grid(row=4, column=5, padx=35)
         Button(self.frm_child_crud_sol, text='Cancel', command=self.click_cancel).grid(row=5, column=5, padx=35)
-        self.lbl_mensaje_crud_sol = Label(self.frm_child_crud_sol, text='')
-        self.lbl_mensaje_crud_sol.config(fg="red", font=ERROR_FONT)
-        self.lbl_mensaje_crud_sol.grid(row=0, column=0, pady=5, sticky=W)
         frm_aux1.grid(row=1, column=0, pady=10, padx=10, columnspan=5,rowspan=5)
         frm_aux2.grid(row=8, column=0, pady=10, columnspan=5, rowspan=10)
 

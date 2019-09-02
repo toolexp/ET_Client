@@ -1,11 +1,11 @@
 from tkinter import ttk
 from tkinter import *
-from Modules.Config.Message import Message
+from Modules.Config.Data import Message
 
-TITLE_FONT = ("Arial", 14, "bold")
-SUBTITLE_FONT = ("Arial", 12, "bold")
-ERROR_FONT = ("Arial", 10, "italic")
+TITLE_FONT = ("Arial", 18)
+SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
+TEXT_FONT = ("Arial", 10)
 
 
 class FormParentExSC:
@@ -66,9 +66,6 @@ class FormChildExSC:
         Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
         #Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
         Button(self.frm_child_list, text='View', command=self.click_view).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
-        self.lbl_mensaje = Label(self.frm_child_list, text='')
-        self.lbl_mensaje.config(fg="red", font=ERROR_FONT)
-        self.lbl_mensaje.grid(row=0, column=5, columnspan=4, rowspan=2)
 
         # Components for General info FRM
         lbl_name = Label(self.frm_child_general, text='Name')
@@ -117,9 +114,6 @@ class FormChildExSC:
         Button(frm_aux2, text='Remove', command=self.click_remove).grid(row=5, column=1)
         Button(self.frm_child_crud, text='Save', command=self.click_save).grid(row=4, column=5, padx=25)
         Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=5, column=5, padx=25)
-        self.lbl_mensaje_crud = Label(self.frm_child_crud, text='')
-        self.lbl_mensaje_crud.config(fg="red", font=ERROR_FONT)
-        self.lbl_mensaje_crud.grid(row=0, column=3, pady=10, sticky=SE)
         frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5,rowspan=5)
         frm_aux2.grid(row=8, column=0, columnspan=5, rowspan=10)
 

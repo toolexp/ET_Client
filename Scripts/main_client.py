@@ -1,5 +1,5 @@
 
-from Modules.Config.Message import Message
+from Modules.Config.Data import Message
 from Modules.Config.Connection import Connection
 
 HOST = '127.0.0.1'  # The server's hostname or IP address
