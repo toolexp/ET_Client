@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Entry, Button
+from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox
 from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message
@@ -43,10 +43,7 @@ class FormChildAED:
 
     def initialize_components(self):
         # Components for List FRM
-        '''lbl_available = Label(self.frm_child_list, text= self.title + 's')
-        lbl_available.config(fg="#222cb3", font=SUBTITLE_FONT)
-        lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)'''
-        self.trv_available = Treeview(self.frm_child_list, height=20, columns=('Name', 'Surname'))
+        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Surname'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Surname', anchor=CENTER)
@@ -54,9 +51,9 @@ class FormChildAED:
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=100, pady=100)
-        Button(self.frm_child_list, text='New', command=self.click_new).grid(row=2, column=7, columnspan=2, padx=25, sticky=W)
-        Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
-        Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
+        Button(self.frm_child_list, text='New', command=self.click_new).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
+        Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
+        Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=5, column=7, columnspan=2, padx=25, sticky=W)
 
         # Components for CRUD FRM
         frm_aux = Frame(self.frm_child_crud)
@@ -164,45 +161,49 @@ class FormChildAED:
 
     def click_save(self):
         if self.validate_fields():
-            name_aux = self.txt_name.get()
-            surname_aux = self.txt_surname.get()
-            email_aux = self.txt_email.get()
-            passwd_aux = self.txt_passwd.get()
-            if self.decide:
-                if self.title == 'Experimenter':
-                    msg = Message(action=16, information=[name_aux, surname_aux, email_aux, passwd_aux])
-                elif self.title == 'Designer':
-                    msg = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
-                elif self.title == 'Administrator':
-                    msg = Message(action=11, information=[name_aux, surname_aux, email_aux, passwd_aux])
+            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
+            if decision:
+                name_aux = self.txt_name.get()
+                surname_aux = self.txt_surname.get()
+                email_aux = self.txt_email.get()
+                passwd_aux = self.txt_passwd.get()
+                if self.decide:
+                    if self.title == 'Experimenter':
+                        msg = Message(action=16, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                    elif self.title == 'Designer':
+                        msg = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                    elif self.title == 'Administrator':
+                        msg = Message(action=11, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                    else:
+                        msg = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
                 else:
-                    msg = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
-            else:
-                if self.title == 'Experimenter':
-                    msg = Message(action=18, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
-                elif self.title == 'Designer':
-                    msg = Message(action=23, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
-                elif self.title == 'Administrator':
-                    msg = Message(action=13, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
-                else:
-                    msg = Message(action=23, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
+                    if self.title == 'Experimenter':
+                        msg = Message(action=18, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
+                    elif self.title == 'Designer':
+                        msg = Message(action=23, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
+                    elif self.title == 'Administrator':
+                        msg = Message(action=13, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
+                    else:
+                        msg = Message(action=23, information=[int(self.id_selected), name_aux, surname_aux, email_aux, passwd_aux])
+                self.txt_name.delete(0, END)
+                self.txt_surname.delete(0, END)
+                self.txt_email.delete(0, END)
+                self.txt_passwd.delete(0, END)
+                self.connection.create_message(msg)
+                self.connection.send_message()
+                self.connection.receive_message()
+                self.frm_child_crud.grid_forget()
+                self.show_frm()
+
+    def click_cancel(self):
+        decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
+        if decision:
             self.txt_name.delete(0, END)
             self.txt_surname.delete(0, END)
             self.txt_email.delete(0, END)
             self.txt_passwd.delete(0, END)
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.receive_message()
             self.frm_child_crud.grid_forget()
             self.show_frm()
-
-    def click_cancel(self):
-        self.txt_name.delete(0, END)
-        self.txt_surname.delete(0, END)
-        self.txt_email.delete(0, END)
-        self.txt_passwd.delete(0, END)
-        self.frm_child_crud.grid_forget()
-        self.show_frm()
 
     def validate_fields(self):
         if len(self.txt_name.get()) != 0 and len(self.txt_surname.get()) != 0 and len(self.txt_email.get()) != 0 and len(self.txt_passwd.get()) != 0:
