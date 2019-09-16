@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, Entry, messagebox
+from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage
 from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message
@@ -32,14 +32,26 @@ class FormParentDG:
 class FormChildDG:
     def __init__(self, frm_parent, connection):
         self.connection = connection
+        self.directive = Message()
         self.decide = True
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
+        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
         # Components for List FRM
+        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
+        frm_aux4 = Frame(self.frm_child_list)
+        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
+                                                                                 sticky=E)
+        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
+                                                                                 sticky=E)
+        frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', '# members'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -49,10 +61,7 @@ class FormChildDG:
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.column('#3', width=100, minwidth=100, stretch=NO)
-        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=100, pady=100)
-        Button(self.frm_child_list, text='New', command=self.click_new).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
-        Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
-        Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=5, column=7, columnspan=2, padx=25, sticky=W)
+        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=50, pady=25)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
@@ -63,7 +72,7 @@ class FormChildDG:
         lbl_description = Label(frm_aux1, text='Description')
         lbl_description.config(fg="#222cb3", font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=NW)
-        self.txt_name = Entry(frm_aux1)
+        self.txt_name = Text(frm_aux1, height=1, width=60, font=TEXT_FONT)
         self.txt_name.grid(row=0, column=1, padx=50, sticky=W)
         self.txt_description = Text(frm_aux1, height=6, width=60, font=TEXT_FONT)
         self.txt_description.grid(row=1, column=1, padx=50, sticky=W)
@@ -77,7 +86,7 @@ class FormChildDG:
         self.trv_available_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_designers.heading('#1', text='Name', anchor=CENTER)
         self.trv_available_designers.heading('#2', text='Surname', anchor=CENTER)
-        self.trv_available_designers.column('#0', width=20, minwidth=20, stretch=NO)
+        self.trv_available_designers.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_available_designers.column('#1', width=100, minwidth=100, stretch=NO)
         self.trv_available_designers.column('#2', width=150, minwidth=150, stretch=NO)
         self.trv_available_designers.bind("<Button-1>", self.click_trv_adesigners)
@@ -86,7 +95,7 @@ class FormChildDG:
         self.trv_selected_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_designers.heading('#1', text='Name', anchor=CENTER)
         self.trv_selected_designers.heading('#2', text='Surname', anchor=CENTER)
-        self.trv_selected_designers.column('#0', width=20, minwidth=20, stretch=NO)
+        self.trv_selected_designers.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_selected_designers.column('#1', width=100, minwidth=100, stretch=NO)
         self.trv_selected_designers.column('#2', width=150, minwidth=150, stretch=NO)
         self.trv_selected_designers.bind("<Button-1>", self.click_trv_sdesigners)
@@ -102,12 +111,10 @@ class FormChildDG:
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
-        msg = Message(action=27, information=[])
-        self.connection.create_message(msg)
-        self.connection.send_message()
-        self.connection.receive_message()
-        for i in range(0, len(self.connection.message.information)):
-            elements = self.connection.message.information[i].split('¥')
+        self.directive = Message(action=27, information=[])
+        self.connection = self.directive.send_directive(self.connection)
+        for item in self.connection.message.information:
+            elements = item.split('¥')
             self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2], elements[3]))
 
     def show_frm(self):
@@ -115,54 +122,50 @@ class FormChildDG:
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
+        self.clear_fields()
         self.frm_child_list.grid_forget()
         self.frm_child_crud.grid_forget()
 
     def click_delete(self):
-        if  self.trv_available.item(self.trv_available.selection())['text'] != '':
-            item = self.trv_available.item(self.trv_available.selection())
-            self.id_selected = item['text']
-            msg = Message(action=29, information=[int(self.id_selected)])
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.receive_message()
-            self.retrieve_list()
+        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+            decision = messagebox.askyesno(title='Confirmation',
+                                           message='Are you sure you want to delete the item?')
+            if decision:
+                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                self.directive = Message(action=29, information=[self.id_selected])
+                self.connection = self.directive.send_directive(self.connection)
+                self.retrieve_list()
+        else:
+            messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_new(self):
         self.decide = True
-        self.frm_child_list.grid_forget()
-        self.txt_name.delete(0, END)
-        self.txt_description.delete('1.0', 'end-1c')
-        msg = Message(action=22, information=[])
-        self.connection.create_message(msg)
-        self.connection.send_message()
-        self.connection.receive_message()
+        self.directive = Message(action=22, information=[])
+        self.connection = self.directive.send_directive(self.connection)
         a_designers = self.connection.message.information
         self.retrieve_designers([], a_designers)
+        self.frm_child_list.grid_forget()
+        self.frm_child_crud['text'] = 'New designers group'
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            item = self.trv_available.item(self.trv_available.selection())
-            self.id_selected = item['text']
             self.decide = False
-            self.frm_child_list.grid_forget()
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-            msg = Message(action=30, information=[int(self.id_selected)])
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.receive_message()
-            self.txt_name.delete(0, END)
-            self.txt_name.insert(0, self.connection.message.information[0])
-            self.txt_description.delete('1.0', 'end-1c')
+            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            self.directive = Message(action=30, information=[self.id_selected])
+            self.connection = self.directive.send_directive(self.connection)
+            self.txt_name.insert('1.0', self.connection.message.information[0])
             self.txt_description.insert('1.0', self.connection.message.information[1])
             s_designers = self.connection.message.information[2]
-            msg = Message(action=22, information=[])
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.receive_message()
+            self.directive = Message(action=22, information=[])
+            self.connection = self.directive.send_directive(self.connection)
             a_designers = self.connection.message.information
             self.retrieve_designers(s_designers, a_designers)
+            self.frm_child_list.grid_forget()
+            self.frm_child_crud['text'] = 'Update designers group'
+            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        else:
+            messagebox.showwarning(title='No selection', message='You must select an item')
 
     def retrieve_designers(self, s_designers, a_designers):
         for item in self.trv_available_designers.get_children():
@@ -172,11 +175,11 @@ class FormChildDG:
         for item in s_designers:
             if item in a_designers:
                 a_designers.remove(item)
-        for i in range(0, len(a_designers)):
-            elements = a_designers[i].split('¥')
+        for item in a_designers:
+            elements = item.split('¥')
             self.trv_available_designers.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
-        for i in range(0, len(s_designers)):
-            elements = s_designers[i].split('¥')
+        for item in s_designers:
+            elements = item.split('¥')
             self.trv_selected_designers.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
 
     def click_add(self):
@@ -203,35 +206,40 @@ class FormChildDG:
         if self.validate_fields():
             decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
             if decision:
-                name_aux = self.txt_name.get()
+                name_aux = self.txt_name.get('1.0', 'end-1c')
                 description_aux = self.txt_description.get('1.0', 'end-1c')
                 if self.decide:
-                    msg = Message(action=26, information=[name_aux, description_aux, []])
+                    self.directive = Message(action=26, information=[name_aux, description_aux, []])
                     for item in self.trv_selected_designers.get_children():
-                        msg.information[2].append(int(self.trv_selected_designers.item(item)['text']))
+                        self.directive.information[2].append(int(self.trv_selected_designers.item(item)['text']))
                 else:
-                    msg = Message(action=28, information=[int(self.id_selected), name_aux, description_aux, []])
+                    self.directive = Message(action=28, information=[self.id_selected, name_aux, description_aux, []])
                     for item in self.trv_selected_designers.get_children():
-                        msg.information[3].append(int(self.trv_selected_designers.item(item)['text']))
-                self.connection.create_message(msg)
-                self.connection.send_message()
-                self.connection.receive_message()
+                        self.directive.information[3].append(int(self.trv_selected_designers.item(item)['text']))
+                self.connection = self.directive.send_directive(self.connection)
+                self.clear_fields()
                 self.frm_child_crud.grid_forget()
                 self.show_frm()
+        else:
+            messagebox.showwarning(title='Missing information',
+                                   message='There are mandatory fields that need to be filled!')
 
     def click_cancel(self):
         decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
         if decision:
-            self.txt_name.delete(0, END)
-            self.txt_description.delete('1.0', 'end-1c')
+            self.clear_fields()
             self.frm_child_crud.grid_forget()
             self.show_frm()
 
     def validate_fields(self):
-        if len(self.txt_name.get()) != 0 and len(self.txt_description.get('1.0', 'end-1c')) != 0:
+        if len(self.txt_name.get('1.0', 'end-1c')) != 0 and len(self.txt_description.get('1.0', 'end-1c')) != 0:
             if len(self.trv_selected_designers.get_children()) != 0:
                 return True
             else:
                 return False
         else:
             return False
+
+    def clear_fields(self):
+        self.txt_name.delete('1.0', 'end-1c')
+        self.txt_description.delete('1.0', 'end-1c')

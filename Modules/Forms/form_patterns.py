@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox
+from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Notebook, Combobox, Style
 from Modules.Config.Data import *
@@ -52,13 +52,21 @@ class FormChildPattern:
         self.style.layout('TNotebook.Tab', [])  # turn off tabs
         defaultbg = self.frm_child_crud.cget('bg')
         # Components for List FRM
+        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
+        frm_aux4 = Frame(self.frm_child_list)
+        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10,padx=10, sticky=E)
+        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10,padx=10, sticky=E)
+        frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns='Pattern')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Pattern', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_pattern_summary)
-        self.trv_available.grid(row=1, column=1, columnspan=10, rowspan=10, sticky=W, padx=100, pady=25)
+        self.trv_available.grid(row=1, column=1, columnspan=10, rowspan=20, sticky=W, padx=50, pady=25)
         self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Content'), selectmode='none')
         self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_list_summary.heading('#1', text='Section', anchor=CENTER)
@@ -66,34 +74,29 @@ class FormChildPattern:
         self.trv_list_summary.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_list_summary.column('#1', width=100, minwidth=100, stretch=NO)
         self.trv_list_summary.column('#2', width=400, minwidth=400, stretch=NO)
-        #self.trv_list_summary.config(state=DISABLED)
-        self.trv_list_summary.grid(row=1, column=11, columnspan=5, rowspan=10, sticky=W, padx=100, pady=100)
-        Button(self.frm_child_list, text='New', command=self.click_new).grid(row=11, column=4, pady=25, padx=25, sticky=E)
-        Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=11, column=5, pady=25,padx=25, sticky=E)
-        Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=11, column=6, pady=25,padx=25, sticky=E)
+        self.trv_list_summary.grid(row=1, column=11, columnspan=5, rowspan=20, sticky=W, padx=50, pady=100)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
 
-        lbl_template = Label(frm_aux1, text='Select template')
+        lbl_template = Label(frm_aux1, text='Select a template')
         lbl_template.config(fg="#222cb3", font=LABEL_FONT)
         lbl_template.grid(pady=10, padx=10, sticky=W)
 
-        self.cbx_template = Combobox(frm_aux1, state="readonly", width=100)
+        self.cbx_template = Combobox(frm_aux1, state="readonly", width=125)
         self.cbx_template.config(font=TEXT_FONT)
-        self.cbx_template.grid(columnspan=2, pady=10, padx=10, sticky=W)
+        self.cbx_template.grid(row=0, column=1, columnspan=3, pady=10, padx=10, sticky=W)
         self.cbx_template.bind("<<ComboboxSelected>>", self.cbx_template_selected)
 
-        Button(frm_aux1, text='Save', command=self.click_save).grid(row=0, column=2, padx=30)
-        Button(frm_aux1, text='Cancel', command=self.click_cancel).grid(row=1, column=2, padx=30)
+        Button(frm_aux1, text='Save', command=self.click_save).grid(row=0, column=4, padx=30)
+        Button(frm_aux1, text='Cancel', command=self.click_cancel).grid(row=1, column=4, padx=30)
 
 
-        self.frm_aux2 = LabelFrame(self.frm_child_crud, text='Pattern content')
-        self.frm_aux2.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_aux2 = Frame(self.frm_child_crud)
 
-        lbl_section = Label(self.frm_aux2, text='Select section')
+        lbl_section = Label(self.frm_aux2, text='Select a section')
         lbl_section.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_section.grid(pady=10, padx=10, sticky=W)
+        lbl_section.grid(pady=10, padx=10, sticky=NW)
 
         self.trv_summary = Treeview(self.frm_aux2, height=6, columns=('Section', 'Mandatory', 'Completed'))
         self.trv_summary.heading('#0', text='ID', anchor=CENTER)
@@ -105,19 +108,19 @@ class FormChildPattern:
         self.trv_summary.column('#2', width=80, minwidth=80, stretch=NO, anchor=CENTER)
         self.trv_summary.column('#3', width=80, minwidth=80, stretch=NO, anchor=CENTER)
         self.trv_summary.bind("<ButtonRelease-1>", self.trv_section_selected)
-        self.trv_summary.grid(rowspan=3, sticky=W, padx=10)
+        self.trv_summary.grid(row=0, column=1, rowspan=3, sticky=W, padx=10)
 
         lbl_desc_section = Label(self.frm_aux2, text='Description')
         lbl_desc_section.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_desc_section.grid(row=0, column=1, pady=10, padx=50, sticky=W)
+        lbl_desc_section.grid(row=0, column=2, pady=10, padx=50, sticky=NE)
 
         self.txt_desc_section = Text(self.frm_aux2, height=4, width=65)
         self.txt_desc_section.config(background=defaultbg, font=TEXT_FONT)
-        self.txt_desc_section.grid(row=1, column=1, pady=10, padx=50, sticky=W)
+        self.txt_desc_section.grid(row=0, column=3, pady=10, padx=20, sticky=W)
 
         lbl_section = Label(self.frm_aux2, text='Content')
         lbl_section.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_section.grid(row=2, column=1, pady=10, padx=50, sticky=W)
+        lbl_section.grid(row=1, column=2, pady=10, padx=50, sticky=NE)
 
         self.tab_control = Notebook(self.frm_aux2)
         tab_desc = Frame(self.tab_control)
@@ -148,12 +151,12 @@ class FormChildPattern:
         self.cbx_category.grid(row=1, column=0, pady=20, padx=20, sticky=W)
         self.cbx_category.bind("<<ComboboxSelected>>", self.cbx_category_selected)
 
-        self.tab_control.grid(row=3, column=1, padx=50, pady=10, sticky=W)
+        self.tab_control.grid(row=1, column=3, padx=20, pady=10, sticky=W)
         self.tab_control.tab(0, state='disabled')
         self.tab_control.tab(1, state='disabled')
         self.tab_control.tab(2, state='disabled')
-        frm_aux1.grid(row=1, column=0, pady=20, padx=10, columnspan=3, rowspan=3)
-        self.frm_aux2.grid(row=5, column=0, pady=10, padx=10, columnspan=3, rowspan=10)
+        frm_aux1.grid(row=1, column=0, pady=20, padx=10, columnspan=4, rowspan=3, sticky=E)
+        self.frm_aux2.grid(row=5, column=0, pady=10, padx=10, columnspan=3, rowspan=10, sticky=E)
 
     def initialize_variables(self):
         """
@@ -167,7 +170,7 @@ class FormChildPattern:
     def get_patterns(self):
         """
         Method that retrieve available patterns, contents and categories, so they can be showed in the initial list and
-        in the summary box, and also can be managed in the
+        in the summary box, and also can be managed
         """
         self.initialize_variables()
         # Retrieve list of templates from DB
@@ -180,36 +183,7 @@ class FormChildPattern:
             self.templates.append(template_aux)
 
         # Retrieve list of patterns from DB
-        self.directive = Message(action=42, information=[])
-        self.connection = self.directive.send_directive(self.connection)
-        patterns_db = self.connection.message.information
-        # Retrieving content of each pattern form DB
-        self.patterns = []
-        for item in patterns_db:
-            id_pattern = item.split('¥')[0]
-            id_template = item.split('¥')[1]
-            self.directive = Message(action=40, information=[int(id_template)])
-            self.connection = self.directive.send_directive(self.connection)
-            template_aux = Template(int(id_template), self.connection.message.information[0],
-                                    self.connection.message.information[1])
-            self.directive = Message(action=77, information=[template_aux.id])
-            self.connection = self.directive.send_directive(self.connection)
-            sections = self.connection.message.information
-            current_sections = []
-            for item2 in sections:
-                elements = item2.split('¥')
-                self.directive = Message(action=47, information=[int(id_pattern), int(elements[0])])
-                self.connection = self.directive.send_directive(self.connection)
-                elements_content = self.connection.message.information[0].split('¥')
-                section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]),
-                                      section_id=int(elements[2]), name=elements[3], description=elements[4],
-                                      data_type=elements[5], position=int(elements[6]), mandatory=elements[7],
-                                      classification_id=elements[8], pattern_section_id=int(elements_content[0]),
-                                      diagram_id=elements_content[4], category_id=elements_content[5],
-                                      content=elements_content[1])
-                current_sections.append(section_aux)
-            pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections)
-            self.patterns.append(pattern_aux)
+        self.patterns = Pattern.get_available_patterns(self.connection)
 
     def retrieve_list(self):
         """
@@ -278,10 +252,15 @@ class FormChildPattern:
         Method that removes a selected pattern from the initial list (changes are updated in DB)
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.directive = Message(action=44, information=[id_selected])
-            self.connection = self.directive.send_directive(self.connection)
-            self.go_back_form()
+            decision = messagebox.askyesno(title='Confirmation',
+                                           message='Are you sure you want to delete the item?')
+            if decision:
+                id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                self.directive = Message(action=44, information=[id_selected])
+                self.connection = self.directive.send_directive(self.connection)
+                self.go_back_form()
+        else:
+            messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_new(self):
         """
@@ -332,6 +311,8 @@ class FormChildPattern:
             self.set_trv_summary(self.new_pattern.sections)
             self.frm_child_crud['text'] = 'Update Pattern'
             self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        else:
+            messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_save(self):
         if self.new_pattern is not None and self.selected_section is not None:

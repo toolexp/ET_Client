@@ -1,5 +1,11 @@
-from tkinter import ttk
-from tkinter import *
+from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage
+from tkinter.constants import *
+from tkinter.ttk import Treeview, Notebook, Combobox, Style
+from Modules.Config.Data import *
+from PIL import Image, ImageTk
+import os
+import shutil
+
 from Modules.Config.Data import Message
 
 TITLE_FONT = ("Arial", 18)
@@ -34,23 +40,34 @@ class FormChildExSC:
         self.decide = True
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
+        self.frm_child_list.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_general = LabelFrame(frm_parent)
+        self.frm_child_general.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_problem = LabelFrame(frm_parent)
-        self.frm_child_solution = LabelFrame(frm_parent)
-        self.frm_child_sol_patterns = LabelFrame(frm_parent)
-        self.frm_child_sol_diagram = LabelFrame(frm_parent)
+        self.frm_child_problem.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_control_g = LabelFrame(frm_parent)
+        self.frm_child_control_g.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_experimental_g = LabelFrame(frm_parent)
+        self.frm_child_experimental_g.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_sc_component_summary = LabelFrame(frm_parent)
+        self.frm_child_sc_component_summary.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_experimental_sc_summary = LabelFrame(frm_parent)
+        self.frm_child_experimental_sc_summary.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
         # Components for List FRM
-        lbl_available = Label(self.frm_child_list, text='Experimental scenarios')
-        lbl_available.config(fg="#222cb3", font=SUBTITLE_FONT)
-        lbl_available.grid(row=0, column=1, columnspan=4, rowspan=2, sticky=NW+SW, pady=50, padx=100)
-        self.trv_available = ttk.Treeview(self.frm_child_list, height=20, columns=('Name', 'Description', 'Active', 'Available'))
+        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
+        frm_aux4 = Frame(self.frm_child_list)
+        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
+                                                                                 sticky=E)
+        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
+                                                                                 sticky=E)
+        frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
+        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', 'Active', 'Available'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
@@ -60,62 +77,54 @@ class FormChildExSC:
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.column('#3', width=100, minwidth=100, stretch=NO)
-        self.trv_available.column('#4', width=50, minwidth=50, stretch=NO)
-        self.trv_available.grid(row=2, column=1, columnspan=5, rowspan=10, sticky=W, padx=100)
-        Button(self.frm_child_list, text='New', command=self.click_new).grid(row=2, column=7, columnspan=2, padx=25, sticky=W)
-        Button(self.frm_child_list, text='Delete', command=self.click_delete).grid(row=3, column=7, columnspan=2, padx=25, sticky=W)
-        #Button(self.frm_child_list, text='Update', command=self.click_update).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
-        Button(self.frm_child_list, text='View', command=self.click_view).grid(row=4, column=7, columnspan=2, padx=25, sticky=W)
+        self.trv_available.column('#4', width=100, minwidth=100, stretch=NO)
+        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=50, pady=25)
 
         # Components for General info FRM
         lbl_name = Label(self.frm_child_general, text='Name')
         lbl_name.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=100, sticky=W)
+        lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(self.frm_child_general, text='Description')
         lbl_description.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_description.grid(rowspan=5,pady=10, padx=100, sticky=NW)
+        lbl_description.grid(pady=10, padx=50, sticky=NW)
         lbl_access = Label(self.frm_child_general, text='Access code')
         lbl_access.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_access.grid(pady=10, padx=100, sticky=W)
+        lbl_access.grid(row=11, column=0,pady=10, padx=50, sticky=W)
         lbl_start = Label(self.frm_child_general, text='Start time')
         lbl_start.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_start.grid(pady=10, padx=100, sticky=W)
-        self.txt_name = Text(self.frm_child_general, width=400)
-        self.txt_name.grid(row=0, column=1, padx=100, columnspan=4)
-        self.txt_description = Text(self.frm_child_general, height=100, width=400)
-        self.txt_description.grid(row=1, column=1, padx=100, columnspan=4, rowspan=5)
-        self.txt_members = Entry(frm_aux1)
-        self.txt_members.grid(row=2, column=1, padx=100)
-        lbl_available_d = Label(frm_aux2, text='Available designers')
-        lbl_available_d.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
-        lbl_selected_d = Label(frm_aux2, text='Selected designers')
-        lbl_selected_d.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_selected_d.grid(row=0, column=2, pady=10, sticky=W)
-        self.trv_available_designers = ttk.Treeview(frm_aux2, height=15, columns=('Name', 'Surname'))
-        self.trv_available_designers.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available_designers.heading('#1', text='Name', anchor=CENTER)
-        self.trv_available_designers.heading('#2', text='Surname', anchor=CENTER)
-        self.trv_available_designers.column('#0', width=20, minwidth=20, stretch=NO)
-        self.trv_available_designers.column('#1', width=100, minwidth=100, stretch=NO)
-        self.trv_available_designers.column('#2', width=150, minwidth=150, stretch=NO)
-        self.trv_available_designers.bind("<Button-1>", self.click_trv_adesigners)
-        self.trv_available_designers.grid(row=1, column=0, rowspan=10, sticky=W, padx=10)
-        self.trv_selected_designers = ttk.Treeview(frm_aux2, height=15, columns=('Name', 'Surname'))
-        self.trv_selected_designers.heading('#0', text='ID', anchor=CENTER)
-        self.trv_selected_designers.heading('#1', text='Name', anchor=CENTER)
-        self.trv_selected_designers.heading('#2', text='Surname', anchor=CENTER)
-        self.trv_selected_designers.column('#0', width=20, minwidth=20, stretch=NO)
-        self.trv_selected_designers.column('#1', width=100, minwidth=100, stretch=NO)
-        self.trv_selected_designers.column('#2', width=150, minwidth=150, stretch=NO)
-        self.trv_selected_designers.bind("<Button-1>", self.click_trv_sdesigners)
-        self.trv_selected_designers.grid(row=1, column=2, rowspan=10, sticky=W, padx=10)
-        Button(frm_aux2, text='Add', command=self.click_add).grid(row=4, column=1)
-        Button(frm_aux2, text='Remove', command=self.click_remove).grid(row=5, column=1)
-        Button(self.frm_child_crud, text='Save', command=self.click_save).grid(row=4, column=5, padx=25)
-        Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=5, column=5, padx=25)
-        frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5,rowspan=5)
-        frm_aux2.grid(row=8, column=0, columnspan=5, rowspan=10)
+        lbl_start.grid(row=12, column=0,pady=10, padx=50, sticky=W)
+        lbl_end = Label(self.frm_child_general, text='End time')
+        lbl_end.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_end.grid(row=13, column=0, pady=10, padx=50, sticky=W)
+        self.txt_name = Text(self.frm_child_general, height=1, width=80)
+        self.txt_name.config(font=TEXT_FONT)
+        self.txt_name.grid(row=0, column=1, padx=50, pady=10, columnspan=8)
+        self.txt_description = Text(self.frm_child_general, height=10, width=80)
+        self.txt_description.config(font=TEXT_FONT)
+        self.txt_description.grid(row=1, column=1, padx=50, pady=10, columnspan=8, rowspan=10)
+        self.txt_access_code = Text(self.frm_child_general, height=1, width=80)
+        self.txt_access_code.config(font=TEXT_FONT)
+        self.txt_access_code.grid(row=11, column=1, padx=50, pady=10, columnspan=8)
+        frm_aux1 = Frame(self.frm_child_general)
+        self.cbx_start_hour = Combobox(frm_aux1, state="readonly", width=10)
+        self.cbx_start_hour.config(font=TEXT_FONT)
+        self.cbx_start_hour.grid(pady=10, padx=10, sticky=W)
+        lbl_separator = Label(frm_aux1, text=':')
+        lbl_separator.config(fg="#222cb3", font=TEXT_FONT)
+        lbl_separator.grid(row=0, column=1, pady=10, padx=10, sticky=W)
+        self.cbx_start_minute = Combobox(frm_aux1, state="readonly", width=10)
+        self.cbx_start_minute.config(font=TEXT_FONT)
+        self.cbx_start_minute.grid(row=0, column=2, pady=10, padx=10, sticky=W)
+        self.cbx_end_hour = Combobox(frm_aux1, state="readonly", width=10)
+        self.cbx_end_hour.config(font=TEXT_FONT)
+        self.cbx_end_hour.grid(row=1, column=0, padx=10, pady=10, sticky=W)
+        lbl_separator2 = Label(frm_aux1, text=':')
+        lbl_separator2.config(fg="#222cb3", font=TEXT_FONT)
+        lbl_separator2.grid(row=1, column=1, pady=10, padx=10, sticky=W)
+        self.cbx_end_minute = Combobox(frm_aux1, state="readonly", width=10)
+        self.cbx_end_minute.config(font=TEXT_FONT)
+        self.cbx_end_minute.grid(row=1, column=2, padx=10, pady=10, sticky=W)
+        frm_aux1.grid(row=12, column=1, padx=50, rowspan=2, sticky=W)
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -135,10 +144,15 @@ class FormChildExSC:
 
     def hide_frm(self):
         self.frm_child_list.grid_forget()
-        self.frm_child_crud.grid_forget()
+        self.frm_child_general.grid_forget()
+        self.frm_child_problem.grid_forget()
+        self.frm_child_control_g.grid_forget()
+        self.frm_child_experimental_g.grid_forget()
+        self.frm_child_sc_component_summary.grid_forget()
+        self.frm_child_experimental_sc_summary.grid_forget()
 
     def click_delete(self):
-        if self.trv_available.selection() != '':
+        """if self.trv_available.selection() != '':
             item = self.trv_available.item(self.trv_available.selection())
             self.id_selected = item['text']
             msg = Message(action=29, information=[int(self.id_selected)])
@@ -148,24 +162,19 @@ class FormChildExSC:
             self.lbl_mensaje['text'] = self.connection.message.comment
             self.retrieve_list()
         else:
-            self.lbl_mensaje['text'] = 'No register selected'
+            self.lbl_mensaje['text'] = 'No register selected'"""
+        pass
 
     def click_new(self):
         self.decide = True
         self.frm_child_list.grid_forget()
-        self.txt_name.delete(0, END)
-        self.txt_description.delete(0, END)
-        self.txt_members.delete(0, END)
-        msg = Message(action=22, information=[])
-        self.connection.create_message(msg)
-        self.connection.send_message()
-        self.connection.receive_message()
-        a_designers = self.connection.message.information
-        self.retrieve_designers([], a_designers)
-        self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        self.txt_name.focus_set()
+        self.title_form = 'New Experimental Scenario'
+        self.frm_child_general['text'] = self.title_form
+        self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
-        if self.trv_available.selection() != '':
+        """if self.trv_available.selection() != '':
             item = self.trv_available.item(self.trv_available.selection())
             self.id_selected = item['text']
             self.decide = False
@@ -189,11 +198,11 @@ class FormChildExSC:
             a_designers = self.connection.message.information
             self.retrieve_designers(s_designers, a_designers)
         else:
-            self.lbl_mensaje['text'] = 'No register selected'
+            self.lbl_mensaje['text'] = 'No register selected'"""
 
         pass
 
-    def retrieve_designers(self, s_designers, a_designers):
+    """def retrieve_designers(self, s_designers, a_designers):
         for item in self.trv_available_designers.get_children():
             self.trv_available_designers.delete(item)
         for item in self.trv_selected_designers.get_children():
@@ -270,4 +279,4 @@ class FormChildExSC:
             else:
                 return False
         else:
-            return False
+            return False"""
