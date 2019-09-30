@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage
 from tkinter.constants import *
 from tkinter.ttk import Treeview
-from Modules.Config.Data import Message
+from Modules.Config.Data import Message, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -41,16 +41,29 @@ class FormChildDG:
         self.initialize_components()
 
     def initialize_components(self):
+        """
+        Method that initialize the visual components for each form associated with the local administration
+        """
+        # Resources for the Forms
+        self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
+        self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+        self.add_icon = PhotoImage(file=r"./Resources/right.png")
+        self.delete_icon = PhotoImage(file=r"./Resources/left.png")
+
         # Components for List FRM
-        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
-        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
-        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
         frm_aux4 = Frame(self.frm_child_list)
-        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
-        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New designers group')
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete designers group')
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit designers group')
         frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', '# members'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
@@ -100,10 +113,18 @@ class FormChildDG:
         self.trv_selected_designers.column('#2', width=150, minwidth=150, stretch=NO)
         self.trv_selected_designers.bind("<Button-1>", self.click_trv_sdesigners)
         self.trv_selected_designers.grid(row=1, column=2, rowspan=10, sticky=W, padx=10)
-        Button(frm_aux2, text='Add', command=self.click_add).grid(row=4, column=1)
-        Button(frm_aux2, text='Remove', command=self.click_remove).grid(row=5, column=1)
-        Button(self.frm_child_crud, text='Save', command=self.click_save).grid(row=4, column=5, padx=25)
-        Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=5, column=5, padx=25)
+        btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
+        btn_add.grid(row=4, column=1)
+        btn_add_ttp = CreateToolTip(btn_add, 'Add designer')
+        btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
+        btn_remove.grid(row=5, column=1)
+        btn_remove_ttp = CreateToolTip(btn_remove, 'Remove designer')
+        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=1, column=5, padx=25)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save designers group')
+        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=2, column=5, padx=25)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
         frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5, rowspan=5)
         frm_aux2.grid(row=8, column=0, pady=20, padx=40, columnspan=5, rowspan=10)
 

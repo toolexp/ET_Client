@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Frame
 from tkinter.constants import *
 from tkinter.ttk import Treeview
-from Modules.Config.Data import Message, Category
+from Modules.Config.Data import Message, Category, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -41,16 +41,27 @@ class FormChildClassification:
         self.initialize_components()
 
     def initialize_components(self):
+        """
+        Method that initialize the visual components for each form associated with the local administration
+        """
+        # Resources for the Forms
+        self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
+        self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+
         # Components for List FRM
-        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
-        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
-        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
         frm_aux4 = Frame(self.frm_child_list)
-        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
-        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New classification')
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete classification')
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit classification')
         frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', '# categories'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
@@ -77,9 +88,12 @@ class FormChildClassification:
         self.txt_name_class.grid(row=0, column=1, padx=10, pady=10, sticky=W)
         self.txt_categories = Text(self.frm_child_crud, height=10, width=50, font=TEXT_FONT)
         self.txt_categories.grid(row=2, column=1, padx=10, pady=10, sticky=W)
-        Button(self.frm_child_crud, text='Save', command=self.click_save).grid(row=0, column=3, padx=20)
-        Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=1, column=3, padx=20)
-        #self.frm_class.grid(row=1, column=0, pady=20, padx=10, columnspan=5, rowspan=10)
+        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=3, padx=20)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save classification')
+        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=1, column=3, padx=20)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
     def retrieve_list(self):
         # Remove existing elements in the list

@@ -1,4 +1,6 @@
 import textwrap
+from datetime import time
+from tkinter import Toplevel, Label
 
 
 class Message:
@@ -15,6 +17,13 @@ class Message:
         connection.send_message()
         connection.receive_message()
         return connection
+
+
+class DesignersGroup:
+    def __init__(self, id=0, name='', description=''):
+        self.id = id
+        self.name = name
+        self.description = description
 
 
 class Template:
@@ -72,8 +81,10 @@ class Pattern:
 
 
 class Section:
-    def __init__(self, temp_section_id=0, template_id=0, section_id=0, name='', description='', data_type='', position=0,
-                 mandatory='✓', classification_id=0, pattern_section_id=0, diagram_id=0, category_id=0, content='', file=None, category=None):
+    def __init__(self, temp_section_id=0, template_id=0, section_id=0, name='', description='', data_type='',
+                 position=0,
+                 mandatory='✓', classification_id=0, pattern_section_id=0, diagram_id=0, category_id=0, content='',
+                 file=None, category=None):
         self.temp_section_id = temp_section_id
         self.template_id = template_id
         self.section_id = section_id
@@ -139,11 +150,19 @@ class File:
 
 
 class Problem:
-    def __init__(self, id=0, name='', description='', solution=None):
+    def __init__(self, id=0, name='', description='', id_solution=None, connection=None):
         self.id = id
         self.name = name
         self.description = description
-        self.solution = solution
+        if id_solution is not None:
+            self.directive = Message(action=60, information=[id_solution])
+            self.connection = self.directive.send_directive(connection)
+            elements = self.connection.message.information
+            solution = Solution(id=id_solution, annotations=elements[0], patterns_id=elements[2],
+                                diagram_id=int(elements[1]))
+            self.solution = solution
+        else:
+            self.solution = id_solution
 
 
 class Solution:
@@ -154,6 +173,69 @@ class Solution:
         self.annotations = annotations
         self.patterns_id = patterns_id
         self.diagram_id = diagram_id
+
+
+class ExperimentalSC:
+    def __init__(self, id=0, name='', description='', access_code='', start_time=time(0, 0, 0), end_time=time(0, 0, 0),
+                 scenario_availability=True, scenario_lock=False, experiment=None, id_control_group=None,
+                 id_experimental_group=None):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.access_code = access_code
+        self.start_time = start_time
+        self.end_time = end_time
+        self.scenario_availability = scenario_availability
+        self.scenario_lock = scenario_lock
+        self.experiment = experiment
+        self.id_control_group = id_control_group
+        self.id_experimental_group = id_experimental_group
+
+
+class ScenarioComponent:
+    id_counter = 0
+
+    def __init__(self, id_problem=0, id_patterns_cgroup=None, id_patterns_egroup=None):
+        if id_patterns_egroup is None:
+            id_patterns_egroup = []
+        if id_patterns_cgroup is None:
+            id_patterns_cgroup = []
+        self.id_counter += 1
+        self.id = self.id_counter
+        self.id_problem = id_problem
+        self.id_patterns_egroup = id_patterns_egroup
+        self.id_patterns_cgroup = id_patterns_cgroup
+
+
+class CreateToolTip(object):
+    """
+    Create a tooltip for a given widget
+    """
+
+    def __init__(self, widget, text='widget info'):
+        self.widget = widget
+        self.text = text
+        self.widget.bind("<Enter>", self.enter)
+        self.widget.bind("<Leave>", self.close)
+
+    def enter(self, event=None):
+        x = y = 0
+        x, y, cx, cy = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 25
+        y += self.widget.winfo_rooty() + 20
+        # creates a toplevel window
+        self.tw = Toplevel(self.widget)
+        # Leaves only the label and removes the app window
+        self.tw.wm_overrideredirect(True)
+        self.tw.wm_geometry("+%d+%d" % (x, y))
+        label = Label(self.tw, text=self.text, justify='left',
+                      background='white', relief='solid', borderwidth=1,
+                      font=("arial", "8", "normal"))
+        label.pack(ipadx=1)
+
+    def close(self, event=None):
+        if self.tw:
+            self.tw.destroy()
 
 
 def wrap_text(string, lenght=90):

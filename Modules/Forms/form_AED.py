@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox, PhotoImage
 from tkinter.constants import *
 from tkinter.ttk import Treeview
-from Modules.Config.Data import Message
+from Modules.Config.Data import Message, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -43,16 +43,27 @@ class FormChildAED:
         self.initialize_components()
 
     def initialize_components(self):
-        # Components for List FRM
-        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
-        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
-        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
+        """
+        Method that initialize the visual components for each form associated with the local administration
+        """
+        # Resources for the Forms
+        self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
+        self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+
+        # Components for List Form
         frm_aux4 = Frame(self.frm_child_list)
-        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
-        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New ' + self.title.lower())
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete ' + self.title.lower())
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit ' + self.title.lower())
         frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Surname'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
@@ -85,14 +96,23 @@ class FormChildAED:
         self.txt_email.grid(row=2, column=1, padx=100)
         self.txt_passwd = Entry(frm_aux, show="*")
         self.txt_passwd.grid(row=3, column=1, padx=100)
-        Button(self.frm_child_crud, text='Save', command=self.click_save).grid(row=4, column=5, padx=20)
-        Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=5, column=5, padx=20)
+        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=1, column=5, padx=20)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save ' + self.title.lower())
+        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=2, column=5, padx=20)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
         frm_aux.grid(row=1, column=0, pady=20, padx=100, columnspan=5,rowspan=10)
 
     def retrieve_list(self):
+        """
+        Method that retrieve users information from the server and displays them in the TreeView from
+        the List Form
+        """
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
+        # Retrieve information from the server
         if self.title == 'Experimenter':
             self.directive = Message(action=17, information=[])
         elif self.title == 'Designer':
@@ -102,20 +122,30 @@ class FormChildAED:
         else:
             raise Exception('Error en recuperacion: tipo de usuario')
         self.connection = self.directive.send_directive(self.connection)
+        # Adding elements in the list
         for item in self.connection.message.information:
             elements = item.split('¥')
             self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2]))
 
     def show_frm(self):
+        """
+        Show the List form when the User administration is called
+        """
         self.retrieve_list()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
+        """
+        Hide the User administration Forms
+        """
         self.clear_fields()
         self.frm_child_list.grid_forget()
         self.frm_child_crud.grid_forget()
 
     def click_delete(self):
+        """
+        Method that removes a selected user from the initial list (changes are updated in DB)
+        """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             decision = messagebox.askyesno(title='Confirmation',
                                            message='Are you sure you want to delete the item?')
@@ -135,6 +165,9 @@ class FormChildAED:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_new(self):
+        """
+        Initialize CRUD Form for creating a new user.
+        """
         self.decide = True
         self.frm_child_list.grid_forget()
         self.txt_name.focus_set()
@@ -142,6 +175,9 @@ class FormChildAED:
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
+        """
+        Initialize CRUD Form for updating a user. It loads information of selected User into visual components
+        """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.decide = False
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
@@ -166,6 +202,9 @@ class FormChildAED:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_save(self):
+        """
+        Saves information of the user inserted into the visual components and sends to the server
+        """
         if self.validate_fields():
             decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
             if decision:
@@ -198,6 +237,9 @@ class FormChildAED:
 
 
     def click_cancel(self):
+        """
+
+        """
         decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
         if decision:
             self.clear_fields()

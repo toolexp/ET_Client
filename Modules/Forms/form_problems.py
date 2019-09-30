@@ -7,7 +7,7 @@ from tkinter.ttk import Treeview
 
 from PIL import ImageTk, Image
 
-from Modules.Config.Data import Message, Problem, Solution, File, Pattern
+from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_text, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -48,16 +48,32 @@ class FormChildProblem:
         self.initialize_components()
 
     def initialize_components(self):
+        """
+        Method that initialize the visual components for each form associated with the local administration
+        """
+        # Resources for the Forms
+        self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
+        self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+        self.open_icon = PhotoImage(file=r"./Resources/open.png")
+        self.add_icon = PhotoImage(file=r"./Resources/right.png")
+        self.delete_icon = PhotoImage(file=r"./Resources/left.png")
+        self.back_icon = PhotoImage(file=r"./Resources/back.png")
+        self.next_icon = PhotoImage(file=r"./Resources/next.png")
+
         # Components for List FRM
-        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
-        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
-        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
         frm_aux4 = Frame(self.frm_child_list)
-        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
-        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New problem')
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=1, column=0, pady=10, padx=10,sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete problem')
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=2, column=0, pady=10, padx=10,sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit problem')
         frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
@@ -84,7 +100,7 @@ class FormChildProblem:
         self.txt_description_prob = Text(frm_aux1, height=6, width=60)
         self.txt_description_prob.config(font=TEXT_FONT)
         self.txt_description_prob.grid(row=1, column=1, pady=10, padx=50,)
-        lbl_annotations = Label(frm_aux2, text='Annotations \n(optional)')
+        lbl_annotations = Label(frm_aux2, text='Notes \n(optional)')
         lbl_annotations.config(fg="#222cb3", font=LABEL_FONT)
         lbl_annotations.grid(pady=10, padx=50, sticky=NW)
         self.txt_annotations = Text(frm_aux2, height=6, width=60)
@@ -93,10 +109,12 @@ class FormChildProblem:
         lbl_diagram = Label(frm_aux2, text='File')
         lbl_diagram.config(fg="#222cb3", font=LABEL_FONT)
         lbl_diagram.grid(row=1, column=0, pady=10, padx=50, sticky=NW)
-        Button(frm_aux2, text='Upload', command=self.click_upload_file).grid(row=1, column=2, padx=50,
-                                                                                           pady=10, sticky=W)
-        Button(frm_aux2, text='Delete', command=self.click_remove_file).grid(row=2, column=2, padx=50,
-                                                                                           pady=10, sticky=W)
+        btn_open = Button(frm_aux2, image=self.open_icon, command=self.click_upload_file)
+        btn_open.grid(row=1, column=2, padx=50, pady=10, sticky=W)
+        btn_open_ttp = CreateToolTip(btn_open, 'Open file')
+        btn_quit = Button(frm_aux2, image=self.remove_icon, command=self.click_remove_file)
+        btn_quit.grid(row=2, column=2, padx=50, pady=10, sticky=W)
+        btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
         self.canvas = Canvas(frm_aux2, width=160, height=160)
         self.canvas.config(background='white', borderwidth=1)
         self.canvas.grid(row=1, column=1, padx=50, pady=10, rowspan=5, sticky=W)
@@ -105,9 +123,12 @@ class FormChildProblem:
         self.check_patterns = Checkbutton(frm_aux2, text="The solution includes patterns", variable=self.var_patterns,
                                           command=self.click_checkbox, font=LABEL_FONT)
         self.check_patterns.grid(row=6, column=1, pady=10, padx=50, sticky=W)
-        self.btn_next = Button(self.frm_child_crud, text='Save', command=self.click_next)
+        self.btn_next = Button(self.frm_child_crud, image=self.save_icon, command=self.click_next)
         self.btn_next.grid(row=1, column=5, padx=35)
-        Button(self.frm_child_crud, text='Cancel', command=self.click_cancel).grid(row=2, column=5, padx=35)
+        btn_next_ttp = CreateToolTip(self.btn_next, 'Next')
+        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=2, column=5, padx=35)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
         frm_aux1.grid(row=1, column=0, pady=10, padx=10, columnspan=5, rowspan=5)
         frm_aux2.grid(row=8, column=0, pady=10, padx=10, columnspan=5, rowspan=10)
 
@@ -135,10 +156,18 @@ class FormChildProblem:
         self.trv_selected_patterns.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_selected_patterns.bind("<Button-1>", self.click_trv_spatterns)
         self.trv_selected_patterns.grid(row=2, column=2, rowspan=10, sticky=NW, pady=25 , padx=50)
-        Button(self.frm_child_patterns, text='Add', command=self.click_add).grid(row=5, column=1)
-        Button(self.frm_child_patterns, text='Remove', command=self.click_remove).grid(row=6, column=1)
-        Button(self.frm_child_patterns, text='Save', command=self.click_save).grid(row=0, column=3, padx=35, sticky=SW)
-        Button(self.frm_child_patterns, text='Back', command=self.click_back).grid(row=1, column=3, padx=35, sticky=SW)
+        btn_add = Button(self.frm_child_patterns, image=self.add_icon, command=self.click_add)
+        btn_add.grid(row=5, column=1)
+        btn_add_ttp = CreateToolTip(btn_add, 'Add pattern')
+        btn_remove = Button(self.frm_child_patterns, image=self.delete_icon, command=self.click_remove)
+        btn_remove.grid(row=6, column=1)
+        btn_remove_ttp = CreateToolTip(btn_remove, 'Remove pattern')
+        btn_save = Button(self.frm_child_patterns, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=3, padx=35, sticky=SW)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save problem')
+        btn_back = Button(self.frm_child_patterns, image=self.back_icon, command=self.click_back)
+        btn_back.grid(row=1, column=3, padx=35, sticky=SW)
+        btn_back_ttp = CreateToolTip(btn_back, 'Go back')
 
     def retrieve_list(self):
         """
@@ -155,7 +184,7 @@ class FormChildProblem:
         # Fills the TreeView with the existing 'Problems', the id is stored in the 'text' field of the TV
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1],  wrap_text(elements[2], 72)))
 
     def show_frm(self):
         """
@@ -262,7 +291,7 @@ class FormChildProblem:
             if not self.var_patterns.get():  # Button has 'Save' function
                 # MessageBox asking confirmation
                 decision = messagebox.askyesno(title='Confirmation',
-                                               message='Are you sure you want to save the changes?')
+                                               message='Are you sure you don\'t want to add patterns to the solution?')
                 # Save problem and solution without patterns
                 if decision:
                     if self.decide:  # New Problem
@@ -274,11 +303,10 @@ class FormChildProblem:
                         solution_aux = Solution(annotations=self.txt_annotations.get('1.0', 'end-1c'),
                                                 diagram_id=id_diagram)
                         self.new_problem = Problem(name=self.txt_name_prob.get('1.0', 'end-1c'),
-                                                   description=self.txt_description_prob.get('1.0', 'end-1c'),
-                                                   solution=solution_aux)
+                                                   description=self.txt_description_prob.get('1.0', 'end-1c'))
                         # Create the ideal solution in DB
-                        self.directive = Message(action=56, information=[self.new_problem.solution.annotations,
-                                                                         self.new_problem.solution.diagram_id])
+                        self.directive = Message(action=56, information=[solution_aux.annotations,
+                                                                         solution_aux.diagram_id])
                         self.connection = self.directive.send_directive(self.connection)
                         id_solution = self.connection.message.information[0]
                         # Create the problem in DB
@@ -429,12 +457,10 @@ class FormChildProblem:
                     for item in self.trv_selected_patterns.get_children():
                         solution_aux.patterns_id.append(int(self.trv_selected_patterns.item(item)['text']))
                     self.new_problem = Problem(name=self.txt_name_prob.get('1.0', 'end-1c'),
-                                               description=self.txt_description_prob.get('1.0', 'end-1c'),
-                                               solution=solution_aux)
+                                               description=self.txt_description_prob.get('1.0', 'end-1c'))
                     # Create the ideal solution in DB
-                    self.directive = Message(action=56, information=[self.new_problem.solution.annotations,
-                                                                     self.new_problem.solution.diagram_id,
-                                                                     self.new_problem.solution.patterns_id])
+                    self.directive = Message(action=56, information=[solution_aux.annotations, solution_aux.diagram_id,
+                                                                     solution_aux.patterns_id])
                     self.connection = self.directive.send_directive(self.connection)
                     id_solution = self.connection.message.information[0]
                     # Create the problem in DB
@@ -507,9 +533,9 @@ class FormChildProblem:
         the correct action
         """
         if not self.var_patterns.get():
-            self.btn_next['text'] = 'Save'
+            self.btn_next['image'] = self.save_icon
         else:
-            self.btn_next['text'] = 'Next'
+            self.btn_next['image'] = self.next_icon
 
     def clear_fields(self):
         """

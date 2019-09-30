@@ -46,19 +46,30 @@ class FormChildPattern:
         """
         Method that initialize the visual components for each form associated with the local administration
         """
+        # Resources for the Forms
+        self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
+        self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+        self.open_icon = PhotoImage(file=r"./Resources/open.png")
         self.style = Style()
         self.style.theme_use("clam")
         self.style.configure("Treeview", foreground="gray", rowheight=50)
         self.style.layout('TNotebook.Tab', [])  # turn off tabs
         defaultbg = self.frm_child_crud.cget('bg')
+
         # Components for List FRM
-        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
-        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
-        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
         frm_aux4 = Frame(self.frm_child_list)
-        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10,padx=10, sticky=E)
-        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10,padx=10, sticky=E)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New pattern')
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete pattern')
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit pattern')
         frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns='Pattern')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
@@ -67,7 +78,8 @@ class FormChildPattern:
         self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_pattern_summary)
         self.trv_available.grid(row=1, column=1, columnspan=10, rowspan=20, sticky=W, padx=50, pady=25)
-        self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Content'), selectmode='none')
+        self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Content'),
+                                         selectmode='none')
         self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_list_summary.heading('#1', text='Section', anchor=CENTER)
         self.trv_list_summary.heading('#2', text='Content', anchor=CENTER)
@@ -87,10 +99,12 @@ class FormChildPattern:
         self.cbx_template.config(font=TEXT_FONT)
         self.cbx_template.grid(row=0, column=1, columnspan=3, pady=10, padx=10, sticky=W)
         self.cbx_template.bind("<<ComboboxSelected>>", self.cbx_template_selected)
-
-        Button(frm_aux1, text='Save', command=self.click_save).grid(row=0, column=4, padx=30)
-        Button(frm_aux1, text='Cancel', command=self.click_cancel).grid(row=1, column=4, padx=30)
-
+        btn_save = Button(frm_aux1, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=4, padx=30)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save pattern')
+        btn_cancel = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=1, column=4, padx=30)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
         self.frm_aux2 = Frame(self.frm_child_crud)
 
@@ -135,8 +149,12 @@ class FormChildPattern:
         lbl_upload = Label(tab_file, text='Load a file for this section: ')
         lbl_upload.config(fg="#222cb3", font=LABEL_FONT)
         lbl_upload.grid(row=0, column=0, padx=20, pady=20, sticky=W)
-        Button(tab_file, text='Upload', command=self.click_upload).grid(row=1, column=0, padx=20, pady=5, sticky=W)
-        Button(tab_file, text='Delete', command=self.click_remove).grid(row=2, column=0, padx=20, pady=5, sticky=W)
+        btn_open = Button(tab_file, image=self.open_icon, command=self.click_upload)
+        btn_open.grid(row=1, column=0, padx=20, pady=5, sticky=W)
+        btn_open_ttp = CreateToolTip(btn_open, 'Open file')
+        btn_quit = Button(tab_file, image=self.remove_icon, command=self.click_remove)
+        btn_quit.grid(row=2, column=0, padx=20, pady=5, sticky=W)
+        btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
         self.canvas = Canvas(tab_file, width=160, height=160)
         self.canvas.config(background='white', borderwidth=1)
         self.canvas.grid(row=0, column=1, padx=20, pady=10, rowspan=5, sticky=E)
@@ -213,13 +231,14 @@ class FormChildPattern:
         """
         Hide the Patterns administration Forms
         """
-        #self.click_cancel()
+        # self.click_cancel()
         self.frm_child_list.grid_forget()
-        #self.frm_child_crud.grid_forget()
+        # self.frm_child_crud.grid_forget()
 
     def select_pattern_summary(self, event):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
+            id_selected = int(self.trv_available.item(self.trv_available.selection())[
+                                  'text'])  # Retrieve id of selected item from TreeView
             for item in self.patterns:
                 if id_selected == item.id:
                     current_pattern = item
@@ -229,12 +248,12 @@ class FormChildPattern:
                 self.trv_list_summary.delete(item)
             # Adding elements in the list
             for item in current_pattern.sections:
-                self.trv_list_summary.insert('', 'end', text='', values=(item.name, wrap_text(item.content,72)))
+                self.trv_list_summary.insert('', 'end', text='', values=(item.name, wrap_text(item.content, 72)))
 
     def restart_components(self):
         self.txt_desc_section['state'] = NORMAL
-        self.txt_desc_section.delete('1.0','end-1c')
-        self.txt_section.delete('1.0','end-1c')
+        self.txt_desc_section.delete('1.0', 'end-1c')
+        self.txt_section.delete('1.0', 'end-1c')
         for item in self.trv_summary.get_children():
             self.trv_summary.delete(item)
         if self.file is not None:  # if an image was already loaded
@@ -283,7 +302,8 @@ class FormChildPattern:
     def click_update(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.initialize_variables()
-            id_selected_pattern = int(self.trv_available.item(self.trv_available.selection())['text']) # Retrieve id of selected item from TreeView
+            id_selected_pattern = int(self.trv_available.item(self.trv_available.selection())[
+                                          'text'])  # Retrieve id of selected item from TreeView
             self.decide = False
             self.frm_child_list.grid_forget()
             # Retrieve pattern from the list of available patterns
@@ -294,19 +314,23 @@ class FormChildPattern:
             # Retrieve content if neccesary
             for index, item in enumerate(self.new_pattern.sections):
                 if item.diagram_id != 0:
-                    self.directive = Message(action=65, information=[item.diagram_id])  # Ask for the diagram of this section
+                    self.directive = Message(action=65,
+                                             information=[item.diagram_id])  # Ask for the diagram of this section
                     self.connection = self.directive.send_directive(self.connection)
                     file_aux = File()
                     file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
                     self.new_pattern.sections[index].file = file_aux
                 elif item.category_id != 0:
-                    self.directive = Message(action=75, information=[item.category_id])  # Ask for the category of this section
+                    self.directive = Message(action=75,
+                                             information=[item.category_id])  # Ask for the category of this section
                     self.connection = self.directive.send_directive(self.connection)
-                    category_aux = Category(item.category_id, self.connection.message.information[0], self.connection.message.information[1])
+                    category_aux = Category(item.category_id, self.connection.message.information[0],
+                                            self.connection.message.information[1])
                     self.new_pattern.sections[index].category = category_aux
 
             # Fill visual components with pattern info
-            self.cbx_template.set('{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
+            self.cbx_template.set(
+                '{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
             self.cbx_template['state'] = DISABLED
             self.set_trv_summary(self.new_pattern.sections)
             self.frm_child_crud['text'] = 'Update Pattern'
@@ -318,7 +342,8 @@ class FormChildPattern:
         if self.new_pattern is not None and self.selected_section is not None:
             self.save_section_local('save')
             if self.validate_fields():
-                decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
+                decision = messagebox.askyesno(title='Confirmation',
+                                               message='Are you sure you want to save the changes?')
                 if decision:
                     if self.decide:
                         self.directive = Message(action=41, information=[self.new_pattern.template.id])
@@ -327,11 +352,13 @@ class FormChildPattern:
                         for item in self.new_pattern.sections:
                             if item.data_type == 'Text':
                                 self.directive = Message(action=46,
-                                                         information=[item.content, id_pattern, item.temp_section_id, None, None])
+                                                         information=[item.content, id_pattern, item.temp_section_id,
+                                                                      None, None])
                                 self.connection = self.directive.send_directive(self.connection)
                             elif item.data_type == 'File':
                                 if item.file is not None:
-                                    self.directive = Message(action=61, information=[item.file.file_bytes, item.file.name])
+                                    self.directive = Message(action=61,
+                                                             information=[item.file.file_bytes, item.file.name])
                                     self.connection = self.directive.send_directive(self.connection)
                                     id_diagram = self.connection.message.information[0]
                                     content_aux = '<File>'
@@ -339,16 +366,19 @@ class FormChildPattern:
                                     id_diagram = None
                                     content_aux = ''
                                 self.directive = Message(action=46,
-                                                         information=[content_aux, id_pattern, item.temp_section_id, id_diagram, None])
+                                                         information=[content_aux, id_pattern, item.temp_section_id,
+                                                                      id_diagram, None])
                                 self.connection = self.directive.send_directive(self.connection)
                             elif item.data_type == 'Classification':
                                 if item.category is not None:
                                     self.directive = Message(action=46, information=['<' + item.category.name + '>',
-                                                                                     id_pattern, item.temp_section_id, None,
+                                                                                     id_pattern, item.temp_section_id,
+                                                                                     None,
                                                                                      item.category.id])
                                 else:
                                     self.directive = Message(action=46,
-                                                             information=['', id_pattern, item.temp_section_id, None, None])
+                                                             information=['', id_pattern, item.temp_section_id, None,
+                                                                          None])
                                 self.connection = self.directive.send_directive(self.connection)
                             else:
                                 raise Exception('Error retrieving data type of section to be created')
@@ -356,12 +386,14 @@ class FormChildPattern:
                         for item in self.new_pattern.sections:
                             if item.data_type == 'Text':
                                 self.directive = Message(action=48,
-                                                         information=[item.pattern_section_id, item.content, None, None])
+                                                         information=[item.pattern_section_id, item.content, None,
+                                                                      None])
                                 self.connection = self.directive.send_directive(self.connection)
                             elif item.data_type == 'File':
                                 # Remove existing file in DB
                                 if item.diagram_id != 0:
-                                    self.directive = Message(action=64, information=[item.diagram_id, 'just remove path'])
+                                    self.directive = Message(action=64,
+                                                             information=[item.diagram_id, 'just remove path'])
                                     self.connection = self.directive.send_directive(self.connection)
                                 if item.file is not None:
                                     self.directive = Message(action=61,
@@ -373,7 +405,8 @@ class FormChildPattern:
                                     id_diagram = None
                                     content_aux = ''
                                 self.directive = Message(action=48,
-                                                         information=[item.pattern_section_id, content_aux, id_diagram, None])
+                                                         information=[item.pattern_section_id, content_aux, id_diagram,
+                                                                      None])
                                 self.connection = self.directive.send_directive(self.connection)
                             elif item.data_type == 'Classification':
                                 if item.category is not None:
@@ -417,7 +450,7 @@ class FormChildPattern:
                                                   filetypes=[("jpeg", "*.jpg")])
             if not filename:
                 return  # user cancelled; stop this method
-            self.file= File()
+            self.file = File()
             self.file.read_file(filename)
             self.show_file(self.file)
             # Section to change the information of the summary treeview when the section is filled
@@ -455,13 +488,15 @@ class FormChildPattern:
         self.tab_control.tab(2, state='disabled')
         self.restart_components()
         self.new_pattern = Pattern()
-        self.new_pattern.template = self.templates[int(self.cbx_template.current())] # The selected template is associated with the local pattern object
+        self.new_pattern.template = self.templates[
+            int(self.cbx_template.current())]  # The selected template is associated with the local pattern object
         self.directive = Message(action=40, information=[self.new_pattern.template.id])
         self.connection = self.directive.send_directive(self.connection)
         # Create sections associated with the selected template for the new pattern object
         for item in self.connection.message.information[2]:
             elements = item.split('¥')
-            section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]), section_id=int(elements[2]),
+            section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]),
+                                  section_id=int(elements[2]),
                                   name=elements[3], description=elements[4], data_type=elements[5],
                                   position=int(elements[6]), mandatory=elements[7], classification_id=elements[8])
             self.new_pattern.sections.append(section_aux)
@@ -478,7 +513,7 @@ class FormChildPattern:
             self.trv_summary.delete(item)
         for item in sections:
             if item.content == '':
-                self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(item.name,item.mandatory,''))
+                self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(item.name, item.mandatory, ''))
             else:
                 self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(item.name, item.mandatory, '✓'))
         self.txt_desc_section['state'] = DISABLED
@@ -514,12 +549,12 @@ class FormChildPattern:
         :parameter: text_decision: string: auxiliary to tell if the function was called from the event "push save button"
         :return:
         """
-        if self.selected_section is not None: # Necessary to avoid trouble when the treeview is selected for the first time
+        if self.selected_section is not None:  # Necessary to avoid trouble when the treeview is selected for the first time
             for index, item in enumerate(self.new_pattern.sections):
                 if item.temp_section_id == self.selected_section.temp_section_id:
                     break
             if self.selected_section.data_type == 'Text':
-                self.new_pattern.sections[index].content = self.txt_section.get('1.0','end-1c')
+                self.new_pattern.sections[index].content = self.txt_section.get('1.0', 'end-1c')
                 if text_decision != 'save':
                     self.txt_section.delete('1.0', 'end-1c')
             elif self.selected_section.data_type == 'File':
@@ -605,7 +640,7 @@ class FormChildPattern:
         :param file:
         """
         load = Image.open(file.filename)
-        load = load.resize((160,160), Image.ANTIALIAS)
+        load = load.resize((160, 160), Image.ANTIALIAS)
         self.render = ImageTk.PhotoImage(load)
         if self.file.image is not None:  # if an image was already loaded
             self.canvas.delete(self.file.image)  # remove the previous image
@@ -629,4 +664,3 @@ class FormChildPattern:
                     if item.category is None:
                         return False
         return True
-

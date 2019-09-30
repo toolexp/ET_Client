@@ -2,7 +2,7 @@ import os
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage
 from tkinter.constants import *
 from tkinter.ttk import Treeview
-from Modules.Config.Data import Message
+from Modules.Config.Data import Message, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -44,16 +44,31 @@ class FormChildTemplate:
         self.initialize_components()
 
     def initialize_components(self):
+        """
+        Method that initialize the visual components for each form associated with the local administration
+        """
+        # Resources for the Forms
+        self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
+        self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
+        self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+        self.add_icon = PhotoImage(file=r"./Resources/right.png")
+        self.delete_icon = PhotoImage(file=r"./Resources/left.png")
+        self.up_arrow = PhotoImage(file=r"./Resources/up_arrow.png")
+        self.down_arrow = PhotoImage(file=r"./Resources/down_arrow.png")
+
         # Components for List FRM
-        self.new_icon = PhotoImage(file=r"./Resources/create.png").subsample(2, 2)
-        self.modify_icon = PhotoImage(file=r"./Resources/modify.png").subsample(2, 2)
-        self.remove_icon = PhotoImage(file=r"./Resources/delete.png").subsample(2, 2)
         frm_aux4 = Frame(self.frm_child_list)
-        Button(frm_aux4, image=self.new_icon, command=self.click_new).grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        Button(frm_aux4, image=self.remove_icon, command=self.click_delete).grid(row=1, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
-        Button(frm_aux4, image=self.modify_icon, command=self.click_update).grid(row=2, column=0, pady=10, padx=10,
-                                                                                 sticky=E)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New template')
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete template')
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit template')
         frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
@@ -91,8 +106,12 @@ class FormChildTemplate:
         self.txt_description = Text(frm_aux1, height=6, width=60)
         self.txt_description.config(font=TEXT_FONT)
         self.txt_description.grid(row=1, column=1, padx=10, pady=10)
-        Button(frm_aux1, text='Save', command=self.click_save).grid(row=0, column=2, padx=30, sticky=W)
-        Button(frm_aux1, text='Cancel', command=self.click_cancel).grid(row=1, column=2, padx=30, sticky=NW)
+        btn_save = Button(frm_aux1, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=2, padx=30, sticky=W)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save template')
+        btn_cancel = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=1, column=2, padx=30, sticky=NW)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
         lbl_available_d = Label(frm_aux2, text='Available sections')
         lbl_available_d.config(fg="#222cb3", font=LABEL_FONT)
         lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
@@ -119,14 +138,18 @@ class FormChildTemplate:
         self.trv_selected_sections.column('#3', width=80, minwidth=80, stretch=NO)
         self.trv_selected_sections.bind("<Button-1>", self.click_trv_ssections)
         self.trv_selected_sections.grid(row=1, column=2, rowspan=10, sticky=W, padx=10, pady=20)
-        Button(frm_aux2, text='Add', command=self.click_add).grid(row=4, column=1)
-        Button(frm_aux2, text='Remove', command=self.click_remove).grid(row=5, column=1)
-        self.up_arrow = PhotoImage(file=r"./Resources/up_arrow.png")
-        self.up_arrow = self.up_arrow.subsample(2, 2)
-        self.down_arrow = PhotoImage(file=r"./Resources/down_arrow.png")
-        self.down_arrow = self.down_arrow.subsample(2, 2)
-        Button(frm_aux2, image=self.up_arrow, command=self.click_up).grid(row=4, column=3)
-        Button(frm_aux2, image=self.down_arrow, command=self.click_down).grid(row=5, column=3)
+        btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
+        btn_add.grid(row=4, column=1)
+        btn_add_ttp = CreateToolTip(btn_add, 'Add section')
+        btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
+        btn_remove.grid(row=5, column=1)
+        btn_remove_ttp = CreateToolTip(btn_remove, 'Remove section')
+        btn_up = Button(frm_aux2, image=self.up_arrow, command=self.click_up)
+        btn_up.grid(row=4, column=3)
+        btn_up_ttp = CreateToolTip(btn_up, 'Move up')
+        btn_down = Button(frm_aux2, image=self.down_arrow, command=self.click_down)
+        btn_down.grid(row=5, column=3)
+        btn_down_ttp = CreateToolTip(btn_down, 'Move down')
         frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5, rowspan=5)
         frm_aux2.grid(row=8, column=0, padx=40, columnspan=5, rowspan=10)
 
