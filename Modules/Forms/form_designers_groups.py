@@ -8,6 +8,8 @@ SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
+TEXT_COLOR = "#1B5070"
+
 
 class FormParentDG:
     def __init__(self, window, connection):
@@ -16,8 +18,8 @@ class FormParentDG:
         self.frm_child = FormChildDG(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Designers groups administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text='Designers groups')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -37,7 +39,7 @@ class FormChildDG:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -80,20 +82,20 @@ class FormChildDG:
         frm_aux1 = Frame(self.frm_child_crud)
         frm_aux2 = Frame(self.frm_child_crud)
         lbl_name = Label(frm_aux1, text='Name')
-        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(frm_aux1, text='Description')
-        lbl_description.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=NW)
         self.txt_name = Text(frm_aux1, height=1, width=60, font=TEXT_FONT)
         self.txt_name.grid(row=0, column=1, padx=50, sticky=W)
         self.txt_description = Text(frm_aux1, height=6, width=60, font=TEXT_FONT)
         self.txt_description.grid(row=1, column=1, padx=50, sticky=W)
         lbl_available_d = Label(frm_aux2, text='Available designers')
-        lbl_available_d.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_available_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
         lbl_selected_d = Label(frm_aux2, text='Selected designers')
-        lbl_selected_d.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_selected_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_d.grid(row=0, column=2, pady=10, sticky=W)
         self.trv_available_designers = Treeview(frm_aux2, height=5, columns=('Name', 'Surname'))
         self.trv_available_designers.heading('#0', text='ID', anchor=CENTER)

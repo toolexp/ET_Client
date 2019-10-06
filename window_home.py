@@ -17,7 +17,7 @@ PORT = 65450        # The port used by the server
 
 class WindowHome:
     def __init__(self, connection):
-
+        #
         # Configuration of the window
         self.connection = connection
         self.window = Tk()

@@ -1,13 +1,14 @@
 from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Frame
 from tkinter.constants import *
 from tkinter.ttk import Treeview
-from Modules.Config.Data import Message, Category, CreateToolTip
+from Modules.Config.Data import Message, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
+TEXT_COLOR = "#1B5070"
 
 class FormParentClassification:
     def __init__(self, window, connection):
@@ -16,8 +17,8 @@ class FormParentClassification:
         self.frm_child = FormChildClassification(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_title = Label(self.frm_parent, text='Classification administration')
-        lbl_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_title = Label(self.frm_parent, text='Classifications')
+        lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -37,7 +38,7 @@ class FormChildClassification:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -74,15 +75,15 @@ class FormChildClassification:
 
         # Components CRUD
         self.frm_class = LabelFrame(self.frm_child_crud, text='New classification')
-        self.frm_class.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_class.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_class = Label(self.frm_child_crud, text='Name')
-        lbl_class.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_class.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_class.grid(pady=10, padx=50, sticky=W)
         lbl_desc_categories = Label(self.frm_child_crud, text='Enter categories separated by a comma ","')
-        lbl_desc_categories.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_desc_categories.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_desc_categories.grid(pady=10, padx=50, columnspan=2, sticky=W)
         lbl_categories = Label(self.frm_child_crud, text='Categories')
-        lbl_categories.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_categories.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_categories.grid(pady=10, padx=50, sticky=NW)
         self.txt_name_class = Text(self.frm_child_crud, height=1, width=50, font=TEXT_FONT)
         self.txt_name_class.grid(row=0, column=1, padx=10, pady=10, sticky=W)

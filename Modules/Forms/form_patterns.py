@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage
 from tkinter.constants import *
-from tkinter.ttk import Treeview, Notebook, Combobox, Style
-from Modules.Config.Data import *
+from tkinter.ttk import Treeview, Notebook, Combobox, Style, Separator
+from Modules.Config.Data import CreateToolTip, Message, Template, Pattern, Category, File, wrap_text, Section
 from PIL import Image, ImageTk
 import os
 import shutil
@@ -11,6 +11,8 @@ SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
+TEXT_COLOR = "#1B5070"
+
 
 class FormParentPattern:
     def __init__(self, window, connection):
@@ -19,8 +21,8 @@ class FormParentPattern:
         self.frm_child = FormChildPattern(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Patterns administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text='Patterns')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -39,7 +41,7 @@ class FormChildPattern:
         self.templates = []
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -78,6 +80,8 @@ class FormChildPattern:
         self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_pattern_summary)
         self.trv_available.grid(row=1, column=1, columnspan=10, rowspan=20, sticky=W, padx=50, pady=25)
+        sep_pattern = Separator(self.frm_child_list, orient=VERTICAL)
+        sep_pattern.grid(row=0, column=11, sticky=NS, rowspan=21, padx=5)
         self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Content'),
                                          selectmode='none')
         self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
@@ -86,13 +90,13 @@ class FormChildPattern:
         self.trv_list_summary.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_list_summary.column('#1', width=100, minwidth=100, stretch=NO)
         self.trv_list_summary.column('#2', width=400, minwidth=400, stretch=NO)
-        self.trv_list_summary.grid(row=1, column=11, columnspan=5, rowspan=20, sticky=W, padx=50, pady=100)
+        self.trv_list_summary.grid(row=1, column=12, columnspan=5, rowspan=20, sticky=W, padx=50, pady=100)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
 
         lbl_template = Label(frm_aux1, text='Select a template')
-        lbl_template.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_template.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_template.grid(pady=10, padx=10, sticky=W)
 
         self.cbx_template = Combobox(frm_aux1, state="readonly", width=125)
@@ -109,7 +113,7 @@ class FormChildPattern:
         self.frm_aux2 = Frame(self.frm_child_crud)
 
         lbl_section = Label(self.frm_aux2, text='Select a section')
-        lbl_section.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(pady=10, padx=10, sticky=NW)
 
         self.trv_summary = Treeview(self.frm_aux2, height=6, columns=('Section', 'Mandatory', 'Completed'))
@@ -125,7 +129,7 @@ class FormChildPattern:
         self.trv_summary.grid(row=0, column=1, rowspan=3, sticky=W, padx=10)
 
         lbl_desc_section = Label(self.frm_aux2, text='Description')
-        lbl_desc_section.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_desc_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_desc_section.grid(row=0, column=2, pady=10, padx=50, sticky=NE)
 
         self.txt_desc_section = Text(self.frm_aux2, height=4, width=65)
@@ -133,7 +137,7 @@ class FormChildPattern:
         self.txt_desc_section.grid(row=0, column=3, pady=10, padx=20, sticky=W)
 
         lbl_section = Label(self.frm_aux2, text='Content')
-        lbl_section.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(row=1, column=2, pady=10, padx=50, sticky=NE)
 
         self.tab_control = Notebook(self.frm_aux2)
@@ -147,7 +151,7 @@ class FormChildPattern:
         tab_file = Frame(self.tab_control)
         self.tab_control.add(tab_file)
         lbl_upload = Label(tab_file, text='Load a file for this section: ')
-        lbl_upload.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_upload.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_upload.grid(row=0, column=0, padx=20, pady=20, sticky=W)
         btn_open = Button(tab_file, image=self.open_icon, command=self.click_upload)
         btn_open.grid(row=1, column=0, padx=20, pady=5, sticky=W)
@@ -162,7 +166,7 @@ class FormChildPattern:
         tab_classification = Frame(self.tab_control)
         self.tab_control.add(tab_classification)
         lbl_category = Label(tab_classification, text='Select a category for this section: ')
-        lbl_category.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_category.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_category.grid(row=0, column=0, padx=20, pady=20, sticky=W)
         self.cbx_category = Combobox(tab_classification, state="readonly", width=30)
         self.cbx_category.config(font=TEXT_FONT)
@@ -225,6 +229,8 @@ class FormChildPattern:
         """
         self.get_patterns()
         self.retrieve_list()
+        self.trv_available.selection_set(self.trv_available.get_children()[0])
+        self.select_pattern_summary(None)
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):

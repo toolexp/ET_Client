@@ -150,19 +150,23 @@ class File:
 
 
 class Problem:
-    def __init__(self, id=0, name='', description='', id_solution=None, connection=None):
+    def __init__(self, id=0, name='', description='', id_solution=None, solution=None, connection=None):
         self.id = id
         self.name = name
         self.description = description
-        if id_solution is not None:
-            self.directive = Message(action=60, information=[id_solution])
-            self.connection = self.directive.send_directive(connection)
-            elements = self.connection.message.information
-            solution = Solution(id=id_solution, annotations=elements[0], patterns_id=elements[2],
-                                diagram_id=int(elements[1]))
-            self.solution = solution
-        else:
-            self.solution = id_solution
+        self.id_solution = id_solution
+        self.solution = solution
+        self.connection = connection
+        if self.connection is not None:
+            self.retrieve_components()
+
+    def retrieve_components(self):
+        if self.id_solution is not None:
+            self.directive = Message(action=60, information=[self.id_solution])
+            self.connection = self.directive.send_directive(self.connection)
+            self.solution = Solution(id=self.id_solution, annotations=self.connection.message.information[0],
+                                     diagram_id=self.connection.message.information[1],
+                                     patterns_id=self.connection.message.information[2])
 
 
 class Solution:
@@ -177,8 +181,9 @@ class Solution:
 
 class ExperimentalSC:
     def __init__(self, id=0, name='', description='', access_code='', start_time=time(0, 0, 0), end_time=time(0, 0, 0),
-                 scenario_availability=True, scenario_lock=False, experiment=None, id_control_group=None,
-                 id_experimental_group=None):
+                 scenario_availability=True, scenario_lock=False, id_experiment=None, id_control_group=None,
+                 id_experimental_group=None, experiment=None, control_group=None, experimental_group=None,
+                 connection=None):
         self.id = id
         self.name = name
         self.description = description
@@ -187,24 +192,74 @@ class ExperimentalSC:
         self.end_time = end_time
         self.scenario_availability = scenario_availability
         self.scenario_lock = scenario_lock
-        self.experiment = experiment
+        self.id_experiment = id_experiment
         self.id_control_group = id_control_group
         self.id_experimental_group = id_experimental_group
+        self.experiment = experiment
+        self.control_group = control_group
+        self.experimental_group = experimental_group
+        self.connection = connection
+        if self.connection is not None:
+            self.retrieve_components()
+
+    def retrieve_components(self):
+        if self.id_experiment is not None:
+            self.experiment = None
+        if self.id_control_group is not None:
+            self.directive = Message(action=30, information=[self.id_control_group])
+            self.connection = self.directive.send_directive(self.connection)
+            self.control_group = DesignersGroup(id=self.id_control_group, name=self.connection.message.information[0],
+                                                description=self.connection.message.information[1])
+        if self.id_experimental_group is not None:
+            self.directive = Message(action=30, information=[self.id_experimental_group])
+            self.connection = self.directive.send_directive(self.connection)
+            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
+                                                     name=self.connection.message.information[0],
+                                                     description=self.connection.message.information[1])
 
 
 class ScenarioComponent:
     id_counter = 0
 
-    def __init__(self, id_problem=0, id_patterns_cgroup=None, id_patterns_egroup=None):
+    def __init__(self, id=0, id_exp_scenario=0, id_problem=0, id_patterns_cgroup=None, id_patterns_egroup=None, problem=None,
+                 connection=None, id_DB=0):
         if id_patterns_egroup is None:
             id_patterns_egroup = []
         if id_patterns_cgroup is None:
             id_patterns_cgroup = []
-        self.id_counter += 1
-        self.id = self.id_counter
+        if id == 0:
+            ScenarioComponent.id_counter += 1
+            self.id = ScenarioComponent.id_counter
+        else:
+            self.id = id
+        self.id_exp_scenario = id_exp_scenario
         self.id_problem = id_problem
         self.id_patterns_egroup = id_patterns_egroup
         self.id_patterns_cgroup = id_patterns_cgroup
+        self.problem = problem
+        self.connection = connection
+        self.id_DB = id_DB
+        if self.connection is not None:
+            self.retrieve_components()
+
+    def retrieve_components(self):
+        if self.id_problem is not None:
+            self.directive = Message(action=55, information=[self.id_problem])
+            self.connection = self.directive.send_directive(self.connection)
+            self.problem = Problem(id=self.id_problem, name=self.connection.message.information[0],
+                                   description=self.connection.message.information[1],
+                                   id_solution=self.connection.message.information[2], connection=self.connection)
+
+        # Ask for the patterns associated with the current scenario component
+        self.directive = Message(action=87, information=[self.id_DB, 2])
+        self.connection = self.directive.send_directive(self.connection)
+        if len(self.connection.message.information) != 0:   # There may not be associated patterns to a sc components when ideal solutions doesnt have patterns
+            for item in self.connection.message.information:
+                elements = item.split('¥')
+                if int(elements[1]) == 1:
+                    self.id_patterns_cgroup.append(int(elements[3]))
+                else:
+                    self.id_patterns_egroup.append(int(elements[3]))
 
 
 class CreateToolTip(object):

@@ -1,0 +1,9 @@
+{
+  "visual_components" : {
+    "title_font" : "(\"Arial\", 18)",
+    "subtitle_font" : "(\"Arial\", 14)",
+    "label_font" : "(\"Arial\", 10)",
+    "text_font" : "(\"Arial\", 10)",
+    "text_color" : "#1B5070"
+  }
+}

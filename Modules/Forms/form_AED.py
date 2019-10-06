@@ -2,11 +2,14 @@ from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox, PhotoIm
 from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message, CreateToolTip
+import json
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
+
+TEXT_COLOR = "#1B5070"
 
 
 class FormParentAED:
@@ -17,8 +20,8 @@ class FormParentAED:
         self.frm_child = FormChildAED(self.frm_parent, title, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text=self.title + 's administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text=self.title + 's')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -39,7 +42,7 @@ class FormChildAED:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -77,25 +80,25 @@ class FormChildAED:
         # Components for CRUD FRM
         frm_aux = Frame(self.frm_child_crud)
         lbl_name = Label(frm_aux, text='Name')
-        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=100, sticky=W)
+        lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_surname = Label(frm_aux, text='Surname')
-        lbl_surname.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_surname.grid(pady=10, padx=100, sticky=W)
+        lbl_surname.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_surname.grid(pady=10, padx=50, sticky=W)
         lbl_email = Label(frm_aux, text='E-mail')
-        lbl_email.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_email.grid(pady=10, padx=100, sticky=W)
+        lbl_email.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_email.grid(pady=10, padx=50, sticky=W)
         lbl_passwd = Label(frm_aux, text='Password')
-        lbl_passwd.config(fg="#222cb3", font=LABEL_FONT)
-        lbl_passwd.grid(pady=10, padx=100, sticky=W)
+        lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_passwd.grid(pady=10, padx=50, sticky=W)
         self.txt_name = Entry(frm_aux)
-        self.txt_name.grid(row=0, column=1, padx=100)
+        self.txt_name.grid(row=0, column=1, padx=50)
         self.txt_surname = Entry(frm_aux)
-        self.txt_surname.grid(row=1, column=1, padx=100)
+        self.txt_surname.grid(row=1, column=1, padx=50)
         self.txt_email = Entry(frm_aux)
-        self.txt_email.grid(row=2, column=1, padx=100)
+        self.txt_email.grid(row=2, column=1, padx=50)
         self.txt_passwd = Entry(frm_aux, show="*")
-        self.txt_passwd.grid(row=3, column=1, padx=100)
+        self.txt_passwd.grid(row=3, column=1, padx=50)
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
         btn_save.grid(row=1, column=5, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save ' + self.title.lower())

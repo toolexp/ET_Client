@@ -9,6 +9,8 @@ SUBTITLE2_FONT = ("Arial", 12)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
+TEXT_COLOR = "#1B5070"
+
 
 class FormParentExSC:
     def __init__(self, window, connection):
@@ -17,8 +19,8 @@ class FormParentExSC:
         self.frm_child = FormChildExSC(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Experimental scenarios administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text='Experimental scenarios')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -36,13 +38,12 @@ class FormChildExSC:
         self.decide = True
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
-        self.frm_child_list.config(fg="#222cb3", font=SUBTITLE_FONT)
         self.frm_child_general = LabelFrame(frm_parent)
-        self.frm_child_general.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_general.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.frm_child_problem = LabelFrame(frm_parent)
-        self.frm_child_problem.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_problem.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.frm_child_patterns = LabelFrame(frm_parent)
-        self.frm_child_patterns.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_patterns.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -87,22 +88,22 @@ class FormChildExSC:
         lbl_name.config(fg="#222cb3", font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(self.frm_child_general, text='Description')
-        lbl_description.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=NW)
         lbl_access = Label(self.frm_child_general, text='Access code')
-        lbl_access.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_access.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_access.grid(row=6, column=0,pady=10, padx=50, sticky=W)
         lbl_start = Label(self.frm_child_general, text='Start time')
-        lbl_start.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_start.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_start.grid(row=7, column=0,pady=10, padx=50, sticky=W)
         lbl_end = Label(self.frm_child_general, text='End time')
-        lbl_end.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_end.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_end.grid(row=8, column=0, pady=10, padx=50, sticky=W)
         lbl_cgroup = Label(self.frm_child_general, text='Control group')
-        lbl_cgroup.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_cgroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_cgroup.grid(row=9, column=0, pady=10, padx=50, sticky=W)
         lbl_egroup = Label(self.frm_child_general, text='Experimental group')
-        lbl_egroup.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_egroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_egroup.grid(row=10, column=0, pady=10, padx=50, sticky=W)
         self.txt_name = Text(self.frm_child_general, height=1, width=80)
         self.txt_name.config(font=TEXT_FONT)
@@ -118,7 +119,7 @@ class FormChildExSC:
         self.cbx_start_hour.config(font=TEXT_FONT)
         self.cbx_start_hour.grid(pady=10, padx=10, sticky=W)
         lbl_separator = Label(frm_aux1, text=':')
-        lbl_separator.config(fg="#222cb3", font=TEXT_FONT)
+        lbl_separator.config(fg=TEXT_COLOR, font=TEXT_FONT)
         lbl_separator.grid(row=0, column=1, pady=10, padx=10, sticky=W)
         self.cbx_start_minute = Combobox(frm_aux1, state="readonly", width=5)
         self.cbx_start_minute.config(font=TEXT_FONT)
@@ -127,7 +128,7 @@ class FormChildExSC:
         self.cbx_end_hour.config(font=TEXT_FONT)
         self.cbx_end_hour.grid(row=1, column=0, padx=10, pady=10, sticky=W)
         lbl_separator2 = Label(frm_aux1, text=':')
-        lbl_separator2.config(fg="#222cb3", font=TEXT_FONT)
+        lbl_separator2.config(fg=TEXT_COLOR, font=TEXT_FONT)
         lbl_separator2.grid(row=1, column=1, pady=10, padx=10, sticky=W)
         self.cbx_end_minute = Combobox(frm_aux1, state="readonly", width=5)
         self.cbx_end_minute.config(font=TEXT_FONT)
@@ -142,7 +143,7 @@ class FormChildExSC:
         sep_general = Separator(self.frm_child_general, orient=HORIZONTAL)
         sep_general.grid(row=11, column=0, sticky=EW, columnspan=10, pady=10)
         lbl_general_components = Label(self.frm_child_general, text='Scenario components')
-        lbl_general_components.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_general_components.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_general_components.grid(row=12, column=0, pady=10, padx=50, sticky=W)
         self.trv_scenario_components = Treeview(self.frm_child_general, height=3, columns=('Problem', 'Patterns available'))
         self.trv_scenario_components.heading('#0', text='ID', anchor=CENTER)
@@ -158,6 +159,8 @@ class FormChildExSC:
         btn_delete_comp = Button(self.frm_child_general, image=self.remove_icon, command=self.click_delete_component)
         btn_delete_comp.grid(row=13, column=2, padx=20)
         btn_delete_comp_ttp = CreateToolTip(btn_delete_comp, 'Delete scenario component')
+        self.btn_edit_comp = Button(self.frm_child_general, image=self.modify_icon, command=self.click_edit_component)
+        btn_edit_comp_ttp = CreateToolTip(self.btn_edit_comp, 'Edit scenario component')
         btn_save = Button(self.frm_child_general, image=self.save_icon, command=self.click_save_general)
         btn_save.grid(row=0, column=9, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save experimental scenario')
@@ -171,10 +174,10 @@ class FormChildExSC:
         lbl_problem_action.config(fg="#222cb3", font=SUBTITLE2_FONT)
         lbl_problem_action.grid(pady=10, padx=50, sticky=W, columnspan=2)
         lbl_problem = Label(frm_aux2, text='Problem')
-        lbl_problem.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_problem.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_problem.grid(pady=10, padx=50, sticky=W)
         lbl_problem_desc = Label(frm_aux2, text='Description')
-        lbl_problem_desc.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_problem_desc.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_problem_desc.grid(pady=10, padx=50, sticky=NW)
         self.cbx_problem = Combobox(frm_aux2, state="readonly", width=80)
         self.cbx_problem.config(font=TEXT_FONT)
@@ -195,13 +198,13 @@ class FormChildExSC:
         frm_aux3 = Frame(self.frm_child_patterns)
         frm_aux6 = Frame(self.frm_child_patterns)
         lbl_cgroup_patterns = Label(frm_aux3, text='Set patterns for the control group:')
-        lbl_cgroup_patterns.config(fg="#222cb3", font=SUBTITLE2_FONT)
+        lbl_cgroup_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_cgroup_patterns.grid(row=0, column=0, sticky=W, pady=10, columnspan=3)
         lbl_available_d_cgroup = Label(frm_aux3, text='Available patterns')
-        lbl_available_d_cgroup.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_available_d_cgroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_available_d_cgroup.grid(row=1, column=0, sticky=W)
         lbl_selected_d_cgroup = Label(frm_aux3, text='Selected patterns')
-        lbl_selected_d_cgroup.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_selected_d_cgroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_d_cgroup.grid(row=1, column=2, sticky=W)
         self.trv_available_patters_cgroup = Treeview(frm_aux3, height=4, columns='Name')
         self.trv_available_patters_cgroup.heading('#0', text='ID', anchor=CENTER)
@@ -227,13 +230,13 @@ class FormChildExSC:
         sep_problem = Separator(self.frm_child_patterns, orient=VERTICAL)
         sep_problem.grid(row=0, column=1, sticky=NS, rowspan=10, padx=20)
         lbl_egroup_patterns = Label(frm_aux6, text='Set patterns for the experimental group:')
-        lbl_egroup_patterns.config(fg="#222cb3", font=SUBTITLE2_FONT)
+        lbl_egroup_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_egroup_patterns.grid(row=0, column=0, pady=10, sticky=W, columnspan=3)
         lbl_available_d_egroup = Label(frm_aux6, text='Available patterns')
-        lbl_available_d_egroup.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_available_d_egroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_available_d_egroup.grid(row=1, column=0, sticky=W)
         lbl_selected_d_egroup = Label(frm_aux6, text='Selected patterns')
-        lbl_selected_d_egroup.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_selected_d_egroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_d_egroup.grid(row=1, column=2, sticky=W)
         self.trv_available_patters_egroup = Treeview(frm_aux6, height=4, columns='Name')
         self.trv_available_patters_egroup.heading('#0', text='ID', anchor=CENTER)
@@ -289,8 +292,9 @@ class FormChildExSC:
 
         # Other important variables for internal use
         self.directive = Message()
-        self.current_problem = None
+        self.current_sc_comp = None
         self.scenario_components = []
+        self.experimental_scenario = None
 
     def retrieve_list(self):
         """
@@ -320,6 +324,7 @@ class FormChildExSC:
         self.frm_child_list.grid_forget()
         self.frm_child_general.grid_forget()
         self.frm_child_problem.grid_forget()
+        self.frm_child_patterns.grid_forget()
 
     def click_delete(self):
         """
@@ -343,52 +348,82 @@ class FormChildExSC:
         self.load_time()
         self.load_designers()
         self.frm_child_list.grid_forget()
+        self.btn_edit_comp.grid_forget()
         self.txt_name.focus_set()
         self.title_form = 'New'
         self.frm_child_general['text'] = self.title_form + ' experimental scenario'
         self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
-        """if self.trv_available.selection() != '':
-            item = self.trv_available.item(self.trv_available.selection())
-            self.id_selected = item['text']
-            self.decide = False
+        """
+        Function activated when 'Update' button is pressed
+        """
+        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+            self.decide = False # Important variable when saving, it indicates the 'Experimental scenario' is being modified
+            self.initialize_variables()  # Retrieve information to show in visual components
+            self.load_time()
+            self.load_designers()
+            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            # Retrieve selected experimental scenario
+            self.directive = Message(action=85, information=[self.id_selected])
+            self.connection = self.directive.send_directive(self.connection)
+            self.experimental_scenario = ExperimentalSC(id=self.id_selected, name=self.connection.message.information[0],
+                                                        description=self.connection.message.information[1],
+                                                        access_code=self.connection.message.information[2],
+                                                        start_time=self.connection.message.information[3],
+                                                        end_time=self.connection.message.information[4],
+                                                        scenario_availability=self.connection.message.information[5],
+                                                        scenario_lock=self.connection.message.information[6],
+                                                        id_experiment=self.connection.message.information[7],
+                                                        id_control_group=self.connection.message.information[8],
+                                                        id_experimental_group=self.connection.message.information[9],
+                                                        connection=self.connection)
+            # Retrieve scenario components
+            self.directive = Message(action=87, information=[self.id_selected, 1])
+            self.connection = self.directive.send_directive(self.connection)
+            for item in self.connection.message.information:
+                elements = item.split('¥')
+                self.scenario_components.append(ScenarioComponent(id_DB=int(elements[0]), id_exp_scenario=int(elements[1]),
+                                                                  id_problem=int(elements[2]), connection=self.connection))
+            # Fill visual components with retrieved information
+            self.txt_name.insert('1.0', self.experimental_scenario.name)
+            self.txt_description.insert('1.0', self.experimental_scenario.description)
+            self.txt_access_code.insert('1.0', self.experimental_scenario.access_code)
+            self.cbx_start_hour.set(self.experimental_scenario.start_time.hour)
+            self.cbx_start_minute.set(str(self.experimental_scenario.start_time.minute).zfill(2))
+            self.cbx_end_hour.set(self.experimental_scenario.end_time.hour)
+            self.cbx_end_minute.set(str(self.experimental_scenario.end_time.minute).zfill(2))
+            self.cbx_cgroup.set(self.experimental_scenario.control_group.name)
+            self.cbx_egroup.set(self.experimental_scenario.experimental_group.name)
+            for item in self.scenario_components:
+                if len(item.problem.solution.patterns_id) == 0:
+                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, ''))
+                else:
+                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '✓'))
             self.frm_child_list.grid_forget()
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-            msg = Message(action=30, information=[int(self.id_selected)])
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.receive_message()
-            self.txt_name.delete(0, END)
-            self.txt_name.insert(0, self.connection.message.information[0])
-            self.txt_description.delete(0, END)
-            self.txt_description.insert(0, self.connection.message.information[1])
-            self.txt_members.delete(0, END)
-            self.txt_members.insert(0, len(self.connection.message.information[2]))
-            s_designers = self.connection.message.information[2]
-            msg = Message(action=22, information=[])
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.receive_message()
-            a_designers = self.connection.message.information
-            self.retrieve_designers(s_designers, a_designers)
+            self.btn_edit_comp.grid(row=14, column=2, padx=20)
+            self.txt_name.focus_set()
+            self.title_form = 'Update'
+            self.frm_child_general['text'] = self.title_form + ' experimental scenario'
+            self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            self.lbl_mensaje['text'] = 'No register selected'"""
-
-        pass
+            messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_save_general(self):
         validation_option = self.validate_general_frm() # Validate any problem with info inserted into visual components
         if validation_option == 0:
+            exp_sc_aux = ExperimentalSC(name=self.txt_name.get('1.0', 'end-1c'),
+                                        description=self.txt_description.get('1.0', 'end-1c'),
+                                        access_code=self.txt_access_code.get('1.0', 'end-1c'),
+                                        start_time=time(int(self.cbx_start_hour.get()),
+                                                        int(self.cbx_start_minute.get()), 0),
+                                        end_time=time(int(self.cbx_end_hour.get()), int(self.cbx_end_minute.get()),
+                                                      0),
+                                        id_control_group=self.designers_group[int(self.cbx_cgroup.current())].id,
+                                        id_experimental_group=self.designers_group[
+                                            int(self.cbx_egroup.current())].id)
             if self.decide:
                 # Create an experimental scenario
-                exp_sc_aux = ExperimentalSC(name=self.txt_name.get('1.0', 'end-1c'),
-                                            description=self.txt_description.get('1.0', 'end-1c'),
-                                            access_code=self.txt_access_code.get('1.0', 'end-1c'),
-                                            start_time=time(int(self.cbx_start_hour.get()), int(self.cbx_start_minute.get()), 0),
-                                            end_time=time(int(self.cbx_end_hour.get()), int(self.cbx_end_minute.get()), 0),
-                                            id_control_group=self.designers_group[int(self.cbx_cgroup.current())].id,
-                                            id_experimental_group=self.designers_group[int(self.cbx_egroup.current())].id)
                 self.directive = Message(action=81, information=[exp_sc_aux.name, exp_sc_aux.description,
                                                                  exp_sc_aux.access_code, exp_sc_aux.start_time,
                                                                  exp_sc_aux.end_time, exp_sc_aux.scenario_availability,
@@ -400,6 +435,31 @@ class FormChildExSC:
                 for item in self.scenario_components:
                     self.directive = Message(action=86, information=[id_exp_sc, item.id_problem, item.id_patterns_cgroup,
                                                                      item.id_patterns_egroup])
+                    self.connection = self.directive.send_directive(self.connection)
+            else:
+                # Update selected experimental scenario
+                self.directive = Message(action=83, information=[self.experimental_scenario.id,
+                                                                 exp_sc_aux.name, exp_sc_aux.description,
+                                                                 exp_sc_aux.access_code, exp_sc_aux.start_time,
+                                                                 exp_sc_aux.end_time, exp_sc_aux.scenario_availability,
+                                                                 exp_sc_aux.scenario_lock, exp_sc_aux.experiment,
+                                                                 exp_sc_aux.id_control_group,
+                                                                 exp_sc_aux.id_experimental_group])
+                self.connection = self.directive.send_directive(self.connection)
+                # Update existing scenario components and create new ones if added
+                for item in self.scenario_components:
+                    if item.id_DB == 0: # Create new scenario components
+                        self.directive = Message(action=86,
+                                                 information=[self.experimental_scenario.id, item.id_problem,
+                                                              item.id_patterns_cgroup,
+                                                              item.id_patterns_egroup])
+                    elif item.id == 0:  # Delete scenario components
+                        self.directive = Message(action=89, information=[item.id_DB])
+                    else:   # Update existing scenario components
+                        self.directive = Message(action=88,
+                                                 information=[item.id_DB, item.id_problem,
+                                                              item.id_patterns_cgroup,
+                                                              item.id_patterns_egroup])
                     self.connection = self.directive.send_directive(self.connection)
             self.clear_fields()
             self.frm_child_general.grid_forget()
@@ -425,10 +485,11 @@ class FormChildExSC:
         decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
         if decision:
             self.clear_fields()
-            self.frm_child_general.grid_forget()
+            self.hide_frm()
             self.show_frm()
 
     def click_new_component(self):
+        self.decide_component = True
         self.load_problems()
         self.frm_child_general.grid_forget()
         self.frm_child_problem['text'] = self.title_form + ' scenario component'
@@ -439,9 +500,30 @@ class FormChildExSC:
             decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to delete the item?')
             if decision:
                 id_selected = int(self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'])
-                aux = [x for x in self.scenario_components if x.id == id_selected]
-                self.scenario_components.remove(aux[0])
-                self.trv_scenario_components.delete(self.trv_scenario_components.selection())
+                for item in self.scenario_components:
+                    if item.id == id_selected:
+                        index = self.scenario_components.index(item)
+                        break
+                if not self.decide and item.id_DB != 0: # If editing an experimental scenario and removing existing sc comp
+                    self.scenario_components[index].id = 0  # Mark scenario for removing from DB when when saving changes
+                else:
+                    self.scenario_components.remove(item)   # Remove sc component from local variable
+                self.trv_scenario_components.delete(self.trv_scenario_components.selection())   # Remove sc component from TRV
+
+        else:
+            messagebox.showwarning(title='No selection', message='You must select an item')
+
+    def click_edit_component(self):
+        if self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'] != '':
+            id_selected = int(self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'])
+            for item in self.scenario_components:
+                if item.id == id_selected:
+                    self.current_sc_comp = item
+                    break
+            self.click_new_component()
+            self.decide_component = False
+            self.show_current_problem(self.current_sc_comp.problem)
+            self.cbx_problem['state'] = DISABLED
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
@@ -461,29 +543,46 @@ class FormChildExSC:
                                                                         ' you want to continue?')
             # Saving an scenario component without associated patterns
             if decision:
-                scenario_component_aux = ScenarioComponent(id_problem=self.current_problem.id)
-                self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
-                                                    values=(self.current_problem.name, ''))
-                self.scenario_components.append(scenario_component_aux)
-                self.current_problem = None
+                if self.decide_component:
+                    scenario_component_aux = ScenarioComponent(id_problem=self.current_sc_comp.problem.id,
+                                                               problem=self.current_sc_comp.problem)
+                    self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
+                                                        values=(self.current_sc_comp.problem.name, ''))
+                    self.scenario_components.append(scenario_component_aux)
+                self.current_sc_comp = None
                 self.frm_child_problem.grid_forget()
                 self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_back_problem(self):
-        self.current_problem = None
+        self.current_sc_comp = None
         self.frm_child_problem.grid_forget()
         self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_save_sc_component(self):
         if len(self.trv_selected_patterns_cgroup.get_children()) != 0 and len(self.trv_selected_patterns_egroup.get_children()) != 0:
-            scenario_component_aux = ScenarioComponent(id_problem=self.current_problem.id)
+            if self.decide_component:
+                scenario_component_aux = ScenarioComponent(id_problem=self.current_sc_comp.problem.id,
+                                                           problem=self.current_sc_comp.problem)
+            else:
+                scenario_component_aux = ScenarioComponent(id=self.current_sc_comp.id,
+                                                           id_problem=self.current_sc_comp.problem.id,
+                                                           id_DB=self.current_sc_comp.id_DB,
+                                                           problem=self.current_sc_comp.problem)
             for item in self.trv_selected_patterns_cgroup.get_children():
                 scenario_component_aux.id_patterns_cgroup.append(self.trv_selected_patterns_cgroup.item(item)['text'])
             for item in self.trv_selected_patterns_egroup.get_children():
                 scenario_component_aux.id_patterns_egroup.append(self.trv_selected_patterns_egroup.item(item)['text'])
-            self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id, values=(self.current_problem.name, '✓'))
-            self.scenario_components.append(scenario_component_aux)
-            self.current_problem = None
+            if self.decide_component:
+                self.scenario_components.append(scenario_component_aux)
+                self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
+                                                    values=(self.current_sc_comp.problem.name, '✓'))
+            else:
+                for item in self.scenario_components:
+                    if item.id == self.current_sc_comp.id:
+                        index = self.scenario_components.index(item)
+                        break
+                self.scenario_components[index] = scenario_component_aux
+            self.current_sc_comp = None
             self.frm_child_patterns.grid_forget()
             self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
@@ -542,7 +641,7 @@ class FormChildExSC:
                 len(self.txt_access_code.get('1.0','end-1c')) !=0 and self.cbx_start_hour.get() != 0 and \
                 self.cbx_start_minute.get() != 0 and self.cbx_end_hour.get() !=0 and self.cbx_end_minute.get() !=0 and \
                 self.cbx_cgroup.get() != 0 and self.cbx_egroup.get() != 0:
-            if self.valdate_time_range():
+            if self.validate_time_range():
                 if self.cbx_egroup.get() != self.cbx_cgroup.get():
                     if len(self.trv_scenario_components.get_children()) != 0:
                         return 0
@@ -556,22 +655,29 @@ class FormChildExSC:
             return 1
 
     def validate_problem_frm(self):
-        if self.cbx_problem.get() != 0 and self.current_problem is not None:
-            repeated_problem = 0
-            for item in self.scenario_components:
-                if item.id_problem == self.current_problem.id:
-                    repeated_problem += 1
-            if repeated_problem == 0:
-                if self.current_problem.solution.patterns_id != []:
-                    return 0
+        if self.decide_component:
+            if self.cbx_problem.get() != 0 and self.current_sc_comp.problem is not None:
+                repeated_problem = 0
+                for item in self.scenario_components:
+                    # Validate repetition of the problem in the sc components of the list
+                    if item.id_problem == self.current_sc_comp.problem.id and item.id != 0:  # If sc comp existing in DB and was deleted
+                        repeated_problem += 1
+                if repeated_problem == 0:
+                    if self.current_sc_comp.problem.solution.patterns_id:
+                        return 0
+                    else:
+                        return 3
                 else:
-                    return 3
+                    return 2
             else:
-                return 2
+                return 1
         else:
-            return 1
+            if self.current_sc_comp.problem.solution.patterns_id:
+                return 0
+            else:
+                return 3
 
-    def valdate_time_range(self):
+    def validate_time_range(self):
         if int(self.cbx_end_hour.get()) - int(self.cbx_start_hour.get()) < 0:
             return False
         elif int(self.cbx_end_hour.get()) - int(self.cbx_start_hour.get()) == 0:
@@ -599,10 +705,12 @@ class FormChildExSC:
 
     def load_problems(self):
         # Clear fields associated with the 'problem'
+        self.cbx_problem['state'] = NORMAL
         self.txt_problem_desc['state'] = NORMAL
         self.txt_problem_desc.delete('1.0', 'end-1c')
         self.txt_problem_desc['state'] = DISABLED
         self.cbx_problem['values'] = []
+        self.cbx_problem.set('')
         # Load comboboxes with available problems
         for item in self.problems:
             self.cbx_problem['values'] += (item.name,)
@@ -627,21 +735,59 @@ class FormChildExSC:
             self.trv_selected_patterns_egroup.delete(item)
         for item in self.trv_selected_patterns_cgroup.get_children():
             self.trv_selected_patterns_cgroup.delete(item)
-        # Adding elements in the list
-        for item in self.patterns:
-            content = item.get_content_name()
-            self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
-            self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
+        # Adding elements in the list depending if the component is new or being modified
+        if not self.decide_component:   # This is executed when an scenario component is being edited
+            a_patterns_cgroup = self.patterns[:]
+            a_patterns_egroup = self.patterns[:]
+            s_patterns_cgroup = self.current_sc_comp.id_patterns_cgroup
+            selected_patterns_cg = []
+            s_patterns_egroup = self.current_sc_comp.id_patterns_egroup
+            selected_patterns_eg = []
+            # Compare and distribute patterns correctly in control group
+            for identity in s_patterns_cgroup:
+                for item in a_patterns_cgroup:
+                    if identity == item.id:
+                        selected_patterns_cg.append(item)
+                        a_patterns_cgroup.remove(item)
+            # Compare and distribute patterns correctly in experimental group
+            for identity in s_patterns_egroup:
+                for item in a_patterns_egroup:
+                    if identity == item.id:
+                        selected_patterns_eg.append(item)
+                        a_patterns_egroup.remove(item)
+            # Fill TVs with the results from the comparation
+            for item in a_patterns_cgroup:
+                content = item.get_content_name()
+                self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
+            for item in selected_patterns_cg:
+                content = item.get_content_name()
+                self.trv_selected_patterns_cgroup.insert('', 'end', text=item.id, values=(content,))
+            for item in a_patterns_egroup:
+                content = item.get_content_name()
+                self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
+            for item in selected_patterns_eg:
+                content = item.get_content_name()
+                self.trv_selected_patterns_egroup.insert('', 'end', text=item.id, values=(content,))
+        else:
+            for item in self.patterns:
+                content = item.get_content_name()
+                self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
+                self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
 
     def cbx_problem_selected(self, event):
-        self.current_problem = self.problems[int(self.cbx_problem.current())]
+        self.current_sc_comp = ScenarioComponent(id=100)
+        self.current_sc_comp.problem = self.problems[int(self.cbx_problem.current())]
+        self.show_current_problem(self.current_sc_comp.problem)
+
+    def show_current_problem(self, problem):
+        self.cbx_problem.set(problem.name)
         # Insert description of the current problem into visual component
         self.txt_problem_desc['state'] = NORMAL
         self.txt_problem_desc.delete('1.0', 'end-1c')
-        self.txt_problem_desc.insert('1.0', self.current_problem.description)
+        self.txt_problem_desc.insert('1.0', problem.description)
         self.txt_problem_desc['state'] = DISABLED
         # Switch image shown in button depending if the ideal solution has or not associated patterns
-        if self.current_problem.solution.patterns_id != []:
+        if problem.solution.patterns_id:
             self.btn_next_problem['image'] = self.next_icon
             self.load_patterns()
         else:
@@ -651,4 +797,13 @@ class FormChildExSC:
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
         self.txt_access_code.delete('1.0', 'end-1c')
+        self.cbx_start_hour.set('')
+        self.cbx_start_minute.set('')
+        self.cbx_end_hour.set('')
+        self.cbx_end_minute.set('')
+        self.cbx_cgroup.set('')
+        self.cbx_egroup.set('')
+        self.cbx_problem.set('')
+        for item in self.trv_scenario_components.get_children():
+            self.trv_scenario_components.delete(item)
 

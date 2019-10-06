@@ -8,6 +8,8 @@ SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
+TEXT_COLOR = "#1B5070"
+
 
 class FormParentSection:
     def __init__(self, window, connection):
@@ -16,8 +18,8 @@ class FormParentSection:
         self.frm_child = FormChildSection(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Sections administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text='Sections')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -37,7 +39,7 @@ class FormChildSection:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -78,13 +80,13 @@ class FormChildSection:
         # Components for CRUD FRM
         self.frm_aux1 = Frame(self.frm_child_crud)
         lbl_type = Label(self.frm_aux1, text='Data type             ')
-        lbl_type.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_type.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_type.grid(pady=10, padx=50, sticky=W)
         lbl_name = Label(self.frm_aux1, text='Name')
-        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(self.frm_aux1, text='Description')
-        lbl_description.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=W)
         self.cbx_data = Combobox(self.frm_aux1, state="readonly")
         self.cbx_data['values'] = ['Text', 'File', 'Classification']
@@ -105,10 +107,10 @@ class FormChildSection:
         # Frame for showing available classifications
         self.frm_aux2 = Frame(self.frm_aux1)
         lbl_class = Label(self.frm_aux2, text='Select classification')
-        lbl_class.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_class.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_class.grid(pady=10, padx=50, sticky=W)
         lbl_category = Label(self.frm_aux2, text='Categories')
-        lbl_category.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_category.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_category.grid(pady=10, padx=50, sticky=NW)
         self.cbx_classification = Combobox(self.frm_aux2, state="readonly")
         self.cbx_classification.bind("<<ComboboxSelected>>", self.cbx_class_selected)

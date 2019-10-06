@@ -3,16 +3,17 @@ import shutil
 from tkinter import Label, LabelFrame, Text, Button, Checkbutton, Canvas, BooleanVar, messagebox, Frame, filedialog, \
     PhotoImage
 from tkinter.constants import *
-from tkinter.ttk import Treeview
-
+from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_text, CreateToolTip
+from tkinter.ttk import Treeview, Separator
 from PIL import ImageTk, Image
 
-from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_text, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
+
+TEXT_COLOR = "#1B5070"
 
 
 class FormParentProblem:
@@ -22,8 +23,8 @@ class FormParentProblem:
         self.frm_child = FormChildProblem(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Problems administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text='Problems')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -42,9 +43,9 @@ class FormChildProblem:
         self.file = None
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.frm_child_patterns = LabelFrame(frm_parent)
-        self.frm_child_patterns.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_patterns.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -83,16 +84,28 @@ class FormChildProblem:
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=50, pady=25)
+        self.trv_available.bind("<ButtonRelease-1>", self.select_problem_summary)
+        sep_problem = Separator(self.frm_child_list, orient=VERTICAL)
+        sep_problem.grid(row=0, column=6, sticky=NS, rowspan=20, padx=20)
+        self.canvas_summary = Canvas(self.frm_child_list, width=160, height=160)
+        self.canvas_summary.config(background='white', borderwidth=1)
+        self.canvas_summary.grid(row=1, column=7, padx=20, pady=100, rowspan=20, sticky=W)
+        self.trv_list_summary = Treeview(self.frm_child_list, height=4, columns='Patterns', selectmode='none')
+        self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
+        self.trv_list_summary.heading('#1', text='Patterns', anchor=CENTER)
+        self.trv_list_summary.column('#0', width=0, minwidth=50, stretch=NO)
+        self.trv_list_summary.column('#1', width=200, minwidth=200, stretch=NO)
+        self.trv_list_summary.grid(row=1, column=8, columnspan=5, rowspan=20, sticky=W, padx=20, pady=100)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
         frm_aux2 = LabelFrame(self.frm_child_crud, text='Ideal solution')
-        frm_aux2.config(fg="#222cb3", font=SUBTITLE_FONT)
+        frm_aux2.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_name = Label(frm_aux1, text='Name')
-        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=NW)
         lbl_description = Label(frm_aux1, text='Description')
-        lbl_description.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=NW)
         self.txt_name_prob = Text(frm_aux1, height=1, width=60)
         self.txt_name_prob.config(font=TEXT_FONT)
@@ -101,13 +114,13 @@ class FormChildProblem:
         self.txt_description_prob.config(font=TEXT_FONT)
         self.txt_description_prob.grid(row=1, column=1, pady=10, padx=50,)
         lbl_annotations = Label(frm_aux2, text='Notes \n(optional)')
-        lbl_annotations.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_annotations.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_annotations.grid(pady=10, padx=50, sticky=NW)
         self.txt_annotations = Text(frm_aux2, height=6, width=60)
         self.txt_annotations.config(font=TEXT_FONT)
         self.txt_annotations.grid(row=0, column=1, pady=10, padx=50, columnspan=3)
         lbl_diagram = Label(frm_aux2, text='File')
-        lbl_diagram.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_diagram.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_diagram.grid(row=1, column=0, pady=10, padx=50, sticky=NW)
         btn_open = Button(frm_aux2, image=self.open_icon, command=self.click_upload_file)
         btn_open.grid(row=1, column=2, padx=50, pady=10, sticky=W)
@@ -134,13 +147,13 @@ class FormChildProblem:
 
         # Components for patterns selection
         lbl_select_patt = Label(self.frm_child_patterns, text='Select patterns for the solution')
-        lbl_select_patt.config(fg="#222cb3", font=SUBTITLE_FONT)
+        lbl_select_patt.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_select_patt.grid(row=0, column=0, columnspan=3, pady=20, padx=50, sticky=W)
         lbl_available_patt = Label(self.frm_child_patterns, text='Available patterns')
-        lbl_available_patt.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_available_patt.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_available_patt.grid(row=1, column=0, pady=10, padx=50, sticky=SW)
         lbl_selected_patt = Label(self.frm_child_patterns, text='Selected patterns')
-        lbl_selected_patt.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_selected_patt.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_patt.grid(row=1, column=2, pady=10, padx=50, sticky=SW)
         self.trv_available_patterns = Treeview(self.frm_child_patterns, height=5, columns='Name')
         self.trv_available_patterns.heading('#0', text='ID', anchor=CENTER)
@@ -186,6 +199,41 @@ class FormChildProblem:
             elements = item.split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(elements[1],  wrap_text(elements[2], 72)))
 
+    def select_problem_summary(self, event):
+        """
+        Function activated when the event of selecting an item in the available problems TV is generated. It fills the
+        summary TV with information of the selected problem
+        :param event:
+        """
+        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
+            self.directive = Message(action=55, information=[id_selected])  # ask for the content of the selected problem
+            self.connection = self.directive.send_directive(self.connection)
+            problem_aux = Problem(id=id_selected, name=self.connection.message.information[0],
+                                  description=self.connection.message.information[1],
+                                  id_solution=self.connection.message.information[2], connection=self.connection)
+            self.directive = Message(action=65, information=[problem_aux.solution.diagram_id])
+            self.connection = self.directive.send_directive(self.connection)
+            file_aux = File()
+            file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
+            # Remove existing elements in the list
+            for item in self.trv_list_summary.get_children():
+                self.trv_list_summary.delete(item)
+            # Adding elements in the list
+            if len(problem_aux.solution.patterns_id) == 0:
+                self.trv_list_summary.grid_forget()
+            else:
+                self.trv_list_summary.grid(row=1, column=12, columnspan=5, rowspan=20, sticky=W, padx=20, pady=100)
+                for item in problem_aux.solution.patterns_id:
+                    id_pattern = item.split('¥')
+                    self.trv_list_summary.insert('', 'end', text='', values=(id_pattern[0],))
+            # Fill canvas with retrieved image
+            load = Image.open(file_aux.filename)
+            load = load.resize((160, 160), Image.ANTIALIAS)
+            self.render = ImageTk.PhotoImage(load)
+            self.canvas_summary.delete()
+            file_aux.image = self.canvas_summary.create_image(0, 0, anchor='nw', image=self.render)  # and display new image
+
     def show_frm(self):
         """
         Displays the home page of the 'Problems'
@@ -194,6 +242,8 @@ class FormChildProblem:
         # more than once when switching between CRUD form and patterns selection form
         self.back_window = True
         self.retrieve_list()
+        self.trv_available.selection_set(self.trv_available.get_children()[0])
+        self.select_problem_summary(None)
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -547,7 +597,7 @@ class FormChildProblem:
         if self.file is not None:  # if an image was already loaded
             self.canvas.delete(self.file.image)  # clear canvas
             self.file = None    # set file NULL
-        self.btn_next['text'] = 'Save'
+        self.btn_next['image'] = self.save_icon
         self.var_patterns.set(False)
         shutil.rmtree('./Resources/temp/')  # remove files that may had been retrieved from the DB
         os.mkdir('./Resources/temp/')

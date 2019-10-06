@@ -1,13 +1,14 @@
-import os
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage
 from tkinter.constants import *
-from tkinter.ttk import Treeview
+from tkinter.ttk import Treeview, Separator
 from Modules.Config.Data import Message, CreateToolTip
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
+
+TEXT_COLOR = "#1B5070"
 
 
 class FormParentTemplate:
@@ -17,8 +18,8 @@ class FormParentTemplate:
         self.frm_child = FormChildTemplate(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Templates administration')
-        lbl_experimenter_title.config(fg="#222cb3", font=TITLE_FONT)
+        lbl_experimenter_title = Label(self.frm_parent, text='Templates')
+        lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
     def show_frm(self):
@@ -38,9 +39,9 @@ class FormChildTemplate:
         self.id_selected = 0
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
-        self.frm_child_crud.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.frm_child_section = LabelFrame(frm_parent)
-        self.frm_child_section.config(fg="#222cb3", font=SUBTITLE_FONT)
+        self.frm_child_section.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -79,6 +80,8 @@ class FormChildTemplate:
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_template_summary)
         self.trv_available.grid(row=1, column=1, columnspan=10, rowspan=20, sticky=W, padx=50, pady=25)
+        sep_template = Separator(self.frm_child_list, orient=VERTICAL)
+        sep_template.grid(row=0, column=11, sticky=NS, rowspan=21, padx=5)
         self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Data type', 'Mandatory'),
                                          selectmode='none')
         self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
@@ -89,16 +92,16 @@ class FormChildTemplate:
         self.trv_list_summary.column('#1', width=100, minwidth=100, stretch=NO)
         self.trv_list_summary.column('#2', width=200, minwidth=200, stretch=NO)
         self.trv_list_summary.column('#3', width=100, minwidth=100, stretch=NO)
-        self.trv_list_summary.grid(row=1, column=11, columnspan=5, rowspan=20, sticky=W, padx=50, pady=100)
+        self.trv_list_summary.grid(row=1, column=12, columnspan=5, rowspan=20, sticky=W, padx=50, pady=100)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
         frm_aux2 = Frame(self.frm_child_crud)
         lbl_name = Label(frm_aux1, text='Name')
-        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(frm_aux1, text='Description')
-        lbl_description.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=NW)
         self.txt_name = Text(frm_aux1, height=1, width=60)
         self.txt_name.config(font=TEXT_FONT)
@@ -113,10 +116,10 @@ class FormChildTemplate:
         btn_cancel.grid(row=1, column=2, padx=30, sticky=NW)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
         lbl_available_d = Label(frm_aux2, text='Available sections')
-        lbl_available_d.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_available_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
         lbl_selected_d = Label(frm_aux2, text='Selected sections')
-        lbl_selected_d.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_selected_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_d.grid(row=0, column=2, pady=10, sticky=W)
         self.trv_available_sections = Treeview(frm_aux2, height=5, columns=('Name', 'Data Type'))
         self.trv_available_sections.heading('#0', text='ID', anchor=CENTER)
@@ -185,6 +188,8 @@ class FormChildTemplate:
 
     def show_frm(self):
         self.retrieve_list()
+        self.trv_available.selection_set(self.trv_available.get_children()[0])
+        self.select_template_summary(None)
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
