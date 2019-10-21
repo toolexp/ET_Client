@@ -7,7 +7,6 @@ from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_
 from tkinter.ttk import Treeview, Separator
 from PIL import ImageTk, Image
 
-
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
@@ -186,6 +185,8 @@ class FormChildProblem:
         """
         This function shows the existing 'Problems' in the home TreeView
         """
+        # Retrieve available patterns
+        self.patterns = Pattern.get_available_patterns(self.connection)
         # Remove existing elements in the TreeView
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
@@ -226,7 +227,10 @@ class FormChildProblem:
                 self.trv_list_summary.grid(row=1, column=12, columnspan=5, rowspan=20, sticky=W, padx=20, pady=100)
                 for item in problem_aux.solution.patterns_id:
                     id_pattern = item.split('¥')
-                    self.trv_list_summary.insert('', 'end', text='', values=(id_pattern[0],))
+                    for item in self.patterns:
+                        if item.id == int(id_pattern[0]):
+                            break
+                    self.trv_list_summary.insert('', 'end', text='', values=(item.get_content_name(),))
             # Fill canvas with retrieved image
             load = Image.open(file_aux.filename)
             load = load.resize((160, 160), Image.ANTIALIAS)
@@ -388,8 +392,6 @@ class FormChildProblem:
             else:   # Button has 'Next' function
                 if self.back_window:
                     self.back_window = False
-                    # Retrieve patterns from DB
-                    self.patterns = Pattern.get_available_patterns(self.connection)
                     if self.decide:
                         self.retrieve_patterns([], self.patterns)
                     else:

@@ -1,7 +1,9 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage
+from datetime import time
+from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Toplevel
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
-from Modules.Config.Data import *
+from Modules.Config.Data import Message, ExperimentalSC, ScenarioComponent, CreateToolTip, Problem, Pattern, \
+    DesignersGroup
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -40,10 +42,9 @@ class FormChildExSC:
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_general = LabelFrame(frm_parent)
         self.frm_child_general.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        self.frm_child_problem = LabelFrame(frm_parent)
-        self.frm_child_problem.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        self.frm_child_patterns = LabelFrame(frm_parent)
-        self.frm_child_patterns.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        self.tlevel_problem = Toplevel(frm_parent)
+        #self.tlevel_problem.overrideredirect(1)
+        self.tlevel_problem.withdraw()
         self.initialize_components()
 
     def initialize_components(self):
@@ -60,6 +61,7 @@ class FormChildExSC:
         self.delete_icon = PhotoImage(file=r"./Resources/left.png")
         self.next_icon = PhotoImage(file=r"./Resources/next.png")
         self.back_icon = PhotoImage(file=r"./Resources/back.png")
+        self.copy_icon = PhotoImage(file=r"./Resources/copy.png")
         defaultbg = self.frm_child_general.cget('bg')
 
         # Components for List FRM
@@ -85,7 +87,7 @@ class FormChildExSC:
 
         # Components for General info FRM
         lbl_name = Label(self.frm_child_general, text='Name')
-        lbl_name.config(fg="#222cb3", font=LABEL_FONT)
+        lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
         lbl_description = Label(self.frm_child_general, text='Description')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
@@ -169,11 +171,8 @@ class FormChildExSC:
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
         # Components for configuring a problem of the scenario component FRM
-        frm_aux2 = Frame(self.frm_child_problem)
-        lbl_problem_action = Label(frm_aux2, text='Problem of the scenario component')
-        lbl_problem_action.config(fg="#222cb3", font=SUBTITLE2_FONT)
-        lbl_problem_action.grid(pady=10, padx=50, sticky=W, columnspan=2)
-        lbl_problem = Label(frm_aux2, text='Problem')
+        frm_aux2 = Frame(self.tlevel_problem)
+        lbl_problem = Label(frm_aux2, text='Design Problem')
         lbl_problem.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_problem.grid(pady=10, padx=50, sticky=W)
         lbl_problem_desc = Label(frm_aux2, text='Description')
@@ -182,21 +181,22 @@ class FormChildExSC:
         self.cbx_problem = Combobox(frm_aux2, state="readonly", width=80)
         self.cbx_problem.config(font=TEXT_FONT)
         self.cbx_problem.bind("<<ComboboxSelected>>", self.cbx_problem_selected)
-        self.cbx_problem.grid(row=1, column=1, padx=50, pady=10, sticky=W)
+        self.cbx_problem.grid(row=0, column=1, padx=50, pady=10, sticky=W)
         self.txt_problem_desc = Text(frm_aux2, height=6, width=80)
         self.txt_problem_desc.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_problem_desc.grid(row=2, column=1, padx=50, pady=10, rowspan=6)
-        self.btn_next_problem = Button(frm_aux2, image=self.next_icon, command=self.click_next_problem)
-        btn_next_ttp = CreateToolTip(self.btn_next_problem, 'Next')
-        self.btn_next_problem.grid(row=0, column=9, padx=20)
-        btn_back = Button(frm_aux2, image=self.back_icon, command=self.click_back_problem)
-        btn_back.grid(row=1, column=9, padx=20)
-        btn_back_ttp = CreateToolTip(btn_back, 'Go back')
+        self.txt_problem_desc.grid(row=1, column=1, padx=50, pady=10, rowspan=6)
+
+        btn_save_scomp = Button(frm_aux2, image=self.save_icon, command=self.click_save_sc_component)
+        btn_save_scomp_ttp = CreateToolTip(btn_save_scomp, 'Save')
+        btn_save_scomp.grid(row=0, column=9, padx=20)
+        btn_cancel_scomp = Button(frm_aux2, image=self.cancel_icon, command=self.click_cancel_sc_component)
+        btn_cancel_scomp.grid(row=1, column=9, padx=20)
+        btn_cancel_scomp_ttp = CreateToolTip(btn_cancel_scomp, 'Cancel')
         frm_aux2.grid(row=0, column=0, pady=20, padx=10, columnspan=7, rowspan=5)
 
         # Components for adding patterns to the designers groups
-        frm_aux3 = Frame(self.frm_child_patterns)
-        frm_aux6 = Frame(self.frm_child_patterns)
+        frm_aux3 = Frame(self.tlevel_problem)
+        frm_aux6 = Frame(self.tlevel_problem)
         lbl_cgroup_patterns = Label(frm_aux3, text='Set patterns for the control group:')
         lbl_cgroup_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_cgroup_patterns.grid(row=0, column=0, sticky=W, pady=10, columnspan=3)
@@ -226,9 +226,12 @@ class FormChildExSC:
         btn_remove_cg = Button(frm_aux3, image=self.delete_icon, command=self.click_remove_cgroup)
         btn_remove_cg.grid(row=6, column=1, padx=20)
         btn_remove_cg_ttp = CreateToolTip(btn_remove_cg, 'Remove pattern')
-        frm_aux3.grid(row=0, column=0, pady=20, padx=10, rowspan=10)
-        sep_problem = Separator(self.frm_child_patterns, orient=VERTICAL)
-        sep_problem.grid(row=0, column=1, sticky=NS, rowspan=10, padx=20)
+        frm_aux3.grid(row=5, column=0, pady=20, padx=10, rowspan=10)
+
+        btn_copy_patterns = Button(self.tlevel_problem, image=self.copy_icon, command=self.click_copy_patterns)
+        btn_copy_patterns.grid(row=10, column=1, padx=5)
+        btn_copy_patterns_ttp = CreateToolTip(btn_copy_patterns, 'Copy patterns')
+
         lbl_egroup_patterns = Label(frm_aux6, text='Set patterns for the experimental group:')
         lbl_egroup_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_egroup_patterns.grid(row=0, column=0, pady=10, sticky=W, columnspan=3)
@@ -258,13 +261,7 @@ class FormChildExSC:
         btn_remove_eg = Button(frm_aux6, image=self.delete_icon, command=self.click_remove_egroup)
         btn_remove_eg.grid(row=6, column=1, padx=20)
         btn_remove_eg_ttp = CreateToolTip(btn_remove_eg, 'Remove pattern')
-        frm_aux6.grid(row=0, column=2, pady=20, padx=10, rowspan=10)
-        btn_sc_save = Button(self.frm_child_patterns, image=self.save_icon, command=self.click_save_sc_component)
-        btn_sc_save.grid(row=0, column=3, padx=20)
-        btn_save_sc_ttp = CreateToolTip(btn_sc_save, 'Save scenario component')
-        btn_sc_back = Button(self.frm_child_patterns, image=self.back_icon, command=self.click_back_sc_component)
-        btn_sc_back.grid(row=1, column=3, padx=20)
-        btn_back_sc_ttp = CreateToolTip(btn_sc_back, 'Go back')
+        frm_aux6.grid(row=5, column=2, pady=20, padx=10, rowspan=10)
 
     def initialize_variables(self):
         """
@@ -323,8 +320,6 @@ class FormChildExSC:
         self.clear_fields()
         self.frm_child_list.grid_forget()
         self.frm_child_general.grid_forget()
-        self.frm_child_problem.grid_forget()
-        self.frm_child_patterns.grid_forget()
 
     def click_delete(self):
         """
@@ -491,9 +486,10 @@ class FormChildExSC:
     def click_new_component(self):
         self.decide_component = True
         self.load_problems()
-        self.frm_child_general.grid_forget()
-        self.frm_child_problem['text'] = self.title_form + ' scenario component'
-        self.frm_child_problem.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        self.load_patterns()
+        self.tlevel_problem.title(self.title_form + ' problem')
+        self.tlevel_problem.deiconify()
+        self.tlevel_problem.grab_set()
 
     def click_delete_component(self):
         if self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'] != '':
@@ -527,70 +523,61 @@ class FormChildExSC:
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
-    def click_next_problem(self):
-        validation_option = self.validate_problem_frm() # Validate any problem with info inserted into visual components
-        # The selected problem has associated patterns that need to be associated with each designers group
-        if validation_option == 0:
-            self.frm_child_problem.grid_forget()
-            self.frm_child_patterns['text'] = self.title_form + ' scenario component'
-            self.frm_child_patterns.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-        elif validation_option == 1:
-            messagebox.showwarning(title='Missing information', message='You must select a problem!')
-        elif validation_option == 2:
-            messagebox.showwarning(title='Repeated problem', message='The selected problem has been already chosen')
-        else:
-            decision = messagebox.askyesno(title='No patterns', message='Current problem has no patterns associated. Do'
-                                                                        ' you want to continue?')
-            # Saving an scenario component without associated patterns
-            if decision:
-                if self.decide_component:
+    def click_save_sc_component(self):
+        validation_option = self.validate_problem_frm()  # Validate any issue associated with problem selection
+        if validation_option == 0: # No issues
+            if len(self.trv_selected_patterns_cgroup.get_children()) != 0 and len(
+                    self.trv_selected_patterns_egroup.get_children()) != 0: # When at least one pattern is selected
+                if self.decide_component:   # New component
                     scenario_component_aux = ScenarioComponent(id_problem=self.current_sc_comp.problem.id,
                                                                problem=self.current_sc_comp.problem)
-                    self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
-                                                        values=(self.current_sc_comp.problem.name, ''))
+                else:   # Edit component
+                    scenario_component_aux = ScenarioComponent(id=self.current_sc_comp.id,
+                                                               id_problem=self.current_sc_comp.problem.id,
+                                                               id_DB=self.current_sc_comp.id_DB,
+                                                               problem=self.current_sc_comp.problem)
+                for item in self.trv_selected_patterns_cgroup.get_children():
+                    scenario_component_aux.id_patterns_cgroup.append(
+                        self.trv_selected_patterns_cgroup.item(item)['text'])
+                for item in self.trv_selected_patterns_egroup.get_children():
+                    scenario_component_aux.id_patterns_egroup.append(
+                        self.trv_selected_patterns_egroup.item(item)['text'])
+                if self.decide_component:
                     self.scenario_components.append(scenario_component_aux)
+                    self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
+                                                        values=(self.current_sc_comp.problem.name, '✓'))
+                else:
+                    for item in self.scenario_components:
+                        if item.id == self.current_sc_comp.id:
+                            index = self.scenario_components.index(item)
+                            break
+                    self.scenario_components[index] = scenario_component_aux
                 self.current_sc_comp = None
-                self.frm_child_problem.grid_forget()
-                self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-
-    def click_back_problem(self):
-        self.current_sc_comp = None
-        self.frm_child_problem.grid_forget()
-        self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-
-    def click_save_sc_component(self):
-        if len(self.trv_selected_patterns_cgroup.get_children()) != 0 and len(self.trv_selected_patterns_egroup.get_children()) != 0:
-            if self.decide_component:
-                scenario_component_aux = ScenarioComponent(id_problem=self.current_sc_comp.problem.id,
-                                                           problem=self.current_sc_comp.problem)
+                self.tlevel_problem.grab_release()
+                self.tlevel_problem.withdraw()
             else:
-                scenario_component_aux = ScenarioComponent(id=self.current_sc_comp.id,
-                                                           id_problem=self.current_sc_comp.problem.id,
-                                                           id_DB=self.current_sc_comp.id_DB,
-                                                           problem=self.current_sc_comp.problem)
-            for item in self.trv_selected_patterns_cgroup.get_children():
-                scenario_component_aux.id_patterns_cgroup.append(self.trv_selected_patterns_cgroup.item(item)['text'])
-            for item in self.trv_selected_patterns_egroup.get_children():
-                scenario_component_aux.id_patterns_egroup.append(self.trv_selected_patterns_egroup.item(item)['text'])
-            if self.decide_component:
-                self.scenario_components.append(scenario_component_aux)
-                self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
-                                                    values=(self.current_sc_comp.problem.name, '✓'))
-            else:
-                for item in self.scenario_components:
-                    if item.id == self.current_sc_comp.id:
-                        index = self.scenario_components.index(item)
-                        break
-                self.scenario_components[index] = scenario_component_aux
-            self.current_sc_comp = None
-            self.frm_child_patterns.grid_forget()
-            self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+                decision = messagebox.askyesno(parent = self.tlevel_problem, title='No patterns',
+                                               message='No patterns selected. Do you want to continue?')
+                # Saving an scenario component without associated patterns
+                if decision:
+                    if self.decide_component:
+                        scenario_component_aux = ScenarioComponent(id_problem=self.current_sc_comp.problem.id,
+                                                                   problem=self.current_sc_comp.problem)
+                        self.trv_scenario_components.insert('', 'end', text=scenario_component_aux.id,
+                                                            values=(self.current_sc_comp.problem.name, ''))
+                        self.scenario_components.append(scenario_component_aux)
+                    self.current_sc_comp = None
+                    self.tlevel_problem.grab_release()
+                    self.tlevel_problem.withdraw()
+        elif validation_option == 1:
+            messagebox.showwarning(parent = self.tlevel_problem, title='Missing information', message='You must select a problem!')
         else:
-            messagebox.showwarning(title='Missing pattern', message='You must associate patterns for both groups')
+            messagebox.showwarning(parent = self.tlevel_problem, title='Repeated problem', message='The selected problem has been already chosen')
 
-    def click_back_sc_component(self):
-        self.frm_child_patterns.grid_forget()
-        self.frm_child_problem.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+    def click_cancel_sc_component(self):
+        self.current_sc_comp = None
+        self.tlevel_problem.grab_release()
+        self.tlevel_problem.withdraw()
 
     def click_trv_apatters_cgroup(self, event):
         self.trv_selected_patterns_cgroup.selection_remove(self.trv_selected_patterns_cgroup.selection())
@@ -663,19 +650,13 @@ class FormChildExSC:
                     if item.id_problem == self.current_sc_comp.problem.id and item.id != 0:  # If sc comp existing in DB and was deleted
                         repeated_problem += 1
                 if repeated_problem == 0:
-                    if self.current_sc_comp.problem.solution.patterns_id:
-                        return 0
-                    else:
-                        return 3
+                    return 0
                 else:
                     return 2
             else:
                 return 1
         else:
-            if self.current_sc_comp.problem.solution.patterns_id:
-                return 0
-            else:
-                return 3
+            return 0
 
     def validate_time_range(self):
         if int(self.cbx_end_hour.get()) - int(self.cbx_start_hour.get()) < 0:
@@ -786,12 +767,6 @@ class FormChildExSC:
         self.txt_problem_desc.delete('1.0', 'end-1c')
         self.txt_problem_desc.insert('1.0', problem.description)
         self.txt_problem_desc['state'] = DISABLED
-        # Switch image shown in button depending if the ideal solution has or not associated patterns
-        if problem.solution.patterns_id:
-            self.btn_next_problem['image'] = self.next_icon
-            self.load_patterns()
-        else:
-            self.btn_next_problem['image'] = self.save_icon
 
     def clear_fields(self):
         self.txt_name.delete('1.0', 'end-1c')
@@ -807,3 +782,12 @@ class FormChildExSC:
         for item in self.trv_scenario_components.get_children():
             self.trv_scenario_components.delete(item)
 
+    def click_copy_patterns(self):
+        if len(self.trv_selected_patterns_cgroup.get_children()) != 0 and len(
+                self.trv_selected_patterns_egroup.get_children()) == 0:
+            for child in self.trv_selected_patterns_cgroup.get_children():
+                self.trv_selected_patterns_egroup.insert('', 'end', text=self.trv_selected_patterns_cgroup.item(child)['text'], values=self.trv_selected_patterns_cgroup.item(child)['values'])
+                for object in self.trv_available_patters_egroup.get_children():
+                    if self.trv_selected_patterns_cgroup.item(child)['text'] == self.trv_available_patters_egroup.item(object)['text']:
+                        self.trv_available_patters_egroup.delete(object)
+                        break

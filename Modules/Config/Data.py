@@ -19,6 +19,26 @@ class Message:
         return connection
 
 
+def verify_ip(ip):
+    try:
+        digits = ip.split('.')
+        for item in digits:
+            if not item.isdigit():
+                return False
+            if int(item) > 255:
+                return False
+    except:
+        return False
+    return True
+
+
+def verify_port(port):
+    if not port.isdigit():
+        return False
+    else:
+        return True
+
+
 class DesignersGroup:
     def __init__(self, id=0, name='', description=''):
         self.id = id
@@ -260,6 +280,13 @@ class ScenarioComponent:
                     self.id_patterns_cgroup.append(int(elements[3]))
                 else:
                     self.id_patterns_egroup.append(int(elements[3]))
+
+
+class Experiment:
+    def __init__(self, id=0, name='', description=''):
+        self.id = id
+        self.name = name
+        self.description = description
 
 
 class CreateToolTip(object):

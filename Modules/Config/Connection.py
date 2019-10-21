@@ -1,7 +1,8 @@
-import socket
-import pickle
+from socket import socket, AF_INET, SOCK_STREAM
+from pickle import dumps, loads
 
 HEADER_SIZE = 10  # Length that indicates the number of characters in the stream
+
 
 class Connection():
 
@@ -12,12 +13,12 @@ class Connection():
         self.stream = stream
 
     def create_connection(self, host, port):
-        self.c_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.c_socket = socket(AF_INET, SOCK_STREAM)
         self.c_socket.connect((host, port))
 
     def create_message(self, data):
         self.message = data
-        body = pickle.dumps(self.message)
+        body = dumps(self.message)
         header = '{:<{}}'.format(len(body), HEADER_SIZE)
         self.stream = bytes(header, 'utf-8') + body
 
@@ -40,7 +41,7 @@ class Connection():
                 print('Full message received')
                 new_msg = False
                 header_ctrl = True
-                self.message = pickle.loads(self.stream[HEADER_SIZE:])
+                self.message = loads(self.stream[HEADER_SIZE:])
 
     def close_connection(self):
         self.c_socket.close()

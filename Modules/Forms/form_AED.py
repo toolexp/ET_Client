@@ -2,7 +2,6 @@ from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox, PhotoIm
 from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message, CreateToolTip
-import json
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
