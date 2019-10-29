@@ -251,10 +251,10 @@ class FormChildSection:
             self.classifications.append(int(elements[0]))
 
     def validate_section_fields(self):
-        if (self.cbx_classification.get()) != 0:
+        if len(self.cbx_data.get()) != 0:
             if len(self.txt_name.get('1.0','end-1c')) != 0 and len(self.txt_description.get('1.0','end-1c')) != 0:
                 if self.cbx_data.get() == 'Classification':
-                    if self.cbx_classification.get() != 0:
+                    if len(self.cbx_classification.get()) != 0:
                         return True
                     else:
                         return False

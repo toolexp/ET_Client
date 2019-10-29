@@ -58,7 +58,7 @@ class FormChildPattern:
         self.style = Style()
         self.style.theme_use("clam")
         self.style.configure("Treeview", foreground="gray", rowheight=50)
-        self.style.layout('TNotebook.Tab', [])  # turn off tabs
+        #self.style.layout('TNotebook.Tab', [])  # turn off tabs
         defaultbg = self.frm_child_crud.cget('bg')
 
         # Components for List FRM

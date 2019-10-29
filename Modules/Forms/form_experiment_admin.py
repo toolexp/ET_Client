@@ -116,7 +116,7 @@ class FormChildExAdmin:
 
     def show_frm(self):
         """
-        Displays the home page of the 'Problems'
+        Displays the home page of the 'Experiments'
         """
         self.retrieve_list()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)

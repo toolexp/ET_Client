@@ -3,7 +3,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoIma
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
 from Modules.Config.Data import Message, ExperimentalSC, ScenarioComponent, CreateToolTip, Problem, Pattern, \
-    DesignersGroup
+    DesignersGroup, wrap_text
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
@@ -14,14 +14,14 @@ TEXT_FONT = ("Arial", 10)
 TEXT_COLOR = "#1B5070"
 
 
-class FormParentExSC:
+class FormParentExConfig:
     def __init__(self, window, connection):
         self.frm_parent = LabelFrame(window)
         self.initialize_components()
-        self.frm_child = FormChildExSC(self.frm_parent, connection)
+        self.frm_child = FormChildExConfig(self.frm_parent, connection)
 
     def initialize_components(self):
-        lbl_experimenter_title = Label(self.frm_parent, text='Experimental scenarios')
+        lbl_experimenter_title = Label(self.frm_parent, text='Experiment configuration')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_experimenter_title.grid(row=0, column=0, columnspan=9, pady=50)
 
@@ -34,16 +34,17 @@ class FormParentExSC:
         self.frm_child.hide_frm()
 
 
-class FormChildExSC:
+class FormChildExConfig:
     def __init__(self, frm_parent, connection):
         self.connection = connection
         self.decide = True
         self.id_selected = 0
+        self.frm_child_exp_list = LabelFrame(frm_parent)
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_general = LabelFrame(frm_parent)
         self.frm_child_general.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.tlevel_problem = Toplevel(frm_parent)
-        #self.tlevel_problem.overrideredirect(1)
+        self.tlevel_problem.protocol("WM_DELETE_WINDOW", self.close_tlevel_problem)
         self.tlevel_problem.withdraw()
         self.initialize_components()
 
@@ -64,6 +65,20 @@ class FormChildExSC:
         self.copy_icon = PhotoImage(file=r"./Resources/copy.png")
         defaultbg = self.frm_child_general.cget('bg')
 
+        # Components for experiments list FRM
+        lbl_select_exp = Label(self.frm_child_exp_list, text='Select an experiment')
+        lbl_select_exp.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        lbl_select_exp.grid(pady=25, padx=50, sticky=W)
+        self.trv_available_exp = Treeview(self.frm_child_exp_list, height=7, columns=('Name', 'Description'))
+        self.trv_available_exp.heading('#0', text='ID', anchor=CENTER)
+        self.trv_available_exp.heading('#1', text='Name', anchor=CENTER)
+        self.trv_available_exp.heading('#2', text='Description', anchor=CENTER)
+        self.trv_available_exp.column('#0', width=0, minwidth=50, stretch=NO)
+        self.trv_available_exp.column('#1', width=200, minwidth=200, stretch=NO)
+        self.trv_available_exp.column('#2', width=400, minwidth=400, stretch=NO)
+        self.trv_available_exp.bind("<ButtonRelease-1>", self.select_experiment)
+        self.trv_available_exp.grid(columnspan=5, rowspan=10, sticky=W, padx=50, pady=5)
+
         # Components for List FRM
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
@@ -75,7 +90,10 @@ class FormChildExSC:
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
         btn_edit.grid(row=2, column=0, pady=10, padx=10, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit experimental scenario')
-        frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
+        frm_aux4.grid(row=1, column=0, pady=35, padx=20, rowspan=10, sticky=NW)
+        lbl_select_exp = Label(self.frm_child_list, text='Experimental scenarios')
+        lbl_select_exp.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        lbl_select_exp.grid(row=1, column=1, pady=25, padx=50, sticky=W)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -83,7 +101,10 @@ class FormChildExSC:
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
-        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=50, pady=25)
+        self.trv_available.grid(row=2, column=1, columnspan=5, rowspan=10, sticky=W, padx=50, pady=5)
+        btn_save_experiment = Button(self.frm_child_list, image=self.save_icon, command=self.click_save_experiment)
+        btn_save_experiment.grid(row=1, column=9, padx=20)
+        btn_save_experiment_ttp = CreateToolTip(btn_save_experiment, 'Save experiment')
 
         # Components for General info FRM
         lbl_name = Label(self.frm_child_general, text='Name')
@@ -144,7 +165,7 @@ class FormChildExSC:
         self.cbx_egroup.grid(row=10, column=1, padx=50, pady=10, columnspan=8, sticky=W)
         sep_general = Separator(self.frm_child_general, orient=HORIZONTAL)
         sep_general.grid(row=11, column=0, sticky=EW, columnspan=10, pady=10)
-        lbl_general_components = Label(self.frm_child_general, text='Scenario components')
+        lbl_general_components = Label(self.frm_child_general, text='Design problems')
         lbl_general_components.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_general_components.grid(row=12, column=0, pady=10, padx=50, sticky=W)
         self.trv_scenario_components = Treeview(self.frm_child_general, height=3, columns=('Problem', 'Patterns available'))
@@ -157,12 +178,12 @@ class FormChildExSC:
         self.trv_scenario_components.grid(row=12, column=1, padx=50, pady=10, rowspan=10, sticky=W)
         btn_new_comp = Button(self.frm_child_general, image=self.new_icon, command=self.click_new_component)
         btn_new_comp.grid(row=12, column=2, padx=20)
-        btn_new_comp_ttp = CreateToolTip(btn_new_comp, 'New scenario component')
+        btn_new_comp_ttp = CreateToolTip(btn_new_comp, 'New problem')
         btn_delete_comp = Button(self.frm_child_general, image=self.remove_icon, command=self.click_delete_component)
         btn_delete_comp.grid(row=13, column=2, padx=20)
-        btn_delete_comp_ttp = CreateToolTip(btn_delete_comp, 'Delete scenario component')
+        btn_delete_comp_ttp = CreateToolTip(btn_delete_comp, 'Delete problem')
         self.btn_edit_comp = Button(self.frm_child_general, image=self.modify_icon, command=self.click_edit_component)
-        btn_edit_comp_ttp = CreateToolTip(self.btn_edit_comp, 'Edit scenario component')
+        btn_edit_comp_ttp = CreateToolTip(self.btn_edit_comp, 'Edit problem')
         btn_save = Button(self.frm_child_general, image=self.save_icon, command=self.click_save_general)
         btn_save.grid(row=0, column=9, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save experimental scenario')
@@ -293,31 +314,58 @@ class FormChildExSC:
         self.scenario_components = []
         self.experimental_scenario = None
 
+    def select_experiment(self, event):
+        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+            self.id_selected_exp = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
+            # Retrieve selected experiment and its 'Experimental scenarios'
+            self.retrieve_list()
+            self.frm_child_exp_list.grid_forget()
+            self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+
+
+    def click_save_experiment(self):
+        self.frm_child_list.grid_forget()
+        self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+
+    def retrieve_experiments(self):
+        """
+        This function shows the existing 'Experiments' in the home TreeView
+        """
+        # Remove existing elements in the list
+        for item in self.trv_available_exp.get_children():
+            self.trv_available_exp.delete(item)
+        self.directive = Message(action=92, information=[])
+        self.connection = self.directive.send_directive(self.connection)
+        for item in self.connection.message.information:
+            elements = item.split('¥')
+            self.trv_available_exp.insert('', 'end', text=elements[0], values=(elements[1], wrap_text(elements[2], 72)))
+
     def retrieve_list(self):
         """
-        This function shows the existing 'Experimental scenarios' in the home TreeView
+        This function shows the existing  in an 'Experiment'
         """
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
-        self.directive = Message(action=82, information=[])
+        self.directive = Message(action=82, information=[self.id_selected_exp])
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2]))
+            self.trv_available.insert('','end',text=elements[0], values=(elements[1], wrap_text(elements[2], 72)))
 
     def show_frm(self):
         """
         Displays the home page of the 'Problems'
         """
-        self.retrieve_list()
-        self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        self.retrieve_experiments()
+        self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
         """
         Hides all forms that ar curently active
         """
         self.clear_fields()
+        self.frm_child_exp_list.grid_forget()
         self.frm_child_list.grid_forget()
         self.frm_child_general.grid_forget()
 
@@ -414,6 +462,7 @@ class FormChildExSC:
                                                         int(self.cbx_start_minute.get()), 0),
                                         end_time=time(int(self.cbx_end_hour.get()), int(self.cbx_end_minute.get()),
                                                       0),
+                                        id_experiment=self.id_selected_exp,
                                         id_control_group=self.designers_group[int(self.cbx_cgroup.current())].id,
                                         id_experimental_group=self.designers_group[
                                             int(self.cbx_egroup.current())].id)
@@ -422,7 +471,7 @@ class FormChildExSC:
                 self.directive = Message(action=81, information=[exp_sc_aux.name, exp_sc_aux.description,
                                                                  exp_sc_aux.access_code, exp_sc_aux.start_time,
                                                                  exp_sc_aux.end_time, exp_sc_aux.scenario_availability,
-                                                                 exp_sc_aux.scenario_lock, exp_sc_aux.experiment,
+                                                                 exp_sc_aux.scenario_lock, exp_sc_aux.id_experiment,
                                                                  exp_sc_aux.id_control_group, exp_sc_aux.id_experimental_group])
                 self.connection = self.directive.send_directive(self.connection)
                 id_exp_sc = self.connection.message.information[0]
@@ -437,7 +486,7 @@ class FormChildExSC:
                                                                  exp_sc_aux.name, exp_sc_aux.description,
                                                                  exp_sc_aux.access_code, exp_sc_aux.start_time,
                                                                  exp_sc_aux.end_time, exp_sc_aux.scenario_availability,
-                                                                 exp_sc_aux.scenario_lock, exp_sc_aux.experiment,
+                                                                 exp_sc_aux.scenario_lock, exp_sc_aux.id_experiment,
                                                                  exp_sc_aux.id_control_group,
                                                                  exp_sc_aux.id_experimental_group])
                 self.connection = self.directive.send_directive(self.connection)
@@ -458,7 +507,8 @@ class FormChildExSC:
                     self.connection = self.directive.send_directive(self.connection)
             self.clear_fields()
             self.frm_child_general.grid_forget()
-            self.show_frm()
+            self.retrieve_list()
+            self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         elif validation_option == 1:
             messagebox.showwarning(title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
@@ -481,10 +531,14 @@ class FormChildExSC:
         if decision:
             self.clear_fields()
             self.hide_frm()
-            self.show_frm()
+            self.retrieve_list()
+            self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
-    def click_new_component(self):
-        self.decide_component = True
+    def click_new_component(self, type='new'):
+        if type == 'new':
+            self.decide_component = True
+        else:
+            self.decide_component = False
         self.load_problems()
         self.load_patterns()
         self.tlevel_problem.title(self.title_form + ' problem')
@@ -505,7 +559,6 @@ class FormChildExSC:
                 else:
                     self.scenario_components.remove(item)   # Remove sc component from local variable
                 self.trv_scenario_components.delete(self.trv_scenario_components.selection())   # Remove sc component from TRV
-
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
@@ -516,8 +569,7 @@ class FormChildExSC:
                 if item.id == id_selected:
                     self.current_sc_comp = item
                     break
-            self.click_new_component()
-            self.decide_component = False
+            self.click_new_component('edit')
             self.show_current_problem(self.current_sc_comp.problem)
             self.cbx_problem['state'] = DISABLED
         else:
@@ -570,9 +622,12 @@ class FormChildExSC:
                     self.tlevel_problem.grab_release()
                     self.tlevel_problem.withdraw()
         elif validation_option == 1:
-            messagebox.showwarning(parent = self.tlevel_problem, title='Missing information', message='You must select a problem!')
+            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information', message='You must select a problem!')
         else:
-            messagebox.showwarning(parent = self.tlevel_problem, title='Repeated problem', message='The selected problem has been already chosen')
+            messagebox.showwarning(parent=self.tlevel_problem, title='Repeated problem', message='The selected problem has been already chosen')
+
+    def close_tlevel_problem(self):
+        self.click_cancel_sc_component()
 
     def click_cancel_sc_component(self):
         self.current_sc_comp = None
@@ -625,9 +680,9 @@ class FormChildExSC:
 
     def validate_general_frm(self):
         if len(self.txt_name.get('1.0','end-1c')) !=0 and len(self.txt_description.get('1.0','end-1c')) !=0 and \
-                len(self.txt_access_code.get('1.0','end-1c')) !=0 and self.cbx_start_hour.get() != 0 and \
-                self.cbx_start_minute.get() != 0 and self.cbx_end_hour.get() !=0 and self.cbx_end_minute.get() !=0 and \
-                self.cbx_cgroup.get() != 0 and self.cbx_egroup.get() != 0:
+                len(self.txt_access_code.get('1.0','end-1c')) !=0 and len(self.cbx_start_hour.get()) != 0 and \
+                len(self.cbx_start_minute.get()) != 0 and len(self.cbx_end_hour.get()) !=0 and len(self.cbx_end_minute.get()) !=0 and \
+                len(self.cbx_cgroup.get()) != 0 and len(self.cbx_egroup.get()) != 0:
             if self.validate_time_range():
                 if self.cbx_egroup.get() != self.cbx_cgroup.get():
                     if len(self.trv_scenario_components.get_children()) != 0:
@@ -643,7 +698,9 @@ class FormChildExSC:
 
     def validate_problem_frm(self):
         if self.decide_component:
-            if self.cbx_problem.get() != 0 and self.current_sc_comp.problem is not None:
+            if len(self.cbx_problem.get()) == 0:
+                return 1
+            if self.current_sc_comp.problem is not None:
                 repeated_problem = 0
                 for item in self.scenario_components:
                     # Validate repetition of the problem in the sc components of the list

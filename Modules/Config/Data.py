@@ -99,6 +99,37 @@ class Pattern:
             patterns.append(pattern_aux)
         return patterns
 
+    @staticmethod
+    def get_patterns(connection, patterns_db):
+        # Retrieving content of each pattern form DB
+        patterns = []
+        for item in patterns_db:
+            id_pattern = item.split('¥')[0]
+            id_template = item.split('¥')[1]
+            directive = Message(action=40, information=[int(id_template)])
+            connection = directive.send_directive(connection)
+            template_aux = Template(int(id_template), connection.message.information[0],
+                                    connection.message.information[1])
+            directive = Message(action=77, information=[template_aux.id])
+            connection = directive.send_directive(connection)
+            sections = connection.message.information
+            current_sections = []
+            for item2 in sections:
+                elements = item2.split('¥')
+                directive = Message(action=47, information=[int(id_pattern), int(elements[0])])
+                connection = directive.send_directive(connection)
+                elements_content = connection.message.information[0].split('¥')
+                section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]),
+                                      section_id=int(elements[2]), name=elements[3], description=elements[4],
+                                      data_type=elements[5], position=int(elements[6]), mandatory=elements[7],
+                                      classification_id=elements[8], pattern_section_id=int(elements_content[0]),
+                                      diagram_id=elements_content[4], category_id=elements_content[5],
+                                      content=elements_content[1])
+                current_sections.append(section_aux)
+            pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections)
+            patterns.append(pattern_aux)
+        return patterns
+
 
 class Section:
     def __init__(self, temp_section_id=0, template_id=0, section_id=0, name='', description='', data_type='',
@@ -224,7 +255,10 @@ class ExperimentalSC:
 
     def retrieve_components(self):
         if self.id_experiment is not None:
-            self.experiment = None
+            self.directive = Message(action=95, information=[self.id_experiment])
+            self.connection = self.directive.send_directive(self.connection)
+            self.control_group = Experiment(id=self.id_experiment, name=self.connection.message.information[0],
+                                                description=self.connection.message.information[1])
         if self.id_control_group is not None:
             self.directive = Message(action=30, information=[self.id_control_group])
             self.connection = self.directive.send_directive(self.connection)
