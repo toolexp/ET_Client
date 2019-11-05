@@ -64,17 +64,6 @@ class FormChildProblem:
         self.next_icon = PhotoImage(file=r"./Resources/next.png")
 
         # Components for List FRM
-        frm_aux4 = Frame(self.frm_child_list)
-        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
-        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
-        btn_new_ttp = CreateToolTip(btn_new, 'New problem')
-        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=1, column=0, pady=10, padx=10,sticky=E)
-        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete problem')
-        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=2, column=0, pady=10, padx=10,sticky=E)
-        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit problem')
-        frm_aux4.grid(row=1, column=0, pady=35, padx=20, sticky=NW)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -82,19 +71,33 @@ class FormChildProblem:
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
-        self.trv_available.grid(row=1, column=1, columnspan=5, rowspan=10, sticky=W, padx=50, pady=25)
+        self.trv_available.grid(row=1, column=0, columnspan=5, rowspan=9, sticky=W, padx=50, pady=25)
         self.trv_available.bind("<ButtonRelease-1>", self.select_problem_summary)
+        frm_aux4 = Frame(self.frm_child_list)
+        btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
+        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new_ttp = CreateToolTip(btn_new, 'New problem')
+        btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
+        btn_edit.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_edit_ttp = CreateToolTip(btn_edit, 'Edit problem')
+        btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
+        btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_delete_ttp = CreateToolTip(btn_delete, 'Delete problem')
+        frm_aux4.grid(row=1, column=5, pady=35, padx=20, sticky=NW)
         sep_problem = Separator(self.frm_child_list, orient=VERTICAL)
-        sep_problem.grid(row=0, column=6, sticky=NS, rowspan=20, padx=20)
+        sep_problem.grid(row=0, column=6, sticky=NS, rowspan=9, padx=5)
+        lbl_details = Label(self.frm_child_list, text='Details')
+        lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        lbl_details.grid(row=1, column=7, sticky=W, padx=20, pady=25)
         self.canvas_summary = Canvas(self.frm_child_list, width=160, height=160)
         self.canvas_summary.config(background='white', borderwidth=1)
-        self.canvas_summary.grid(row=1, column=7, padx=20, pady=100, rowspan=20, sticky=W)
+        self.canvas_summary.grid(row=2, column=7, padx=20, pady=25, sticky=NW)
         self.trv_list_summary = Treeview(self.frm_child_list, height=4, columns='Patterns', selectmode='none')
         self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_list_summary.heading('#1', text='Patterns', anchor=CENTER)
         self.trv_list_summary.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_list_summary.column('#1', width=200, minwidth=200, stretch=NO)
-        self.trv_list_summary.grid(row=1, column=8, columnspan=5, rowspan=20, sticky=W, padx=20, pady=100)
+        self.trv_list_summary.grid(row=2, column=8, sticky=NW, padx=20, pady=25)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
@@ -224,13 +227,12 @@ class FormChildProblem:
             if len(problem_aux.solution.patterns_id) == 0:
                 self.trv_list_summary.grid_forget()
             else:
-                self.trv_list_summary.grid(row=1, column=12, columnspan=5, rowspan=20, sticky=W, padx=20, pady=100)
+                self.trv_list_summary.grid(row=1, column=12, sticky=NW, padx=20, pady=25)
                 for item in problem_aux.solution.patterns_id:
-                    id_pattern = item.split('¥')
-                    for item in self.patterns:
-                        if item.id == int(id_pattern[0]):
+                    for item2 in self.patterns:
+                        if item2.id == item:
                             break
-                    self.trv_list_summary.insert('', 'end', text='', values=(item.get_content_name(),))
+                    self.trv_list_summary.insert('', 'end', text='', values=(item2.get_content_name(),))
             # Fill canvas with retrieved image
             load = Image.open(file_aux.filename)
             load = load.resize((160, 160), Image.ANTIALIAS)
@@ -272,6 +274,7 @@ class FormChildProblem:
                 self.directive = Message(action=54, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 self.retrieve_list()
+                self.trv_available.selection_set(self.trv_available.get_children()[0])
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

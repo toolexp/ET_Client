@@ -1,5 +1,6 @@
 import textwrap
-from datetime import time
+import threading
+import time
 from tkinter import Toplevel, Label
 
 
@@ -217,7 +218,9 @@ class Problem:
             self.connection = self.directive.send_directive(self.connection)
             self.solution = Solution(id=self.id_solution, annotations=self.connection.message.information[0],
                                      diagram_id=self.connection.message.information[1],
-                                     patterns_id=self.connection.message.information[2])
+                                     patterns_id=[])
+            for item in self.connection.message.information[2]:
+                self.solution.patterns_id.append(int(item.split('¥')[0]))
 
 
 class Solution:
@@ -231,16 +234,13 @@ class Solution:
 
 
 class ExperimentalSC:
-    def __init__(self, id=0, name='', description='', access_code='', start_time=time(0, 0, 0), end_time=time(0, 0, 0),
-                 scenario_availability=True, scenario_lock=False, id_experiment=None, id_control_group=None,
-                 id_experimental_group=None, experiment=None, control_group=None, experimental_group=None,
-                 connection=None):
+    def __init__(self, id=0, name='', description='', access_code='', scenario_availability=True, scenario_lock=False,
+                 id_experiment=None, id_control_group=None, id_experimental_group=None, experiment=None,
+                 control_group=None, experimental_group=None, connection=None):
         self.id = id
         self.name = name
         self.description = description
         self.access_code = access_code
-        self.start_time = start_time
-        self.end_time = end_time
         self.scenario_availability = scenario_availability
         self.scenario_lock = scenario_lock
         self.id_experiment = id_experiment
@@ -323,6 +323,40 @@ class Experiment:
         self.description = description
 
 
+class Measurement:
+    def __init__(self, id=0, value='', id_metric=None, id_designer=None, id_scenario_comp=None, metric=None,
+                 designer=None, scenario_comp=None, connection=None):
+        self.id = id
+        self.value = value
+        self.id_metric = id_metric
+        self.id_designer = id_designer
+        self.id_scenario_comp = id_scenario_comp
+        self.metric = metric
+        self.designer = designer
+        self.scenario_comp = scenario_comp
+        self.connection = connection
+        '''if self.connection is not None:
+            self.retrieve_components()'''
+
+    '''def retrieve_components(self):
+        if self.id_metric is not None:
+            self.directive = Message(action=95, information=[self.id_metric])
+            self.connection = self.directive.send_directive(self.connection)
+            self.metric = Metric(id=self.id_metric, name=self.connection.message.information[0],
+                                 description=self.connection.message.information[1])
+        if self.id_designer is not None:
+            self.directive = Message(action=30, information=[self.id_designer])
+            self.connection = self.directive.send_directive(self.connection)
+            self.control_group = Designer(id=self.id_designer, name=self.connection.message.information[0],
+                                                description=self.connection.message.information[1])
+        if self.id_scenario_comp is not None:
+            self.directive = Message(action=30, information=[self.id_experimental_group])
+            self.connection = self.directive.send_directive(self.connection)
+            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
+                                                     name=self.connection.message.information[0],
+                                                     description=self.connection.message.information[1])'''
+
+
 class CreateToolTip(object):
     """
     Create a tooltip for a given widget
@@ -352,6 +386,26 @@ class CreateToolTip(object):
     def close(self, event=None):
         if self.tw:
             self.tw.destroy()
+
+
+class TimerClass:
+    def __init__(self):
+        self.running_thread = threading.Thread(target=self.count, daemon=True)
+        self.seconds = 0
+        self.stop_var = False
+
+    def begin(self):
+        self.running_thread.start()
+
+    def count(self):
+        while True:
+            time.sleep(1)
+            self.seconds += 1
+            if self.stop_var:
+                break
+
+    def stop(self):
+        self.stop_var = True
 
 
 def wrap_text(string, lenght=90):
