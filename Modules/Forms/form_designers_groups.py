@@ -227,22 +227,20 @@ class FormChildDG:
 
     def click_save(self):
         if self.validate_fields():
-            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
-            if decision:
-                name_aux = self.txt_name.get('1.0', 'end-1c')
-                description_aux = self.txt_description.get('1.0', 'end-1c')
-                if self.decide:
-                    self.directive = Message(action=26, information=[name_aux, description_aux, []])
-                    for item in self.trv_selected_designers.get_children():
-                        self.directive.information[2].append(int(self.trv_selected_designers.item(item)['text']))
-                else:
-                    self.directive = Message(action=28, information=[self.id_selected, name_aux, description_aux, []])
-                    for item in self.trv_selected_designers.get_children():
-                        self.directive.information[3].append(int(self.trv_selected_designers.item(item)['text']))
-                self.connection = self.directive.send_directive(self.connection)
-                self.clear_fields()
-                self.frm_child_crud.grid_forget()
-                self.show_frm()
+            name_aux = self.txt_name.get('1.0', 'end-1c')
+            description_aux = self.txt_description.get('1.0', 'end-1c')
+            if self.decide:
+                self.directive = Message(action=26, information=[name_aux, description_aux, []])
+                for item in self.trv_selected_designers.get_children():
+                    self.directive.information[2].append(int(self.trv_selected_designers.item(item)['text']))
+            else:
+                self.directive = Message(action=28, information=[self.id_selected, name_aux, description_aux, []])
+                for item in self.trv_selected_designers.get_children():
+                    self.directive.information[3].append(int(self.trv_selected_designers.item(item)['text']))
+            self.connection = self.directive.send_directive(self.connection)
+            self.clear_fields()
+            self.frm_child_crud.grid_forget()
+            self.show_frm()
         else:
             messagebox.showwarning(title='Missing information',
                                    message='There are mandatory fields that need to be filled!')

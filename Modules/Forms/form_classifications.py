@@ -159,32 +159,30 @@ class FormChildClassification:
 
     def click_save(self):
         if self.validate_fields():
-            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
             name_aux = self.txt_name_class.get('1.0', 'end-1c')
-            if decision:
-                if self.decide:
-                    self.directive = Message(action=66, information=[name_aux])
+            if self.decide:
+                self.directive = Message(action=66, information=[name_aux])
+                self.connection = self.directive.send_directive(self.connection)
+                id_classification = self.connection.message.information[0]
+                categories_aux = self.txt_categories.get('1.0', 'end-1c').split(',')
+                for item in categories_aux:
+                    self.directive = Message(action=71, information=[item, id_classification])
                     self.connection = self.directive.send_directive(self.connection)
-                    id_classification = self.connection.message.information[0]
-                    categories_aux = self.txt_categories.get('1.0', 'end-1c').split(',')
-                    for item in categories_aux:
-                        self.directive = Message(action=71, information=[item, id_classification])
-                        self.connection = self.directive.send_directive(self.connection)
-                else:
-                    # Update classification name
-                    self.directive = Message(action=68, information=[self.id_selected, name_aux])
+            else:
+                # Update classification name
+                self.directive = Message(action=68, information=[self.id_selected, name_aux])
+                self.connection = self.directive.send_directive(self.connection)
+                # Delete categories associated with the current classification
+                self.directive = Message(action=74, information=[self.id_selected])
+                self.connection = self.directive.send_directive(self.connection)
+                # Create categories for the current classification
+                categories_aux = self.txt_categories.get('1.0', 'end-1c').split(',')
+                for item in categories_aux:
+                    self.directive = Message(action=71, information=[item, self.id_selected])
                     self.connection = self.directive.send_directive(self.connection)
-                    # Delete categories associated with the current classification
-                    self.directive = Message(action=74, information=[self.id_selected])
-                    self.connection = self.directive.send_directive(self.connection)
-                    # Create categories for the current classification
-                    categories_aux = self.txt_categories.get('1.0', 'end-1c').split(',')
-                    for item in categories_aux:
-                        self.directive = Message(action=71, information=[item, self.id_selected])
-                        self.connection = self.directive.send_directive(self.connection)
-                self.clear_fields()
-                self.frm_child_crud.grid_forget()
-                self.show_frm()
+            self.clear_fields()
+            self.frm_child_crud.grid_forget()
+            self.show_frm()
         else:
             messagebox.showwarning(title='Missing information',
                                    message='There are mandatory fields that need to be filled!')

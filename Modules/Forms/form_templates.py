@@ -1,12 +1,13 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
-from Modules.Config.Data import Message, CreateToolTip
+from Modules.Config.Data import Message, CreateToolTip, wrap_text
 
 TITLE_FONT = ("Arial", 18)
 SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
+NOTE_FONT = ("Arial", 8)
 
 TEXT_COLOR = "#1B5070"
 
@@ -58,6 +59,7 @@ class FormChildTemplate:
         self.delete_icon = PhotoImage(file=r"./Resources/left.png")
         self.up_arrow = PhotoImage(file=r"./Resources/up_arrow.png")
         self.down_arrow = PhotoImage(file=r"./Resources/down_arrow.png")
+        defaultbg = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
@@ -84,18 +86,10 @@ class FormChildTemplate:
         sep_template.grid(row=0, column=11, sticky=NS, rowspan=9, padx=5)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_details.grid(row=1, column=12, sticky=W, padx=50, pady=25)
-        self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Data type', 'Mandatory'),
-                                         selectmode='none')
-        self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
-        self.trv_list_summary.heading('#1', text='Section', anchor=CENTER)
-        self.trv_list_summary.heading('#2', text='Data type', anchor=CENTER)
-        self.trv_list_summary.heading('#3', text='Mandatory', anchor=CENTER)
-        self.trv_list_summary.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_list_summary.column('#1', width=100, minwidth=100, stretch=NO)
-        self.trv_list_summary.column('#2', width=200, minwidth=200, stretch=NO)
-        self.trv_list_summary.column('#3', width=100, minwidth=100, stretch=NO)
-        self.trv_list_summary.grid(row=2, column=12, rowspan=9, sticky=NW, padx=50, pady=25)
+        lbl_details.grid(row=1, column=12, sticky=SW, padx=50, pady=25)
+        self.txt_summary = Text(self.frm_child_list, height=15, width=50)
+        self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_summary.grid(row=2, column=12, rowspan=9, sticky=NW, padx=50)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
@@ -109,7 +103,7 @@ class FormChildTemplate:
         self.txt_name = Text(frm_aux1, height=1, width=60)
         self.txt_name.config(font=TEXT_FONT)
         self.txt_name.grid(row=0, column=1, padx=10)
-        self.txt_description = Text(frm_aux1, height=6, width=60)
+        self.txt_description = Text(frm_aux1, height=3, width=60)
         self.txt_description.config(font=TEXT_FONT)
         self.txt_description.grid(row=1, column=1, padx=10, pady=10)
         btn_save = Button(frm_aux1, image=self.save_icon, command=self.click_save)
@@ -143,7 +137,12 @@ class FormChildTemplate:
         self.trv_selected_sections.column('#2', width=120, minwidth=120, stretch=NO)
         self.trv_selected_sections.column('#3', width=80, minwidth=80, stretch=NO)
         self.trv_selected_sections.bind("<Button-1>", self.click_trv_ssections)
+        self.trv_selected_sections.bind("<Double-1>", self.click_switch_mandatory)
         self.trv_selected_sections.grid(row=1, column=2, rowspan=10, sticky=W, padx=10, pady=20)
+        lbl_note_optional = Label(frm_aux2, text='NOTE: To switch between optional and mandatory, double click on '
+                                                 'selected section\n')
+        lbl_note_optional.config(fg=TEXT_COLOR, font=NOTE_FONT)
+        lbl_note_optional.grid(row=11, column=2, padx=10, sticky=W)
         btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
         btn_add.grid(row=4, column=1)
         btn_add_ttp = CreateToolTip(btn_add, 'Add section')
@@ -173,20 +172,28 @@ class FormChildTemplate:
     def select_template_summary(self, event):
         """
         Function activated when the event of selecting an item in the available templates TV is generated. It fills the
-        summary TV with information of the selected template
+        summary text box with information of the selected template
         :param event:
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
-            self.directive = Message(action=77, information=[id_selected])  # ask for the sections of the selected template
+            # Clear summary txt box
+            self.txt_summary['state'] = NORMAL
+            self.txt_summary.delete('1.0', 'end-1c')
+            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
+            self.directive = Message(action=40, information=[self.id_selected]) # ask for the template
             self.connection = self.directive.send_directive(self.connection)
-            # Remove existing elements in the list
-            for item in self.trv_list_summary.get_children():
-                self.trv_list_summary.delete(item)
-            # Adding elements in the list
+            # Insert template's name and description
+            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(self.connection.message.information[0], 50)))
+            self.txt_summary.insert('end-1c', "Description:\n{}\n\nSections:\n".format(wrap_text(self.connection.message.information[1], 50)))
+            self.directive = Message(action=77, information=[self.id_selected])  # ask for the sections of the selected template
+            self.connection = self.directive.send_directive(self.connection)
+            # Adding elements in the summary text box
+            index = 0
             for item in self.connection.message.information:
                 elements = item.split('¥')
-                self.trv_list_summary.insert('', 'end', text='', values=(elements[3], elements[5], elements[7]))
+                self.txt_summary.insert('end-1c', "{}) {} - {}\n".format(index + 1, elements[3], 'optional' if elements[7] == '' else 'mandatory'))
+                index += 1
+            self.txt_summary['state'] = DISABLED
 
 
     def show_frm(self):
@@ -205,7 +212,6 @@ class FormChildTemplate:
             decision = messagebox.askyesno(title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
-                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
                 self.directive = Message(action=39, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:
@@ -229,7 +235,6 @@ class FormChildTemplate:
     def click_update(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.decide_template = False
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
             self.directive = Message(action=40, information=[self.id_selected])
             self.connection = self.directive.send_directive(self.connection)
             self.txt_name.insert('1.0', self.connection.message.information[0])
@@ -272,21 +277,19 @@ class FormChildTemplate:
     def click_add(self):
         if self.trv_available_sections.item(self.trv_available_sections.selection())['text'] != '' and \
                 self.trv_selected_sections.item(self.trv_selected_sections.selection())['text'] == '':
-            decision = messagebox.askyesnocancel(title='Add section', message='Is the selected section mandatory?')
-            if decision:
-                values = self.trv_available_sections.item(
-                    self.trv_available_sections.focus())['values']
-                text = self.trv_available_sections.item(
-                    self.trv_available_sections.focus())['text']
-                self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], '✓'))
-                self.trv_available_sections.delete(self.trv_available_sections.selection())
-            elif decision == False:
+            values = self.trv_available_sections.item(
+                self.trv_available_sections.focus())['values']
+            text = self.trv_available_sections.item(
+                self.trv_available_sections.focus())['text']
+            self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], '✓'))
+            self.trv_available_sections.delete(self.trv_available_sections.selection())
+            '''elif decision == False:
                 values = self.trv_available_sections.item(
                     self.trv_available_sections.focus())['values']
                 text = self.trv_available_sections.item(
                     self.trv_available_sections.focus())['text']
                 self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], ''))
-                self.trv_available_sections.delete(self.trv_available_sections.selection())
+                self.trv_available_sections.delete(self.trv_available_sections.selection())'''
 
     def click_remove(self):
         if self.trv_selected_sections.item(self.trv_selected_sections.selection())['text'] != '' and \
@@ -320,25 +323,23 @@ class FormChildTemplate:
 
     def click_save(self):
         if self.validate_fields():
-            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
-            if decision:
-                name_aux = self.txt_name.get('1.0', 'end-1c')
-                description_aux = self.txt_description.get('1.0', 'end-1c')
-                if self.decide_template:
-                    self.directive = Message(action=36, information=[name_aux, description_aux, [], []])
-                    for item in self.trv_selected_sections.get_children():
-                        self.directive.information[2].append(int(self.trv_selected_sections.item(item)['text']))
-                        self.directive.information[3].append(self.trv_selected_sections.item(item)['values'][2])
-                else:
-                    self.directive = Message(action=38,
-                                             information=[self.id_selected, name_aux, description_aux, [], []])
-                    for item in self.trv_selected_sections.get_children():
-                        self.directive.information[3].append(int(self.trv_selected_sections.item(item)['text']))
-                        self.directive.information[4].append(self.trv_selected_sections.item(item)['values'][2])
-                self.connection = self.directive.send_directive(self.connection)
-                self.clear_fields()
-                self.frm_child_crud.grid_forget()
-                self.show_frm()
+            name_aux = self.txt_name.get('1.0', 'end-1c')
+            description_aux = self.txt_description.get('1.0', 'end-1c')
+            if self.decide_template:
+                self.directive = Message(action=36, information=[name_aux, description_aux, [], []])
+                for item in self.trv_selected_sections.get_children():
+                    self.directive.information[2].append(int(self.trv_selected_sections.item(item)['text']))
+                    self.directive.information[3].append(self.trv_selected_sections.item(item)['values'][2])
+            else:
+                self.directive = Message(action=38,
+                                         information=[self.id_selected, name_aux, description_aux, [], []])
+                for item in self.trv_selected_sections.get_children():
+                    self.directive.information[3].append(int(self.trv_selected_sections.item(item)['text']))
+                    self.directive.information[4].append(self.trv_selected_sections.item(item)['values'][2])
+            self.connection = self.directive.send_directive(self.connection)
+            self.clear_fields()
+            self.frm_child_crud.grid_forget()
+            self.show_frm()
         else:
             messagebox.showwarning(title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
@@ -362,3 +363,14 @@ class FormChildTemplate:
     def clear_fields(self):
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
+
+    def click_switch_mandatory(self, event):
+        if self.trv_selected_sections.item(self.trv_selected_sections.selection())['text'] != '':
+            values = self.trv_selected_sections.item(
+                self.trv_selected_sections.focus())['values']
+            if values[2] == '':
+                self.trv_selected_sections.item(self.trv_selected_sections.focus(), values=(values[0], values[1], '✓'))
+            else:
+                self.trv_selected_sections.item(self.trv_selected_sections.focus(), values=(values[0], values[1], ''))
+
+

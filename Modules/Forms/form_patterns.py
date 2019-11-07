@@ -62,7 +62,7 @@ class FormChildPattern:
         defaultbg = self.frm_child_crud.cget('bg')
 
         # Components for List FRM
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns='Pattern')
+        self.trv_available = Treeview(self.frm_child_list, height=8, columns='Pattern')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Pattern', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
@@ -84,16 +84,10 @@ class FormChildPattern:
         sep_pattern.grid(row=0, column=11, sticky=NS, rowspan=21, padx=5)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_details.grid(row=1, column=12, sticky=W, padx=50, pady=25)
-        self.trv_list_summary = Treeview(self.frm_child_list, height=5, columns=('Section', 'Content'),
-                                         selectmode='none')
-        self.trv_list_summary.heading('#0', text='ID', anchor=CENTER)
-        self.trv_list_summary.heading('#1', text='Section', anchor=CENTER)
-        self.trv_list_summary.heading('#2', text='Content', anchor=CENTER)
-        self.trv_list_summary.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_list_summary.column('#1', width=100, minwidth=100, stretch=NO)
-        self.trv_list_summary.column('#2', width=400, minwidth=400, stretch=NO)
-        self.trv_list_summary.grid(row=2, column=12, columnspan=5, rowspan=20, sticky=NW, padx=50, pady=25)
+        lbl_details.grid(row=1, column=12, sticky=SW, padx=50, pady=25)
+        self.txt_summary = Text(self.frm_child_list, height=20, width=60)
+        self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_summary.grid(row=2, column=12, rowspan=9, sticky=NW, padx=50)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
@@ -223,8 +217,8 @@ class FormChildPattern:
             content = item.get_content_name()
             self.trv_available.insert('', 'end', text=item.id, values=(content,))
         # Remove existing elements in the list
-        for item in self.trv_list_summary.get_children():
-            self.trv_list_summary.delete(item)
+        '''for item in self.trv_list_summary.get_children():
+            self.trv_list_summary.delete(item)'''
 
     def show_frm(self):
         """
@@ -246,18 +240,18 @@ class FormChildPattern:
 
     def select_pattern_summary(self, event):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            id_selected = int(self.trv_available.item(self.trv_available.selection())[
-                                  'text'])  # Retrieve id of selected item from TreeView
+            self.id_selected_pattern = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
             for item in self.patterns:
-                if id_selected == item.id:
+                if self.id_selected_pattern == item.id:
                     current_pattern = item
                     break
-            # Remove existing elements in the list
-            for item in self.trv_list_summary.get_children():
-                self.trv_list_summary.delete(item)
+            # Clear summary txt box
+            self.txt_summary['state'] = NORMAL
+            self.txt_summary.delete('1.0', 'end-1c')
             # Adding elements in the list
             for item in current_pattern.sections:
-                self.trv_list_summary.insert('', 'end', text='', values=(item.name, wrap_text(item.content, 72)))
+                self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 60)))
+            self.txt_summary['state'] = DISABLED
 
     def restart_components(self):
         self.txt_desc_section['state'] = NORMAL
@@ -283,8 +277,7 @@ class FormChildPattern:
             decision = messagebox.askyesno(title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
-                id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-                self.directive = Message(action=44, information=[id_selected])
+                self.directive = Message(action=44, information=[self.id_selected_pattern])
                 self.connection = self.directive.send_directive(self.connection)
                 self.go_back_form()
         else:
@@ -311,13 +304,11 @@ class FormChildPattern:
     def click_update(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.initialize_variables()
-            id_selected_pattern = int(self.trv_available.item(self.trv_available.selection())[
-                                          'text'])  # Retrieve id of selected item from TreeView
             self.decide = False
             self.frm_child_list.grid_forget()
             # Retrieve pattern from the list of available patterns
             for item in self.patterns:
-                if item.id == id_selected_pattern:
+                if item.id == self.id_selected_pattern:
                     self.new_pattern = item
                     break
             # Retrieve content if neccesary
@@ -351,84 +342,81 @@ class FormChildPattern:
         if self.new_pattern is not None and self.selected_section is not None:
             self.save_section_local('save')
             if self.validate_fields():
-                decision = messagebox.askyesno(title='Confirmation',
-                                               message='Are you sure you want to save the changes?')
-                if decision:
-                    if self.decide:
-                        self.directive = Message(action=41, information=[self.new_pattern.template.id])
-                        self.connection = self.directive.send_directive(self.connection)
-                        id_pattern = self.connection.message.information[0]
-                        for item in self.new_pattern.sections:
-                            if item.data_type == 'Text':
-                                self.directive = Message(action=46,
-                                                         information=[item.content, id_pattern, item.temp_section_id,
-                                                                      None, None])
+                if self.decide:
+                    self.directive = Message(action=41, information=[self.new_pattern.template.id])
+                    self.connection = self.directive.send_directive(self.connection)
+                    id_pattern = self.connection.message.information[0]
+                    for item in self.new_pattern.sections:
+                        if item.data_type == 'Text':
+                            self.directive = Message(action=46,
+                                                     information=[item.content, id_pattern, item.temp_section_id,
+                                                                  None, None])
+                            self.connection = self.directive.send_directive(self.connection)
+                        elif item.data_type == 'File':
+                            if item.file is not None:
+                                self.directive = Message(action=61,
+                                                         information=[item.file.file_bytes, item.file.name])
                                 self.connection = self.directive.send_directive(self.connection)
-                            elif item.data_type == 'File':
-                                if item.file is not None:
-                                    self.directive = Message(action=61,
-                                                             information=[item.file.file_bytes, item.file.name])
-                                    self.connection = self.directive.send_directive(self.connection)
-                                    id_diagram = self.connection.message.information[0]
-                                    content_aux = '<File>'
-                                else:
-                                    id_diagram = None
-                                    content_aux = ''
-                                self.directive = Message(action=46,
-                                                         information=[content_aux, id_pattern, item.temp_section_id,
-                                                                      id_diagram, None])
-                                self.connection = self.directive.send_directive(self.connection)
-                            elif item.data_type == 'Classification':
-                                if item.category is not None:
-                                    self.directive = Message(action=46, information=['<' + item.category.name + '>',
-                                                                                     id_pattern, item.temp_section_id,
-                                                                                     None,
-                                                                                     item.category.id])
-                                else:
-                                    self.directive = Message(action=46,
-                                                             information=['', id_pattern, item.temp_section_id, None,
-                                                                          None])
-                                self.connection = self.directive.send_directive(self.connection)
+                                id_diagram = self.connection.message.information[0]
+                                content_aux = '<File>'
                             else:
-                                raise Exception('Error retrieving data type of section to be created')
-                    else:
-                        for item in self.new_pattern.sections:
-                            if item.data_type == 'Text':
-                                self.directive = Message(action=48,
-                                                         information=[item.pattern_section_id, item.content, None,
-                                                                      None])
-                                self.connection = self.directive.send_directive(self.connection)
-                            elif item.data_type == 'File':
-                                # Remove existing file in DB
-                                if item.diagram_id != 0:
-                                    self.directive = Message(action=64,
-                                                             information=[item.diagram_id, 'just remove path'])
-                                    self.connection = self.directive.send_directive(self.connection)
-                                if item.file is not None:
-                                    self.directive = Message(action=61,
-                                                             information=[item.file.file_bytes, item.file.name])
-                                    self.connection = self.directive.send_directive(self.connection)
-                                    id_diagram = self.connection.message.information[0]
-                                    content_aux = '<File>'
-                                else:
-                                    id_diagram = None
-                                    content_aux = ''
-                                self.directive = Message(action=48,
-                                                         information=[item.pattern_section_id, content_aux, id_diagram,
-                                                                      None])
-                                self.connection = self.directive.send_directive(self.connection)
-                            elif item.data_type == 'Classification':
-                                if item.category is not None:
-                                    self.directive = Message(action=48, information=[item.pattern_section_id,
-                                                                                     '<' + item.category.name + '>',
-                                                                                     None, item.category.id])
-                                else:
-                                    self.directive = Message(action=48, information=[item.pattern_section_id, '', None,
-                                                                                     None])
-                                self.connection = self.directive.send_directive(self.connection)
+                                id_diagram = None
+                                content_aux = ''
+                            self.directive = Message(action=46,
+                                                     information=[content_aux, id_pattern, item.temp_section_id,
+                                                                  id_diagram, None])
+                            self.connection = self.directive.send_directive(self.connection)
+                        elif item.data_type == 'Classification':
+                            if item.category is not None:
+                                self.directive = Message(action=46, information=['<' + item.category.name + '>',
+                                                                                 id_pattern, item.temp_section_id,
+                                                                                 None,
+                                                                                 item.category.id])
                             else:
-                                raise Exception('Error retrieving data type of section to be created')
-                    self.go_back_form()
+                                self.directive = Message(action=46,
+                                                         information=['', id_pattern, item.temp_section_id, None,
+                                                                      None])
+                            self.connection = self.directive.send_directive(self.connection)
+                        else:
+                            raise Exception('Error retrieving data type of section to be created')
+                else:
+                    for item in self.new_pattern.sections:
+                        if item.data_type == 'Text':
+                            self.directive = Message(action=48,
+                                                     information=[item.pattern_section_id, item.content, None,
+                                                                  None])
+                            self.connection = self.directive.send_directive(self.connection)
+                        elif item.data_type == 'File':
+                            # Remove existing file in DB
+                            if item.diagram_id != 0:
+                                self.directive = Message(action=64,
+                                                         information=[item.diagram_id, 'just remove path'])
+                                self.connection = self.directive.send_directive(self.connection)
+                            if item.file is not None:
+                                self.directive = Message(action=61,
+                                                         information=[item.file.file_bytes, item.file.name])
+                                self.connection = self.directive.send_directive(self.connection)
+                                id_diagram = self.connection.message.information[0]
+                                content_aux = '<File>'
+                            else:
+                                id_diagram = None
+                                content_aux = ''
+                            self.directive = Message(action=48,
+                                                     information=[item.pattern_section_id, content_aux, id_diagram,
+                                                                  None])
+                            self.connection = self.directive.send_directive(self.connection)
+                        elif item.data_type == 'Classification':
+                            if item.category is not None:
+                                self.directive = Message(action=48, information=[item.pattern_section_id,
+                                                                                 '<' + item.category.name + '>',
+                                                                                 None, item.category.id])
+                            else:
+                                self.directive = Message(action=48, information=[item.pattern_section_id, '', None,
+                                                                                 None])
+                            self.connection = self.directive.send_directive(self.connection)
+                        else:
+                            raise Exception('Error retrieving data type of section to be created')
+                self.go_back_form()
             else:
                 messagebox.showwarning(title='Missing information',
                                        message='There are mandatory fields that need to be filled!')

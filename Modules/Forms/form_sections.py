@@ -188,29 +188,27 @@ class FormChildSection:
 
     def click_save(self):
         if self.validate_section_fields():
-            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
-            if decision:
-                name_aux = self.txt_name.get('1.0', 'end-1c')
-                description_aux = self.txt_description.get('1.0', 'end-1c')
-                type_aux = self.cbx_data.get()
-                if self.decide:
-                    if type_aux == 'Classification':
-                        id_class = self.classifications[self.cbx_classification.current()]
-                        self.directive = Message(action=31, information=[name_aux, description_aux, type_aux, id_class])
-                    else:
-                        self.directive = Message(action=31, information=[name_aux, description_aux, type_aux])
+            name_aux = self.txt_name.get('1.0', 'end-1c')
+            description_aux = self.txt_description.get('1.0', 'end-1c')
+            type_aux = self.cbx_data.get()
+            if self.decide:
+                if type_aux == 'Classification':
+                    id_class = self.classifications[self.cbx_classification.current()]
+                    self.directive = Message(action=31, information=[name_aux, description_aux, type_aux, id_class])
                 else:
-                    if type_aux == 'Classification':
-                        id_class = self.classifications[self.cbx_classification.current()]
-                        self.directive = Message(action=33,information=[self.id_selected, name_aux, description_aux,
-                                                                        type_aux, id_class])
-                    else:
-                        self.directive = Message(action=33, information=[self.id_selected, name_aux, description_aux,
-                                                                         type_aux])
-                self.connection = self.directive.send_directive(self.connection)
-                self.clear_fields()
-                self.frm_child_crud.grid_forget()
-                self.show_frm()
+                    self.directive = Message(action=31, information=[name_aux, description_aux, type_aux])
+            else:
+                if type_aux == 'Classification':
+                    id_class = self.classifications[self.cbx_classification.current()]
+                    self.directive = Message(action=33,information=[self.id_selected, name_aux, description_aux,
+                                                                    type_aux, id_class])
+                else:
+                    self.directive = Message(action=33, information=[self.id_selected, name_aux, description_aux,
+                                                                     type_aux])
+            self.connection = self.directive.send_directive(self.connection)
+            self.clear_fields()
+            self.frm_child_crud.grid_forget()
+            self.show_frm()
         else:
             messagebox.showwarning(title='Missing information',
                                    message='There are mandatory fields that need to be filled!')

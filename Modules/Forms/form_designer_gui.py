@@ -148,7 +148,7 @@ class FormParentDesigner:
         self.txt_pattern_content = Text(tab_patterns, height=16, width=70)
         self.txt_pattern_content.config(font=TEXT_FONT)
         self.txt_pattern_content.grid(row=1, column=3, padx=10, pady=10, sticky=W, rowspan=7)
-        self.btn_view_diagram = Button(tab_patterns, text='View >>\ndiagram', command=self.click_expand_image)
+        self.btn_view_diagram = Button(tab_patterns, text='View >>\ndiagram', command=self.click_expand_diagram)
         self.btn_view_diagram.grid(row=1, column=4, padx=10, pady=10, sticky=W)
 
         tab_file = Frame(self.tab_control)
@@ -331,19 +331,23 @@ class FormParentDesigner:
             scenario_comp_id = self.scenario_components[self.current_scenarios_counter].id_DB
             current_measurements = []
             # Solution time
-            measurement_1 = Measurement(value=str(self.solution_time), id_metric=3, id_designer=self.id_designer,
+            measurement_1 = Measurement(value=str(self.solution_time), id_metric=1, id_designer=self.id_designer,
                                         id_scenario_comp=scenario_comp_id)
             current_measurements.append(measurement_1)
             # Selection time
-            measurement_2 = Measurement(value=str(self.selection_time), id_metric=1, id_designer=self.id_designer,
+            measurement_2 = Measurement(value=str(self.selection_time), id_metric=2, id_designer=self.id_designer,
                                         id_scenario_comp=scenario_comp_id)
             current_measurements.append(measurement_2)
-            # Selection efficiency
-            measurement_3 = Measurement(value=str(float(self.lbx_sel_paterns.size())/float(len(self.av_patterns_seen))),
-                                        id_metric=2, id_designer=self.id_designer, id_scenario_comp=scenario_comp_id)
+            # Viewed patterns
+            measurement_3 = Measurement(value=str(len(self.av_patterns_seen)), id_metric=3,
+                                        id_designer=self.id_designer, id_scenario_comp=scenario_comp_id)
             current_measurements.append(measurement_3)
+            # Chosen patterns
+            measurement_4 = Measurement(value=str(self.lbx_sel_paterns.size()), id_metric=4,
+                                        id_designer=self.id_designer, id_scenario_comp=scenario_comp_id)
+            current_measurements.append(measurement_4)
             for item in current_measurements:
-                self.directive = Message(action=96, information=[item.value, item.id_metric, item.id_designer,
+                self.directive = Message(action=96, information=[item.value, item.date, item.id_metric, item.id_designer,
                                                                  item.id_scenario_comp])
                 self.connection = self.directive.send_directive(self.connection)
             # Get info and build the solution to send to the server
@@ -441,7 +445,7 @@ class FormParentDesigner:
                         self.sel_patterns_ids.remove(item)
                         break
 
-    def click_expand_image(self):
+    def click_expand_diagram(self):
         # Fill canvas with retrieved image
         load = Image.open(self.file_aux.filename)
         load = load.resize((500, 500), Image.ANTIALIAS)
@@ -455,7 +459,6 @@ class FormParentDesigner:
     def close_tlevel_image(self):
         self.tlevel_image_exp.grab_release()
         self.tlevel_image_exp.withdraw()
-        #self.select_available_pattern(None)
 
     def clear_visual_components(self):
         self.txt_hints['state'] = NORMAL
@@ -489,8 +492,8 @@ class FormParentDesigner:
         for item in self.available_patterns:
             self.av_patterns_ids.append(item.id)
             self.lbx_av_patterns.insert(END, item.get_content_name())
-        self.lbx_av_patterns.select_set(0)
-        self.select_available_pattern(None)
+        #self.lbx_av_patterns.select_set(0)
+        #self.select_available_pattern(None)
         self.current_ideal_patterns = self.scenario_components[index].problem.solution.patterns_id  # Get the patterns of the ideal solution for current problem
         self.time_thread = TimerClass()
         self.time_thread.begin()

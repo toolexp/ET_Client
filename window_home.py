@@ -49,8 +49,8 @@ class WindowHome:
         experiment_menu = Menu(administration_menu)
         experiment_menu.add_command(label='Experiment administration', command=self.click_exp_admin)
         experiment_menu.add_command(label='Experiment configuration', command=self.click_config_ex_sc)
-        administration_menu.add_cascade(label='Experiment', menu=experiment_menu)
         menu_bar.add_cascade(label='Administration', menu=administration_menu)
+        menu_bar.add_cascade(label='Experiment', menu=experiment_menu)
         menu_bar.add_command(label='Designer GUI', command=self.click_designer_gui)
         menu_bar.add_command(label='Log out', command=self.click_log_out)
 

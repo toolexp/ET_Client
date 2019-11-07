@@ -180,7 +180,7 @@ class FormChildExAdmin:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
     def click_save(self):
-        if len(self.txt_name.get('1.0','end-1c')) !=0 and len(self.txt_description.get('1.0','end-1c')) !=0:
+        if len(self.txt_name.get('1.0','end-1c')) != 0 and len(self.txt_description.get('1.0','end-1c')) != 0:
             self.experiment.name = self.txt_name.get('1.0', 'end-1c')
             self.experiment.description = self.txt_description.get('1.0', 'end-1c')
             if self.decide:
@@ -195,8 +195,8 @@ class FormChildExAdmin:
             self.frm_child_general.grid_forget()
             self.show_frm()
         else:
-            messagebox.showwarning(title='Empty fields',
-                                   message='You must fill all fields')
+            messagebox.showwarning(title='Missing information',
+                                   message='There are mandatory fields that need to be filled!')
 
     def click_cancel(self):
         """

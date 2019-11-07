@@ -79,6 +79,9 @@ class FormChildExConfig:
         self.trv_available_exp.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available_exp.bind("<Double-1>", self.select_experiment)
         self.trv_available_exp.grid(columnspan=5, rowspan=10, sticky=W, padx=50, pady=20)
+        btn_select = Button(self.frm_child_exp_list, image=self.new_icon, command=self.select_experiment(None))
+        btn_select.grid(row=1, column=5, pady=20, padx=20, sticky=W)
+        btn_select_ttp = CreateToolTip(btn_select, 'Access experiment')
 
         # Components for List FRM
         txt_scenario_desc = Text(self.frm_child_list, height=4, width=65)

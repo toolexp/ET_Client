@@ -1,6 +1,7 @@
 import textwrap
 import threading
 import time
+import datetime
 from tkinter import Toplevel, Label
 
 
@@ -324,10 +325,11 @@ class Experiment:
 
 
 class Measurement:
-    def __init__(self, id=0, value='', id_metric=None, id_designer=None, id_scenario_comp=None, metric=None,
-                 designer=None, scenario_comp=None, connection=None):
+    def __init__(self, id=0, value='', date=datetime.datetime.now(), id_metric=None, id_designer=None,
+                 id_scenario_comp=None, metric=None, designer=None, scenario_comp=None, connection=None):
         self.id = id
         self.value = value
+        self.date = date
         self.id_metric = id_metric
         self.id_designer = id_designer
         self.id_scenario_comp = id_scenario_comp

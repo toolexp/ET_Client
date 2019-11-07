@@ -208,34 +208,35 @@ class FormChildAED:
         Saves information of the user inserted into the visual components and sends to the server
         """
         if self.validate_fields():
-            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to save the changes?')
-            if decision:
-                name_aux = self.txt_name.get()
-                surname_aux = self.txt_surname.get()
-                email_aux = self.txt_email.get()
-                passwd_aux = self.txt_passwd.get()
-                if self.decide:
-                    if self.title == 'Experimenter':
-                        self.directive = Message(action=16, information=[name_aux, surname_aux, email_aux, passwd_aux])
-                    elif self.title == 'Designer':
-                        self.directive = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
-                    elif self.title == 'Administrator':
-                        self.directive = Message(action=11, information=[name_aux, surname_aux, email_aux, passwd_aux])
-                    else:
-                        raise Exception('Error en guardar: tipo de usuario')
+            name_aux = self.txt_name.get()
+            surname_aux = self.txt_surname.get()
+            email_aux = self.txt_email.get()
+            passwd_aux = self.txt_passwd.get()
+            if self.decide:
+                if self.title == 'Experimenter':
+                    self.directive = Message(action=16, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                elif self.title == 'Designer':
+                    self.directive = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                elif self.title == 'Administrator':
+                    self.directive = Message(action=11, information=[name_aux, surname_aux, email_aux, passwd_aux])
                 else:
-                    if self.title == 'Experimenter':
-                        self.directive = Message(action=18, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
-                    elif self.title == 'Designer':
-                        self.directive = Message(action=23, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
-                    elif self.title == 'Administrator':
-                        self.directive = Message(action=13, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
-                    else:
-                        raise Exception('Error en guardar: tipo de usuario')
-                self.connection = self.directive.send_directive(self.connection)
-                self.clear_fields()
-                self.frm_child_crud.grid_forget()
-                self.show_frm()
+                    raise Exception('Error en guardar: tipo de usuario')
+            else:
+                if self.title == 'Experimenter':
+                    self.directive = Message(action=18, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
+                elif self.title == 'Designer':
+                    self.directive = Message(action=23, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
+                elif self.title == 'Administrator':
+                    self.directive = Message(action=13, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
+                else:
+                    raise Exception('Error en guardar: tipo de usuario')
+            self.connection = self.directive.send_directive(self.connection)
+            self.clear_fields()
+            self.frm_child_crud.grid_forget()
+            self.show_frm()
+        else:
+            messagebox.showwarning(title='Missing information',
+                                   message='There are mandatory fields that need to be filled!')
 
 
     def click_cancel(self):
