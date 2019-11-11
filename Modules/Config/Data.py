@@ -41,6 +41,34 @@ def verify_port(port):
         return True
 
 
+class Designer:
+    def __init__(self, id=0, name='', surname='', user='', password='', current_group='control', connection=None):
+        self.id = id
+        self.name = name
+        self.surname = surname
+        self.user = user
+        self.password = password
+        self.current_group = current_group
+        self.connection = connection
+        if self.connection is not None:
+            self.retrieve_components()
+
+    def retrieve_components(self):
+        if self.id is not None:
+            self.directive = Message(action=25, information=[self.id])
+            self.connection = self.directive.send_directive(self.connection)
+            self.name = self.connection.message.information[0]
+            self.surname = self.connection.message.information[1]
+            self.user = self.connection.message.information[2]
+            self.password = self.connection.message.information[3]
+
+    def get_current_role(self, id_exp_sc):
+        # Get role for current experimental scenario (control or experimental)
+        self.directive = Message(action=85, information=[self.id, id_exp_sc])
+        self.connection = self.directive.send_directive(self.connection)
+        self.current_group = self.connection.message.information[0]
+
+
 class DesignersGroup:
     def __init__(self, id=0, name='', description=''):
         self.id = id

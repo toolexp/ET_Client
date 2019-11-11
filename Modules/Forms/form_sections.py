@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox, PhotoImage
+from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox
 from Modules.Config.Data import Message, wrap_text, CreateToolTip
@@ -55,6 +55,8 @@ class FormChildSection:
         defaultbg = self.frm_child_crud.cget('bg')
 
         # Components for List FRM
+        lbl_sep1 = Label(self.frm_child_list)
+        lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', 'Data Type'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -64,7 +66,12 @@ class FormChildSection:
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.column('#3', width=200, minwidth=200, stretch=NO)
-        self.trv_available.grid(row=1, column=0, columnspan=5, rowspan=10, sticky=W, padx=50, pady=25)
+        self.trv_available.grid(row=0, column=1, sticky=W, pady=25)
+        vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
+        vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
+        self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
+        lbl_sep2 = Label(self.frm_child_list)
+        lbl_sep2.grid(row=0, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
         btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
@@ -75,11 +82,11 @@ class FormChildSection:
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
         btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete section')
-        frm_aux4.grid(row=1, column=5, pady=35, padx=20, sticky=NW)
+        frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
 
         # Components for CRUD FRM
         self.frm_aux1 = Frame(self.frm_child_crud)
-        lbl_type = Label(self.frm_aux1, text='Data type             ')
+        lbl_type = Label(self.frm_aux1, text='Data type')
         lbl_type.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_type.grid(pady=10, padx=50, sticky=W)
         lbl_name = Label(self.frm_aux1, text='Name')
@@ -149,10 +156,11 @@ class FormChildSection:
                 self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
                 self.directive = Message(action=34, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
-                if self.connection.message.action == 5:
-                    messagebox.showwarning(title='Fail deleting',
-                                           message='The section cant be deleted, it may be used in a template')
-                self.retrieve_list()
+                if self.connection.message.action == 5:  # An error ocurred while deleting the item
+                    messagebox.showerror(title='Can not delete the item',
+                                         message=self.connection.message.information[0])
+                else:
+                    self.retrieve_list()
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

@@ -1,5 +1,5 @@
 from datetime import time
-from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Toplevel
+from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Toplevel, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
 from Modules.Config.Data import Message, ExperimentalSC, ScenarioComponent, CreateToolTip, Problem, Pattern, \
@@ -67,9 +67,12 @@ class FormChildExConfig:
         defaultbg = self.frm_child_general.cget('bg')
 
         # Components for experiments list FRM
-        lbl_select_exp = Label(self.frm_child_exp_list, text='Select an experiment')
-        lbl_select_exp.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_select_exp.grid(pady=25, padx=50, sticky=W)
+        lbl_sep1 = Label(self.frm_child_exp_list)
+        lbl_sep1.grid(row=1, column=0, padx=25, pady=25)
+        lbl_select_exp = Label(self.frm_child_exp_list, text=wrap_text('Here is a list of configurable experiments, '
+                                                                       'select one to configure', 80), anchor=W)
+        lbl_select_exp.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        lbl_select_exp.grid(row=0, column=1, pady=25, sticky=W)
         self.trv_available_exp = Treeview(self.frm_child_exp_list, height=7, columns=('Name', 'Description'))
         self.trv_available_exp.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_exp.heading('#1', text='Name', anchor=CENTER)
@@ -78,19 +81,27 @@ class FormChildExConfig:
         self.trv_available_exp.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available_exp.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available_exp.bind("<Double-1>", self.select_experiment)
-        self.trv_available_exp.grid(columnspan=5, rowspan=10, sticky=W, padx=50, pady=20)
-        btn_select = Button(self.frm_child_exp_list, image=self.new_icon, command=self.select_experiment(None))
-        btn_select.grid(row=1, column=5, pady=20, padx=20, sticky=W)
+        self.trv_available_exp.grid(row=1, column=1, rowspan=15, sticky=W, pady=25)
+        vsb_trv_avex = Scrollbar(self.frm_child_exp_list, orient="vertical", command=self.trv_available_exp.yview)
+        vsb_trv_avex.grid(row=1, column=2, rowspan=15, pady=25, sticky=NS)
+        self.trv_available_exp.configure(yscrollcommand=vsb_trv_avex.set)
+        lbl_sep2 = Label(self.frm_child_exp_list)
+        lbl_sep2.grid(row=1, column=3, padx=25, pady=25)
+        btn_select = Button(self.frm_child_exp_list, image=self.next_icon, command=self.select_experiment)
+        btn_select.grid(row=1, column=4, pady=25, padx=25, sticky=W)
         btn_select_ttp = CreateToolTip(btn_select, 'Access experiment')
 
         # Components for List FRM
-        txt_scenario_desc = Text(self.frm_child_list, height=4, width=65)
-        txt_scenario_desc.config(font=SUBTITLE2_FONT, bg=defaultbg, fg=TEXT_COLOR)
-        txt_scenario_desc.insert('end-1c', wrap_text('In this section you can configure the experimental scenarios associated'
-                                           ' with the experiment you have selected. Each scenario contains one or more '
-                                           'design problems and extra information as: designers groups and a description',80))
-        txt_scenario_desc['state'] = DISABLED
-        txt_scenario_desc.grid(row=0, column=0, padx=50, pady=10)
+        lbl_sep3 = Label(self.frm_child_list)
+        lbl_sep3.grid(row=1, column=0, padx=25, pady=25)
+        lbl_scenario_desc = Label(self.frm_child_list, text=wrap_text('In this section you can configure the '
+                                                                      'experimental scenarios associated with the '
+                                                                      'experiment you have selected. Each scenario '
+                                                                      'contains one or more design problems and extra '
+                                                                      'information such as: designers groups and a '
+                                                                      'description', 80), anchor=W)
+        lbl_scenario_desc.config(font=SUBTITLE2_FONT, fg=TEXT_COLOR)
+        lbl_scenario_desc.grid(row=0, column=1, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -98,7 +109,12 @@ class FormChildExConfig:
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
-        self.trv_available.grid(row=1, column=0, rowspan=2, sticky=W, padx=50, pady=25)
+        self.trv_available.grid(row=1, column=1, rowspan=2, sticky=W, pady=25)
+        vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
+        vsb_trv_av.grid(row=1, column=2, rowspan=2, pady=25, sticky=NS)
+        self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
+        lbl_sep4 = Label(self.frm_child_list)
+        lbl_sep4.grid(row=1, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
         btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
@@ -116,8 +132,8 @@ class FormChildExConfig:
         btn_cancel_experiment = Button(frm_aux5, image=self.cancel_icon, command=self.click_save_experiment)
         btn_cancel_experiment.grid(row=1, column=0, pady=10, padx=10, sticky=E)
         btn_cancel_experiment_ttp = CreateToolTip(btn_cancel_experiment, 'Cancel')
-        frm_aux4.grid(row=1, column=5, pady=25, padx=10, sticky=NW)
-        frm_aux5.grid(row=2, column=5, pady=25, padx=10, sticky=SW)
+        frm_aux4.grid(row=1, column=4, pady=25, padx=25, sticky=NW)
+        frm_aux5.grid(row=2, column=4, pady=25, padx=25, sticky=SW)
 
         # Components for General info FRM
         lbl_name = Label(self.frm_child_general, text='Name')
@@ -146,15 +162,17 @@ class FormChildExConfig:
         self.txt_access_code.grid(row=6, column=1, padx=50, pady=10, columnspan=8)
         self.cbx_cgroup = Combobox(self.frm_child_general, state="readonly", width=40)
         self.cbx_cgroup.config(font=TEXT_FONT)
-        self.cbx_cgroup.grid(row=7, column=1, padx=50, pady=10, columnspan=8, sticky=W)
+        self.cbx_cgroup.grid(row=7, column=2, padx=50, pady=10, columnspan=8, sticky=W)
         self.cbx_egroup = Combobox(self.frm_child_general, state="readonly", width=40)
         self.cbx_egroup.config(font=TEXT_FONT)
-        self.cbx_egroup.grid(row=8, column=1, padx=50, pady=10, columnspan=8, sticky=W)
+        self.cbx_egroup.grid(row=8, column=2, padx=50, pady=10, columnspan=8, sticky=W)
         sep_general = Separator(self.frm_child_general, orient=HORIZONTAL)
         sep_general.grid(row=9, column=0, sticky=EW, columnspan=10, pady=10)
         lbl_general_components = Label(self.frm_child_general, text='Design problems')
         lbl_general_components.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_general_components.grid(row=12, column=0, pady=10, padx=50, sticky=W)
+        lbl_sep5 = Label(self.frm_child_general)
+        lbl_sep5.grid(row=12, column=1, padx=50, pady=10)
         self.trv_scenario_components = Treeview(self.frm_child_general, height=3, columns=('Problem', 'Control group patterns?', 'Expm. group patterns?'))
         self.trv_scenario_components.heading('#0', text='ID', anchor=CENTER)
         self.trv_scenario_components.heading('#1', text='Problem', anchor=CENTER)
@@ -162,14 +180,19 @@ class FormChildExConfig:
         self.trv_scenario_components.heading('#3', text='Expm. group patterns?', anchor=CENTER)
         self.trv_scenario_components.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_scenario_components.column('#1', width=200, minwidth=200, stretch=NO)
-        self.trv_scenario_components.column('#2', width=150, minwidth=150, stretch=NO)
-        self.trv_scenario_components.column('#3', width=150, minwidth=150, stretch=NO)
-        self.trv_scenario_components.grid(row=12, column=1, padx=50, pady=10, rowspan=10, sticky=W)
+        self.trv_scenario_components.column('#2', width=150, minwidth=150, stretch=NO, anchor=CENTER)
+        self.trv_scenario_components.column('#3', width=150, minwidth=150, stretch=NO, anchor=CENTER)
+        self.trv_scenario_components.grid(row=12, column=2, pady=10, rowspan=10, sticky=W)
+        vsb_trv_sc = Scrollbar(self.frm_child_general, orient="vertical", command=self.trv_scenario_components.yview)
+        vsb_trv_sc.grid(row=12, column=3, rowspan=10, pady=10, sticky=NS)
+        self.trv_scenario_components.configure(yscrollcommand=vsb_trv_sc.set)
+        lbl_sep6 = Label(self.frm_child_general)
+        lbl_sep6.grid(row=12, column=4, padx=50, pady=10)
         btn_new_comp = Button(self.frm_child_general, image=self.new_icon, command=self.click_new_component)
-        btn_new_comp.grid(row=12, column=2, padx=20)
+        btn_new_comp.grid(row=12, column=5, padx=10)
         btn_new_comp_ttp = CreateToolTip(btn_new_comp, 'New problem')
         btn_delete_comp = Button(self.frm_child_general, image=self.remove_icon, command=self.click_delete_component)
-        btn_delete_comp.grid(row=13, column=2, padx=20)
+        btn_delete_comp.grid(row=13, column=5, padx=10)
         btn_delete_comp_ttp = CreateToolTip(btn_delete_comp, 'Delete problem')
         self.btn_edit_comp = Button(self.frm_child_general, image=self.modify_icon, command=self.click_edit_component)
         btn_edit_comp_ttp = CreateToolTip(self.btn_edit_comp, 'Edit problem')
@@ -205,36 +228,44 @@ class FormChildExConfig:
         frm_aux2.grid(row=0, column=0, pady=20, padx=10, columnspan=7, rowspan=5)
 
         # Components for adding patterns to the designers groups
-        frm_aux3 = Frame(self.tlevel_problem)
-        frm_aux6 = Frame(self.tlevel_problem)
-        lbl_cgroup_patterns = Label(frm_aux3, text='Set patterns for the control group:')
-        lbl_cgroup_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_cgroup_patterns.grid(row=0, column=0, sticky=W, pady=10, columnspan=3)
-        lbl_available_d_cgroup = Label(frm_aux3, text='Available patterns')
-        lbl_available_d_cgroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_available_d_cgroup.grid(row=1, column=0, sticky=W)
-        lbl_selected_d_cgroup = Label(frm_aux3, text='Selected patterns')
-        lbl_selected_d_cgroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_selected_d_cgroup.grid(row=1, column=2, sticky=W)
-        self.trv_available_patters_cgroup = Treeview(frm_aux3, height=4, columns='Name')
+        frm_aux3 = LabelFrame(self.tlevel_problem, text='Select available patterns for control group:')
+        frm_aux3.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        frm_aux6 = LabelFrame(self.tlevel_problem, text='Select available patterns for experimental group:')
+        frm_aux6.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        lbl_sep7 = Label(frm_aux3)
+        lbl_sep7.grid(row=0, column=0, padx=10, pady=10)
+        self.trv_available_patters_cgroup = Treeview(frm_aux3, height=4, columns='Patterns')
         self.trv_available_patters_cgroup.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available_patters_cgroup.heading('#1', text='Name', anchor=CENTER)
+        self.trv_available_patters_cgroup.heading('#1', text='Patterns', anchor=CENTER)
         self.trv_available_patters_cgroup.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_available_patters_cgroup.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available_patters_cgroup.bind("<Button-1>", self.click_trv_apatters_cgroup)
-        self.trv_available_patters_cgroup.grid(row=2, column=0, rowspan=10, sticky=W)
-        self.trv_selected_patterns_cgroup = Treeview(frm_aux3, height=4, columns='Name')
+        self.trv_available_patters_cgroup.grid(row=0, column=1, rowspan=10, pady=10, sticky=W)
+        vsb_trv_avcg = Scrollbar(frm_aux3, orient="vertical", command=self.trv_available_patters_cgroup.yview)
+        vsb_trv_avcg.grid(row=0, column=2, rowspan=10, pady=10, sticky=NS)
+        self.trv_available_patters_cgroup.configure(yscrollcommand=vsb_trv_avcg.set)
+        lbl_sep8 = Label(frm_aux3)
+        lbl_sep8.grid(row=0, column=3, padx=10, pady=10)
+        lbl_sep9 = Label(frm_aux3)
+        lbl_sep9.grid(row=0, column=5, padx=10, pady=10)
+        self.trv_selected_patterns_cgroup = Treeview(frm_aux3, height=4, columns=('Available patterns',))
         self.trv_selected_patterns_cgroup.heading('#0', text='ID', anchor=CENTER)
-        self.trv_selected_patterns_cgroup.heading('#1', text='Name', anchor=CENTER)
+        self.trv_selected_patterns_cgroup.heading('#1', text='Available patterns', anchor=CENTER)
         self.trv_selected_patterns_cgroup.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_selected_patterns_cgroup.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_selected_patterns_cgroup.bind("<Button-1>", self.click_trv_spatters_cgroup)
-        self.trv_selected_patterns_cgroup.grid(row=2, column=2, rowspan=10, sticky=W)
+        self.trv_selected_patterns_cgroup.grid(row=0, column=6, rowspan=10, pady=10, sticky=W)
+        vsb_trv_selcg = Scrollbar(frm_aux3, orient="vertical", command=self.trv_selected_patterns_cgroup.yview)
+        vsb_trv_selcg.grid(row=0, column=7, rowspan=10, pady=10, sticky=NS)
+        self.trv_selected_patterns_cgroup.configure(yscrollcommand=vsb_trv_selcg.set)
+        lbl_sep10 = Label(frm_aux3)
+        lbl_sep10.grid(row=0, column=8, padx=10, pady=10)
+
         btn_add_cg = Button(frm_aux3, image=self.add_icon, command=self.click_add_cgroup)
-        btn_add_cg.grid(row=5, column=1, padx=20)
+        btn_add_cg.grid(row=3, column=4)
         btn_add_cg_ttp = CreateToolTip(btn_add_cg, 'Add pattern')
         btn_remove_cg = Button(frm_aux3, image=self.delete_icon, command=self.click_remove_cgroup)
-        btn_remove_cg.grid(row=6, column=1, padx=20)
+        btn_remove_cg.grid(row=4, column=4)
         btn_remove_cg_ttp = CreateToolTip(btn_remove_cg, 'Remove pattern')
         frm_aux3.grid(row=5, column=0, pady=20, padx=10, rowspan=10)
 
@@ -242,34 +273,39 @@ class FormChildExConfig:
         btn_copy_patterns.grid(row=10, column=1, padx=5)
         btn_copy_patterns_ttp = CreateToolTip(btn_copy_patterns, 'Copy patterns')
 
-        lbl_egroup_patterns = Label(frm_aux6, text='Set patterns for the experimental group:')
-        lbl_egroup_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_egroup_patterns.grid(row=0, column=0, pady=10, sticky=W, columnspan=3)
-        lbl_available_d_egroup = Label(frm_aux6, text='Available patterns')
-        lbl_available_d_egroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_available_d_egroup.grid(row=1, column=0, sticky=W)
-        lbl_selected_d_egroup = Label(frm_aux6, text='Selected patterns')
-        lbl_selected_d_egroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_selected_d_egroup.grid(row=1, column=2, sticky=W)
-        self.trv_available_patters_egroup = Treeview(frm_aux6, height=4, columns='Name')
+        lbl_sep11 = Label(frm_aux6)
+        lbl_sep11.grid(row=0, column=0, padx=10, pady=10)
+        self.trv_available_patters_egroup = Treeview(frm_aux6, height=4, columns='Patterns')
         self.trv_available_patters_egroup.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available_patters_egroup.heading('#1', text='Name', anchor=CENTER)
+        self.trv_available_patters_egroup.heading('#1', text='Patterns', anchor=CENTER)
         self.trv_available_patters_egroup.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_available_patters_egroup.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available_patters_egroup.bind("<Button-1>", self.click_trv_apatters_egroup)
-        self.trv_available_patters_egroup.grid(row=2, column=0, rowspan=10, sticky=W)
-        self.trv_selected_patterns_egroup = Treeview(frm_aux6, height=4, columns='Name')
+        self.trv_available_patters_egroup.grid(row=0, column=1, rowspan=10, pady=10, sticky=W)
+        vsb_trv_aveg = Scrollbar(frm_aux6, orient="vertical", command=self.trv_available_patters_egroup.yview)
+        vsb_trv_aveg.grid(row=0, column=2, rowspan=10, pady=10, sticky=NS)
+        self.trv_available_patters_egroup.configure(yscrollcommand=vsb_trv_aveg.set)
+        lbl_sep12 = Label(frm_aux6)
+        lbl_sep12.grid(row=0, column=3, padx=10, pady=10)
+        lbl_sep13 = Label(frm_aux6)
+        lbl_sep13.grid(row=0, column=5, padx=10, pady=10)
+        self.trv_selected_patterns_egroup = Treeview(frm_aux6, height=4, columns=('Available patterns',))
         self.trv_selected_patterns_egroup.heading('#0', text='ID', anchor=CENTER)
-        self.trv_selected_patterns_egroup.heading('#1', text='Name', anchor=CENTER)
+        self.trv_selected_patterns_egroup.heading('#1', text='Available patterns', anchor=CENTER)
         self.trv_selected_patterns_egroup.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_selected_patterns_egroup.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_selected_patterns_egroup.bind("<Button-1>", self.click_trv_spatters_egroup)
-        self.trv_selected_patterns_egroup.grid(row=2, column=2, rowspan=10, sticky=W)
+        self.trv_selected_patterns_egroup.grid(row=0, column=6, rowspan=10, pady=10, sticky=W)
+        vsb_trv_seleg = Scrollbar(frm_aux6, orient="vertical", command=self.trv_selected_patterns_egroup.yview)
+        vsb_trv_seleg.grid(row=0, column=7, rowspan=10, pady=10, sticky=NS)
+        self.trv_selected_patterns_egroup.configure(yscrollcommand=vsb_trv_seleg.set)
+        lbl_sep14 = Label(frm_aux6)
+        lbl_sep14.grid(row=0, column=8, padx=10, pady=10)
         btn_add_eg = Button(frm_aux6, image=self.add_icon, command=self.click_add_egroup)
-        btn_add_eg.grid(row=5, column=1, padx=20)
+        btn_add_eg.grid(row=3, column=4)
         btn_add_eg_ttp = CreateToolTip(btn_add_eg, 'Add pattern')
         btn_remove_eg = Button(frm_aux6, image=self.delete_icon, command=self.click_remove_egroup)
-        btn_remove_eg.grid(row=6, column=1, padx=20)
+        btn_remove_eg.grid(row=4, column=4)
         btn_remove_eg_ttp = CreateToolTip(btn_remove_eg, 'Remove pattern')
         frm_aux6.grid(row=5, column=2, pady=20, padx=10, rowspan=10)
 
@@ -303,14 +339,13 @@ class FormChildExConfig:
         self.scenario_components = []
         self.experimental_scenario = None
 
-    def select_experiment(self, event):
+    def select_experiment(self, event=None):
         if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
             self.id_selected_exp = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
             # Retrieve selected experiment and its 'Experimental scenarios'
             self.retrieve_list()
             self.frm_child_exp_list.grid_forget()
             self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-
 
     def click_save_experiment(self):
         self.frm_child_list.grid_forget()
@@ -420,12 +455,16 @@ class FormChildExConfig:
             self.cbx_cgroup.set(self.experimental_scenario.control_group.name)
             self.cbx_egroup.set(self.experimental_scenario.experimental_group.name)
             for item in self.scenario_components:
-                if len(item.id_patterns_cgroup) == 0:
-                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, ''))
+                if len(item.id_patterns_cgroup) == 0 and len(item.id_patterns_egroup) == 0:
+                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '', ''))
+                elif len(item.id_patterns_cgroup) != 0 and len(item.id_patterns_egroup) == 0:
+                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '✓', ''))
+                elif len(item.id_patterns_cgroup) == 0 and len(item.id_patterns_egroup) != 0:
+                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '', '✓'))
                 else:
-                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '✓'))
+                    self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '✓', '✓'))
             self.frm_child_list.grid_forget()
-            self.btn_edit_comp.grid(row=14, column=2, padx=20)
+            #self.btn_edit_comp.grid(row=14, column=2, padx=20)
             self.txt_name.focus_set()
             self.title_form = 'Update'
             self.frm_child_general['text'] = self.title_form + ' experimental scenario'
@@ -490,9 +529,12 @@ class FormChildExConfig:
         elif validation_option == 2:
             messagebox.showwarning(title='Designers',
                                    message='Control group and experimental group cant be the same')
-        else:
+        elif validation_option == 3:
             messagebox.showwarning(title='Scenario components',
                                    message='You must insert at least one scenario component')
+        else:
+            messagebox.showwarning(title='Designers', message='At least one designer belongs to control and experimental '
+                                                              'group. Please check the selected groups')
 
     def click_cancel(self):
         """
@@ -507,15 +549,19 @@ class FormChildExConfig:
             self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_new_component(self, type='new'):
-        if type == 'new':
-            self.decide_component = True
+        if len(self.problems) > len(self.trv_scenario_components.get_children()):  # Validates if the design problems are all already configured or not
+            if type == 'new':
+                self.decide_component = True
+            else:
+                self.decide_component = False
+            self.load_problems()
+            self.load_patterns()
+            self.tlevel_problem.title(self.title_form + ' problem')
+            self.tlevel_problem.deiconify()
+            self.tlevel_problem.grab_set()
         else:
-            self.decide_component = False
-        self.load_problems()
-        self.load_patterns()
-        self.tlevel_problem.title(self.title_form + ' problem')
-        self.tlevel_problem.deiconify()
-        self.tlevel_problem.grab_set()
+            messagebox.showwarning(title='No design problems', message='All design problems are already configured '
+                                                                       'within this scenario')
 
     def click_delete_component(self):
         if self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'] != '':
@@ -550,7 +596,7 @@ class FormChildExConfig:
     def click_save_sc_component(self):
         validation_option = self.validate_problem_frm()  # Validate any issue associated with problem selection
         if validation_option == 0: # No issues
-            if len(self.trv_selected_patterns_cgroup.get_children()) != 0 and len(
+            if len(self.trv_selected_patterns_cgroup.get_children()) != 0 or len(
                     self.trv_selected_patterns_egroup.get_children()) != 0: # When at least one pattern is selected
                 if self.decide_component:   # New component
                     scenario_component_aux = ScenarioComponent(id_problem=self.current_sc_comp.problem.id,
@@ -560,12 +606,14 @@ class FormChildExConfig:
                                                                id_problem=self.current_sc_comp.problem.id,
                                                                id_DB=self.current_sc_comp.id_DB,
                                                                problem=self.current_sc_comp.problem)
-                for item in self.trv_selected_patterns_cgroup.get_children():
-                    scenario_component_aux.id_patterns_cgroup.append(
-                        self.trv_selected_patterns_cgroup.item(item)['text'])
-                for item in self.trv_selected_patterns_egroup.get_children():
-                    scenario_component_aux.id_patterns_egroup.append(
-                        self.trv_selected_patterns_egroup.item(item)['text'])
+                if len(self.trv_selected_patterns_cgroup.get_children()) != 0:  # If patterns selected for control group
+                    for item in self.trv_selected_patterns_cgroup.get_children():
+                        scenario_component_aux.id_patterns_cgroup.append(
+                            self.trv_selected_patterns_cgroup.item(item)['text'])
+                if len(self.trv_selected_patterns_egroup.get_children()) != 0:  # If patterns selected for experimental group
+                    for item in self.trv_selected_patterns_egroup.get_children():
+                        scenario_component_aux.id_patterns_egroup.append(
+                            self.trv_selected_patterns_egroup.item(item)['text'])
                 if self.decide_component:
                     self.scenario_components.append(scenario_component_aux)
                     if len(self.trv_selected_patterns_cgroup.get_children()) != 0 and len(
@@ -589,8 +637,8 @@ class FormChildExConfig:
                 self.tlevel_problem.grab_release()
                 self.tlevel_problem.withdraw()
             else:
-                decision = messagebox.askyesno(parent = self.tlevel_problem, title='No patterns',
-                                               message='No patterns selected. Do you want to continue?')
+                decision = messagebox.askyesno(parent=self.tlevel_problem, title='No patterns',
+                                               message='No patterns selected for any group. Do you want to continue?')
                 # Saving an scenario component without associated patterns
                 if decision:
                     if self.decide_component:
@@ -661,10 +709,13 @@ class FormChildExConfig:
 
     def validate_general_frm(self):
         if len(self.txt_name.get('1.0','end-1c')) !=0 and len(self.txt_description.get('1.0','end-1c')) !=0 and \
-                len(self.txt_access_code.get('1.0','end-1c')) !=0 and len(self.cbx_cgroup.get()) != 0 and len(self.cbx_egroup.get()) != 0:
+                len(self.txt_access_code.get('1.0','end-1c')) != 0 and len(self.cbx_cgroup.get()) != 0 and len(self.cbx_egroup.get()) != 0:
             if self.cbx_egroup.get() != self.cbx_cgroup.get():
                 if len(self.trv_scenario_components.get_children()) != 0:
-                    return 0
+                    if self.validate_repeated_designers():
+                        return 0
+                    else:
+                        return 4
                 else:
                     return 3
             else:
@@ -690,6 +741,18 @@ class FormChildExConfig:
                 return 1
         else:
             return 0
+
+    def validate_repeated_designers(self):
+        self.directive = Message(action=30, information=[self.designers_group[int(self.cbx_cgroup.current())].id])
+        self.connection = self.directive.send_directive(self.connection)
+        control_group = self.connection.message.information[2]
+        self.directive = Message(action=30, information=[self.designers_group[int(self.cbx_egroup.current())].id])
+        self.connection = self.directive.send_directive(self.connection)
+        experimental_group = self.connection.message.information[2]
+        for item in control_group:
+            if item in experimental_group:  # If designer (control group) belongs to experimental group
+                return False
+        return True     # Any designer belongs to both groups simultaneously
 
     def load_problems(self):
         # Clear fields associated with the 'problem'

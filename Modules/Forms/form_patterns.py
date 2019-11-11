@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage
+from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Notebook, Combobox, Style, Separator
 from Modules.Config.Data import CreateToolTip, Message, Template, Pattern, Category, File, wrap_text, Section
@@ -62,13 +62,20 @@ class FormChildPattern:
         defaultbg = self.frm_child_crud.cget('bg')
 
         # Components for List FRM
+        lbl_sep1 = Label(self.frm_child_list)
+        lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=8, columns='Pattern')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Pattern', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_pattern_summary)
-        self.trv_available.grid(row=1, column=0, columnspan=10, rowspan=9, sticky=W, padx=50, pady=25)
+        self.trv_available.grid(row=0, column=1, rowspan=2, sticky=W, pady=25)
+        vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
+        vsb_trv_av.grid(row=0, column=2, rowspan=2, pady=25, sticky=NS)
+        self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
+        lbl_sep2 = Label(self.frm_child_list)
+        lbl_sep2.grid(row=0, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
         btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
@@ -79,15 +86,22 @@ class FormChildPattern:
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
         btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete pattern')
-        frm_aux4.grid(row=1, column=10, pady=35, padx=20, rowspan=3, sticky=NW)
+        frm_aux4.grid(row=0, column=4, pady=25, padx=25, rowspan=2, sticky=NW)
         sep_pattern = Separator(self.frm_child_list, orient=VERTICAL)
-        sep_pattern.grid(row=0, column=11, sticky=NS, rowspan=21, padx=5)
+        sep_pattern.grid(row=0, column=5, sticky=NS, rowspan=2, padx=5)
+        lbl_sep3 = Label(self.frm_child_list)
+        lbl_sep3.grid(row=0, column=6, padx=25, pady=25)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_details.grid(row=1, column=12, sticky=SW, padx=50, pady=25)
+        lbl_details.grid(row=0, column=7, sticky=W, pady=25)
         self.txt_summary = Text(self.frm_child_list, height=20, width=60)
         self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_summary.grid(row=2, column=12, rowspan=9, sticky=NW, padx=50)
+        self.txt_summary.grid(row=1, column=7, pady=1, sticky=NW)
+        vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
+        vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
+        self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
+        lbl_sep4 = Label(self.frm_child_list)
+        lbl_sep4.grid(row=0, column=9, padx=25, pady=25)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
@@ -112,7 +126,8 @@ class FormChildPattern:
         lbl_section = Label(self.frm_aux2, text='Select a section')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(pady=10, padx=10, sticky=NW)
-
+        lbl_sep5 = Label(self.frm_aux2)
+        lbl_sep5.grid(row=0, column=1, padx=10, pady=10)
         self.trv_summary = Treeview(self.frm_aux2, height=6, columns=('Section', 'Mandatory', 'Completed'))
         self.trv_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_summary.heading('#1', text='Section', anchor=CENTER)
@@ -123,19 +138,24 @@ class FormChildPattern:
         self.trv_summary.column('#2', width=80, minwidth=80, stretch=NO, anchor=CENTER)
         self.trv_summary.column('#3', width=80, minwidth=80, stretch=NO, anchor=CENTER)
         self.trv_summary.bind("<ButtonRelease-1>", self.trv_section_selected)
-        self.trv_summary.grid(row=0, column=1, rowspan=3, sticky=W, padx=10)
+        self.trv_summary.grid(row=0, column=2, rowspan=3, sticky=W, pady=10)
+        vsb_trv_sum = Scrollbar(self.frm_aux2, orient="vertical", command=self.trv_summary.yview)
+        vsb_trv_sum.grid(row=0, column=3, rowspan=3, pady=10, sticky=NS)
+        self.trv_summary.configure(yscrollcommand=vsb_trv_sum.set)
+        lbl_sep6 = Label(self.frm_aux2)
+        lbl_sep6.grid(row=0, column=4, padx=10, pady=10)
 
         lbl_desc_section = Label(self.frm_aux2, text='Description')
         lbl_desc_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_desc_section.grid(row=0, column=2, pady=10, padx=50, sticky=NE)
+        lbl_desc_section.grid(row=0, column=5, pady=10, padx=50, sticky=NE)
 
         self.txt_desc_section = Text(self.frm_aux2, height=4, width=65)
         self.txt_desc_section.config(background=defaultbg, font=TEXT_FONT)
-        self.txt_desc_section.grid(row=0, column=3, pady=10, padx=20, sticky=W)
+        self.txt_desc_section.grid(row=0, column=6, pady=10, padx=20, sticky=W)
 
         lbl_section = Label(self.frm_aux2, text='Content')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_section.grid(row=1, column=2, pady=10, padx=50, sticky=NE)
+        lbl_section.grid(row=1, column=5, pady=10, padx=50, sticky=NE)
 
         self.tab_control = Notebook(self.frm_aux2)
         tab_desc = Frame(self.tab_control)
@@ -170,7 +190,7 @@ class FormChildPattern:
         self.cbx_category.grid(row=1, column=0, pady=20, padx=20, sticky=W)
         self.cbx_category.bind("<<ComboboxSelected>>", self.cbx_category_selected)
 
-        self.tab_control.grid(row=1, column=3, padx=20, pady=10, sticky=W)
+        self.tab_control.grid(row=1, column=6, padx=20, pady=10, sticky=W)
         self.tab_control.tab(0, state='disabled')
         self.tab_control.tab(1, state='disabled')
         self.tab_control.tab(2, state='disabled')
@@ -216,14 +236,12 @@ class FormChildPattern:
         for item in self.patterns:
             content = item.get_content_name()
             self.trv_available.insert('', 'end', text=item.id, values=(content,))
-        # Remove existing elements in the list
-        '''for item in self.trv_list_summary.get_children():
-            self.trv_list_summary.delete(item)'''
 
     def show_frm(self):
         """
         Show the List form when the Patterns administration is called
         """
+        #self.style.layout('TNotebook.Tab', [])  # turn off tabs
         self.get_patterns()
         self.retrieve_list()
         self.trv_available.selection_set(self.trv_available.get_children()[0])
@@ -235,6 +253,7 @@ class FormChildPattern:
         Hide the Patterns administration Forms
         """
         # self.click_cancel()
+        #self.style.layout('TNotebook.Tab')  # turn on tabs
         self.frm_child_list.grid_forget()
         # self.frm_child_crud.grid_forget()
 
@@ -279,7 +298,10 @@ class FormChildPattern:
             if decision:
                 self.directive = Message(action=44, information=[self.id_selected_pattern])
                 self.connection = self.directive.send_directive(self.connection)
-                self.go_back_form()
+                if self.connection.message.action == 5:  # An error ocurred while deleting the item
+                    messagebox.showerror(title='Can not delete the item', message=self.connection.message.information[0])
+                else:
+                    self.go_back_form()
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

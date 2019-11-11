@@ -255,9 +255,10 @@ class WindowHome:
         self.connection.close_connection()
         self.window.destroy()
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     connection = Connection()
-    if True:
+    try:
         # Ask user for Socket info
         host = input('Insert ip address of the server to connect:\n')
         port = input('Inset the port number of the server to connect (>1023):\n')
@@ -270,8 +271,8 @@ if __name__=='__main__':
             print('Client connecting to IP {} in PORT {}'.format(HOST, str(PORT)))
         app = WindowHome(connection)
         app.window.mainloop()
-    '''except Exception as e:
+    except Exception as e:
         error = 'Error with the client: ' + str(e)
         print(error)
     finally:
-        connection.close_connection()'''
+        connection.close_connection()
