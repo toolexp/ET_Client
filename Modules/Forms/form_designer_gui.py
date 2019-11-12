@@ -15,7 +15,7 @@ LABEL_FONT = ("Arial", 11)
 TEXT_FONT = ("Arial", 10)
 BOLD_FONT = ("Arial", 10, 'bold')
 
-TEXT_COLOR = "#1B5070"
+TEXT_COLOR = "#286ded"
 
 INDICATIONS = {
     "PATTERNS": "This component shows you a design problem with its respective description. You must design a solution "
@@ -27,9 +27,9 @@ INDICATIONS = {
 }
 
 class FormParentDesigner:
-    def __init__(self, window, connection):
+    def __init__(self, window, connection, current_designer):
         self.connection = connection
-        self.current_designer = Designer(id=1, connection=self.connection)
+        self.current_designer = current_designer
         self.frm_parent = LabelFrame(window)
         self.tlevel_auth_scenario = Toplevel(window)
         self.tlevel_auth_scenario.protocol("WM_DELETE_WINDOW", self.click_authenticate_cancel)
@@ -59,7 +59,7 @@ class FormParentDesigner:
         # Initialize visual components for displaying available experiment scenarios
         lbl_title = Label(self.frm_parent, text='Experimental scenarios')
         lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_title.grid(row=0, column=1, columnspan=5, pady=15, sticky=EW)
+        lbl_title.grid(row=0, column=1, columnspan=5, pady=25, sticky=EW)
         lbl_experimental_trv = Label(self.frm_parent, text='Select a scenario')
         lbl_experimental_trv.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_experimental_trv.grid(row=1, column=1, pady=5, sticky=NW)
@@ -80,7 +80,7 @@ class FormParentDesigner:
         vsb_trv_av = Scrollbar(self.frm_parent, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=2, column=2, pady=25, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
-        self.txt_scenario_desc = Text(self.frm_parent, height=6, width=70)
+        self.txt_scenario_desc = Text(self.frm_parent, height=4, width=85)
         self.txt_scenario_desc.config(font=SUBTITLE2_FONT, bg=defaultbg)
         self.txt_scenario_desc.grid(row=4, column=1, pady=25, sticky=NW)
         btn_access = Button(self.frm_parent, image=self.next_icon, command=self.click_enter_scenario)
@@ -119,7 +119,7 @@ class FormParentDesigner:
         self.lbl_problem_title = Label(frm_aux1)
         self.lbl_problem_title.config(font=TEXT_FONT)
         self.lbl_problem_title.grid(row=2, column=3, pady=10, padx=25, sticky=NW)
-        self.txt_problem_desc = Text(frm_aux1, height=4, width=110)
+        self.txt_problem_desc = Text(frm_aux1, height=4, width=108)
         self.txt_problem_desc.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_problem_desc.grid(row=3, column=2, padx=25, pady=10, columnspan=2, sticky=NW)
         sep_aux3 = Separator(frm_aux1, orient=HORIZONTAL)
@@ -129,7 +129,7 @@ class FormParentDesigner:
 
         self.btn_next_scenario = Button(frm_aux1, image=self.next_icon, command=self.click_next_scenario)
         self.btn_next_scenario.grid(row=2, column=5, padx=25, pady=10, sticky=W)
-        btn_next_scenario_ttp = CreateToolTip(self.btn_next_scenario, 'Next problem')
+        btn_next_scenario_ttp = CreateToolTip(self.btn_next_scenario, 'Next component')
 
         lbl_solution = Label(frm_aux1, text='Design a solution')
         lbl_solution.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
@@ -222,7 +222,7 @@ class FormParentDesigner:
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
-        self.directive = Message(action=82, information=[1, self.current_designer.id])
+        self.directive = Message(action=82, information=['my scenarios', self.current_designer.id])
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
             elements = item.split('¥')
@@ -264,7 +264,7 @@ class FormParentDesigner:
                 text = 'The selected scenario has {} design problems that you can solve with supporting ' \
                        'tools, such as: design patterns, digrams and descriptions. Take the necessary time to solve it ' \
                        'in the most efficient way.'.format(len(self.scenario_components))
-            self.txt_scenario_desc.insert('1.0', wrap_text(text,85))
+            self.txt_scenario_desc.insert('1.0', wrap_text(text,108))
             self.txt_scenario_desc['state'] = DISABLED
 
     def click_enter_scenario(self):
@@ -377,7 +377,7 @@ class FormParentDesigner:
                 self.connection = self.directive.send_directive(self.connection)
             # Get info and build the solution to send to the server
             # Create diagram in DB
-            self.directive = Message(action=61, information=[self.attached_file.file_bytes, self.attached_file.name])
+            self.directive = Message(action=61, information=[self.attached_file.file_bytes, self.attached_file.name, 'sent sol'])
             self.connection = self.directive.send_directive(self.connection)
             id_diagram = self.connection.message.information[0]
             # Create object for the solution
@@ -502,7 +502,8 @@ class FormParentDesigner:
             self.attached_file = None
 
     def load_scenario_component(self, index):
-        self.directive = Message(action=42, information=[self.current_designer.id, self.scenario_components[index].id_DB])
+        # Ask for available patterns in current scenario for the current designer, depending of the role
+        self.directive = Message(action=42, information=[self.scenario_components[index].id_DB, 1 if self.current_designer.current_group == 'control' else 2])
         self.connection = self.directive.send_directive(self.connection)
         self.available_patterns = Pattern.get_patterns(self.connection, self.connection.message.information)
         self.lbl_component_title['text'] = 'Component {} of {}'.format(self.current_scenarios_counter + 1,

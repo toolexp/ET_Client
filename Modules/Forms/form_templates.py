@@ -9,7 +9,7 @@ LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 NOTE_FONT = ("Arial", 8)
 
-TEXT_COLOR = "#1B5070"
+TEXT_COLOR = "#286ded"
 
 
 class FormParentTemplate:
@@ -91,12 +91,19 @@ class FormChildTemplate:
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, rowspan=2, sticky=NW)
         sep_template = Separator(self.frm_child_list, orient=VERTICAL)
         sep_template.grid(row=0, column=5, sticky=NS, rowspan=2, padx=5)
+        lbl_sep3 = Label(self.frm_child_list)
+        lbl_sep3.grid(row=0, column=6, padx=25, pady=25)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_details.grid(row=0, column=6, sticky=W, padx=25, pady=25)
+        lbl_details.grid(row=0, column=7, sticky=W, pady=25)
         self.txt_summary = Text(self.frm_child_list, height=18, width=50)
         self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_summary.grid(row=1, column=6, sticky=NW, padx=25)
+        self.txt_summary.grid(row=1, column=7, pady=10, sticky=NW)
+        vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
+        vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
+        self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
+        lbl_sep4 = Label(self.frm_child_list)
+        lbl_sep4.grid(row=0, column=9, padx=25, pady=25)
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)

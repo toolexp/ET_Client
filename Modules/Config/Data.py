@@ -54,7 +54,7 @@ class Designer:
             self.retrieve_components()
 
     def retrieve_components(self):
-        if self.id is not None:
+        if self.id == 0:
             self.directive = Message(action=25, information=[self.id])
             self.connection = self.directive.send_directive(self.connection)
             self.name = self.connection.message.information[0]

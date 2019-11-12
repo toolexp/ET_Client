@@ -8,7 +8,7 @@ SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
-TEXT_COLOR = "#1B5070"
+TEXT_COLOR = "#286ded"
 
 
 class FormParentSection:

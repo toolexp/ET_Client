@@ -11,7 +11,7 @@ SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
-TEXT_COLOR = "#1B5070"
+TEXT_COLOR = "#286ded"
 
 
 class FormParentPattern:
@@ -56,7 +56,8 @@ class FormChildPattern:
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
         self.style = Style()
-        self.style.theme_use("clam")
+        self.style.layout('TNotebook.Tab', [])  # turn off tabs
+        #self.style.theme_use("clam")
         self.style.configure("Treeview", foreground="gray", rowheight=50)
         #self.style.layout('TNotebook.Tab', [])  # turn off tabs
         defaultbg = self.frm_child_crud.cget('bg')
@@ -96,7 +97,7 @@ class FormChildPattern:
         lbl_details.grid(row=0, column=7, sticky=W, pady=25)
         self.txt_summary = Text(self.frm_child_list, height=20, width=60)
         self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_summary.grid(row=1, column=7, pady=1, sticky=NW)
+        self.txt_summary.grid(row=1, column=7, pady=10, sticky=NW)
         vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
@@ -241,7 +242,6 @@ class FormChildPattern:
         """
         Show the List form when the Patterns administration is called
         """
-        #self.style.layout('TNotebook.Tab', [])  # turn off tabs
         self.get_patterns()
         self.retrieve_list()
         self.trv_available.selection_set(self.trv_available.get_children()[0])
@@ -377,7 +377,7 @@ class FormChildPattern:
                         elif item.data_type == 'File':
                             if item.file is not None:
                                 self.directive = Message(action=61,
-                                                         information=[item.file.file_bytes, item.file.name])
+                                                         information=[item.file.file_bytes, item.file.name, 'pattern'])
                                 self.connection = self.directive.send_directive(self.connection)
                                 id_diagram = self.connection.message.information[0]
                                 content_aux = '<File>'
@@ -416,7 +416,7 @@ class FormChildPattern:
                                 self.connection = self.directive.send_directive(self.connection)
                             if item.file is not None:
                                 self.directive = Message(action=61,
-                                                         information=[item.file.file_bytes, item.file.name])
+                                                         information=[item.file.file_bytes, item.file.name, 'pattern'])
                                 self.connection = self.directive.send_directive(self.connection)
                                 id_diagram = self.connection.message.information[0]
                                 content_aux = '<File>'

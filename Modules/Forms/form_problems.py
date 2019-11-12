@@ -12,7 +12,7 @@ SUBTITLE_FONT = ("Arial", 14)
 LABEL_FONT = ("Arial", 10)
 TEXT_FONT = ("Arial", 10)
 
-TEXT_COLOR = "#1B5070"
+TEXT_COLOR = "#286ded"
 
 
 class FormParentProblem:
@@ -98,14 +98,21 @@ class FormChildProblem:
         frm_aux4.grid(row=0, column=4, rowspan=2, pady=25, padx=25, sticky=NW)
         sep_problem = Separator(self.frm_child_list, orient=VERTICAL)
         sep_problem.grid(row=0, column=5, sticky=NS, rowspan=2, padx=5)
+        lbl_sep3 = Label(self.frm_child_list)
+        lbl_sep3.grid(row=0, column=6, padx=25, pady=25)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_details.grid(row=0, column=6, sticky=W, padx=25, pady=25)
+        lbl_details.grid(row=0, column=7, sticky=W, pady=25)
         self.txt_summary = Text(self.frm_child_list, height=18, width=50)
         self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_summary.grid(row=1, column=6, sticky=NW, padx=25)
+        self.txt_summary.grid(row=1, column=7, pady=10, sticky=NW)
+        vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
+        vsb_txt_sum.grid(row=1, column=8, pady=10, sticky=NS)
+        self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
+        lbl_sep4 = Label(self.frm_child_list)
+        lbl_sep4.grid(row=0, column=9, padx=25, pady=25)
         self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
-        self.btn_view_diagram.grid(row=1, column=7, padx=25, sticky=NW)
+        self.btn_view_diagram.grid(row=1, column=10, padx=25, sticky=NW)
 
         self.canvas_summary = Canvas(self.tlevel_diagram_summary, width=500, height=500)
         self.canvas_summary.config(background='white', borderwidth=1)
@@ -365,7 +372,7 @@ class FormChildProblem:
                 if decision:
                     if self.decide:  # New Problem
                         # Create diagram in DB
-                        self.directive = Message(action=61, information=[self.file.file_bytes, self.file.name])
+                        self.directive = Message(action=61, information=[self.file.file_bytes, self.file.name, 'ideal sol'])
                         self.connection = self.directive.send_directive(self.connection)
                         id_diagram = self.connection.message.information[0]
                         # Create object for the solution and the problem
@@ -389,7 +396,7 @@ class FormChildProblem:
                         self.new_problem.solution.annotations = self.txt_annotations.get('1.0', 'end-1c')
                         # Update current diagram in DB
                         self.directive = Message(action=63, information=[self.new_problem.solution.diagram_id,
-                                                                         self.file.file_bytes, self.file.name])
+                                                                         self.file.file_bytes, self.file.name, 'ideal sol'])
                         self.connection = self.directive.send_directive(self.connection)
                         # Update the ideal solution in DB
                         self.directive = Message(action=58, information=[self.new_problem.solution.id,
@@ -408,7 +415,7 @@ class FormChildProblem:
             else:
                 if self.decide:  # New problem
                     # Create diagram in DB
-                    self.directive = Message(action=61, information=[self.file.file_bytes, self.file.name])
+                    self.directive = Message(action=61, information=[self.file.file_bytes, self.file.name, 'ideal sol'])
                     self.connection = self.directive.send_directive(self.connection)
                     id_diagram = self.connection.message.information[0]
                     # Create object for the solution and the problem
@@ -438,7 +445,7 @@ class FormChildProblem:
                         self.new_problem.solution.patterns_id.append(int(self.trv_selected_patterns.item(item)['text']))
                     # Update current diagram in DB
                     self.directive = Message(action=63, information=[self.new_problem.solution.diagram_id,
-                                                                     self.file.file_bytes, self.file.name])
+                                                                     self.file.file_bytes, self.file.name, 'ideal sol'])
                     self.connection = self.directive.send_directive(self.connection)
                     # Update the ideal solution in DB
                     self.directive = Message(action=58, information=[self.new_problem.solution.id,
