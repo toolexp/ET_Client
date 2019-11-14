@@ -1,9 +1,15 @@
 {
-  "visual_components" : {
-    "title_font" : "(\"Arial\", 18)",
-    "subtitle_font" : "(\"Arial\", 14)",
-    "label_font" : "(\"Arial\", 10)",
-    "text_font" : "(\"Arial\", 10)",
-    "text_color" : "#1B5070"
+  "font_type" : "Arial",
+  "font_size" : {
+    "title" : 18,
+    "subtitle" : 14,
+    "subtitle_two" : 12,
+    "label": 11,
+    "text" : 10,
+    "note": 8
+  },
+  "color": {
+    "sky_blue": "#286ded",
+    "red": "#ff0019"
   }
 }

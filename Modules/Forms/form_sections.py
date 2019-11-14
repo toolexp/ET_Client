@@ -2,13 +2,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox,
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox
 from Modules.Config.Data import Message, wrap_text, CreateToolTip
-
-TITLE_FONT = ("Arial", 18)
-SUBTITLE_FONT = ("Arial", 14)
-LABEL_FONT = ("Arial", 10)
-TEXT_FONT = ("Arial", 10)
-
-TEXT_COLOR = "#286ded"
+from Modules.Config.Visual import *
 
 
 class FormParentSection:

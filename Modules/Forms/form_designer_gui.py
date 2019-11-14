@@ -3,19 +3,11 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, 
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Notebook, Separator
 from Modules.Config.Data import CreateToolTip, Message, Pattern, File, wrap_text, ExperimentalSC, ScenarioComponent, \
-    Measurement, Solution, TimerClass, Designer
+    Measurement, Solution, TimerClass
 from PIL import Image, ImageTk
 import os
-import shutil
+from Modules.Config.Visual import *
 
-TITLE_FONT = ("Arial", 18)
-SUBTITLE_FONT = ("Arial", 14)
-SUBTITLE2_FONT = ("Arial", 12)
-LABEL_FONT = ("Arial", 11)
-TEXT_FONT = ("Arial", 10)
-BOLD_FONT = ("Arial", 10, 'bold')
-
-TEXT_COLOR = "#286ded"
 
 INDICATIONS = {
     "PATTERNS": "This component shows you a design problem with its respective description. You must design a solution "
@@ -212,8 +204,6 @@ class FormParentDesigner:
     def hide_frm(self):
         self.frm_parent.grid_forget()
         self.frm_general.grid_forget()
-        shutil.rmtree('./Resources/temp/')
-        os.mkdir('./Resources/temp/')
 
     def retrieve_list(self):
         """
@@ -222,6 +212,10 @@ class FormParentDesigner:
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
+        # Remove text from annotation
+        self.txt_scenario_desc['state'] = NORMAL
+        self.txt_scenario_desc.delete('1.0', 'end-1c')
+        self.txt_scenario_desc['state'] = DISABLED
         self.directive = Message(action=82, information=['my scenarios', self.current_designer.id])
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
@@ -230,10 +224,10 @@ class FormParentDesigner:
 
     def select_experimental_scenario(self, event):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            self.id_selected_ex_scenario = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
-            self.directive = Message(action=85, information=[self.id_selected_ex_scenario])
+            id_selected_ex_scenario = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
+            self.directive = Message(action=85, information=[id_selected_ex_scenario])
             self.connection = self.directive.send_directive(self.connection)
-            self.experimental_scenario = ExperimentalSC(id=self.id_selected_ex_scenario,
+            self.experimental_scenario = ExperimentalSC(id=id_selected_ex_scenario,
                                                         name=self.connection.message.information[0],
                                                         description=self.connection.message.information[1],
                                                         access_code=self.connection.message.information[2],
@@ -245,7 +239,7 @@ class FormParentDesigner:
                                                         connection=self.connection)
             # Retrieve scenario components
             self.scenario_components = []
-            self.directive = Message(action=87, information=[self.id_selected_ex_scenario, 1])
+            self.directive = Message(action=87, information=[id_selected_ex_scenario, 1])
             self.connection = self.directive.send_directive(self.connection)
             for item in self.connection.message.information:
                 elements = item.split('¥')
@@ -264,7 +258,7 @@ class FormParentDesigner:
                 text = 'The selected scenario has {} design problems that you can solve with supporting ' \
                        'tools, such as: design patterns, digrams and descriptions. Take the necessary time to solve it ' \
                        'in the most efficient way.'.format(len(self.scenario_components))
-            self.txt_scenario_desc.insert('1.0', wrap_text(text,108))
+            self.txt_scenario_desc.insert('1.0', wrap_text(text, 108))
             self.txt_scenario_desc['state'] = DISABLED
 
     def click_enter_scenario(self):
@@ -292,7 +286,8 @@ class FormParentDesigner:
             self.initialize_component_variables()
             self.current_scenarios_counter = 0
             self.clear_visual_components()
-            self.current_designer.get_current_role(self.id_selected_ex_scenario)    #Get role for current experimental scenario
+            self.current_designer.get_current_role(self.experimental_scenario.id)    #Get role for current experimental scenario
+            self.lock_experiment()
             self.load_scenario_component(self.current_scenarios_counter)
         else:
             messagebox.showerror(parent=self.tlevel_auth_scenario, title='Wrong access code',
@@ -302,8 +297,8 @@ class FormParentDesigner:
         self.attached_file = None
         self.av_patterns_seen = []
         self.solution_time = 0
-        self.selection_time = 0
-        self.first_pattern_sol = False # Indicates that any pattern solution has been selected yet
+        self.selection_time = []    # Time for selecting solution patterns (may be more than one solution pattern)
+        self.selected_pattern_sol = []  # Indicates that any pattern solution has been selected yet
 
     def click_authenticate_cancel(self):
         """
@@ -337,7 +332,6 @@ class FormParentDesigner:
                     messagebox.showinfo(title='Experimental scenario finished',
                                            message="This concludes the execution of the experimental scenario. Thank you!")
                     self.clear_visual_components()
-                    self.finish_experiment()
                     self.hide_frm()
                     self.show_frm()
                 else: # If another scenario component available
@@ -400,17 +394,23 @@ class FormParentDesigner:
                                    message='You must add annotations to your solution')
         return False
 
-    def validate_component_frm(self):
-        if len(self.txt_solution_desc.get('1.0','end-1c')) != 0:
-            if self.attached_file is not None:
-                if self.lbx_sel_paterns.size() != 0:
-                    return 0
-                return 1
-            return 2
-        return 3
+    def lock_experiment(self):
+        """
+        This section locks the scenario before starting its resolution, so the experimenter can not make any changes to
+        it later (this section is only executed if the scenario is not locked)
+        """
+        if not self.experimental_scenario.scenario_lock:
+            self.directive = Message(action=83, information=['lock_scenario', self.experimental_scenario.id])
+            self.connection = self.directive.send_directive(self.connection)
 
-    def finish_experiment(self):
-        pass
+    def validate_component_frm(self):
+        if self.lbx_sel_paterns.size() != 0:
+            if self.attached_file is not None:
+                if len(self.txt_solution_desc.get('1.0', 'end-1c')) != 0:
+                    return 0
+                return 3
+            return 2
+        return 1
 
     def click_attach_file(self):
         """
@@ -441,14 +441,17 @@ class FormParentDesigner:
             self.attached_file = None
 
     def click_add_patt(self):
+        """
+        Adds a pattern to the selected pattern listbox (when available to the designer).
+        """
         element = self.lbx_av_patterns.curselection()
         if element is not None:   # Check if listbox is selected
             index = element[0]
             id_selected = self.av_patterns_ids[index]
             if not id_selected in self.sel_patterns_ids:    # Check if current patern_id is not in the 'selected patterns list'
-                if id_selected in self.current_ideal_patterns and not self.first_pattern_sol:  # Check if selected pattern matches ideal patterns and for the first time
-                    self.first_pattern_sol = True
-                    self.selection_time = self.time_thread.seconds
+                if id_selected in self.current_ideal_patterns and not id_selected in self.selected_pattern_sol:  # Check if selected pattern matches ideal patterns and for the first time
+                    self.selected_pattern_sol.append(id_selected)
+                    self.selection_time.append(self.time_thread.seconds)
                 for item in self.available_patterns:
                     if item.id == id_selected:  # Find selected pattern in available patterns list
                         self.selected_pattern = item
@@ -457,15 +460,18 @@ class FormParentDesigner:
                 self.lbx_sel_paterns.insert(END, self.selected_pattern.get_content_name())  # Insert pattern name into selected listbox patters
 
     def click_remove_patt(self):
+        """
+        Removes a pattern from the selected pattern listbox (when available to the designer).
+        """
         element = self.lbx_sel_paterns.curselection()
         if element is not None:  # Check if listbox is selected
             if element:
                 index = element[0]
                 id_selected = self.sel_patterns_ids[index]
                 self.lbx_sel_paterns.delete(element)  # Remove from listbox
-                if id_selected in self.current_ideal_patterns and self.first_pattern_sol:  # Check if selected pattern matches ideal patterns
-                    self.first_pattern_sol = False
-                    self.selection_time = 0 # Discard saved time
+                if id_selected in self.current_ideal_patterns and id_selected in self.selected_pattern_sol:  # Check if selected pattern matches ideal patterns and if the the selected pattern correspond to the one selected previously as the pattern solution
+                    del self.selection_time[self.selected_pattern_sol.index(id_selected)]
+                    self.selected_pattern_sol.remove(id_selected)
                 for item in reversed(self.sel_patterns_ids):
                     if item == id_selected:
                         self.sel_patterns_ids.remove(item)

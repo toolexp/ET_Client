@@ -1,18 +1,11 @@
 import os
-import shutil
 from tkinter import Label, LabelFrame, Text, Button, Canvas, messagebox, Frame, filedialog, PhotoImage, Toplevel, \
     Scrollbar
 from tkinter.constants import *
 from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_text, CreateToolTip
 from tkinter.ttk import Treeview, Separator
 from PIL import ImageTk, Image
-
-TITLE_FONT = ("Arial", 18)
-SUBTITLE_FONT = ("Arial", 14)
-LABEL_FONT = ("Arial", 10)
-TEXT_FONT = ("Arial", 10)
-
-TEXT_COLOR = "#286ded"
+from Modules.Config.Visual import *
 
 
 class FormParentProblem:
@@ -48,8 +41,8 @@ class FormChildProblem:
         self.tlevel_diagram_summary.protocol("WM_DELETE_WINDOW", self.close_tlevel_diagram)
         self.tlevel_diagram_summary.withdraw()
         self.tlevel_patterns_solution = Toplevel(frm_parent)
-        self.tlevel_patterns_solution.title('Select patterns for the ideal solution')
-        self.tlevel_patterns_solution.protocol("WM_DELETE_WINDOW", self.close_tlevel_patterns)
+        self.tlevel_patterns_solution.title('Set patterns for the ideal solution')
+        self.tlevel_patterns_solution.protocol("WM_DELETE_WINDOW", self.click_cancel_pat)
         self.tlevel_patterns_solution.withdraw()
         self.initialize_components()
 
@@ -201,12 +194,12 @@ class FormChildProblem:
         btn_remove_ttp = CreateToolTip(btn_remove, 'Remove pattern')
         sep_patterns = Separator(self.tlevel_patterns_solution, orient=VERTICAL)
         sep_patterns.grid(row=0, column=9, sticky=NS, rowspan=10, padx=5)
-        btn_save_pat = Button(self.tlevel_patterns_solution, image=self.save_icon, command=self.close_tlevel_patterns)
-        btn_save_pat.grid(row=0, column=10, padx=25, pady=25, sticky=SW)
+        btn_save_pat = Button(self.tlevel_patterns_solution, image=self.save_icon, command=self.click_save_pat)
+        btn_save_pat.grid(row=0, column=10, padx=25, pady=10, sticky=SW)
         btn_save_pat_ttp = CreateToolTip(btn_save_pat, 'Save patterns')
-        btn_back = Button(self.tlevel_patterns_solution, image=self.cancel_icon, command=self.click_back)
-        btn_back.grid(row=1, column=10, padx=25, pady=25, sticky=SW)
-        btn_back_ttp = CreateToolTip(btn_back, 'Cancel')
+        btn_cancel_pat = Button(self.tlevel_patterns_solution, image=self.cancel_icon, command=self.click_cancel_pat)
+        btn_cancel_pat.grid(row=1, column=10, padx=25, pady=10, sticky=SW)
+        btn_cancel_pat_ttp = CreateToolTip(btn_cancel_pat, 'Cancel')
 
     def retrieve_list(self):
         """
@@ -473,9 +466,9 @@ class FormChildProblem:
         if self.back_window:
             self.back_window = False
             if self.decide:
-                self.retrieve_patterns([], self.patterns)
+                self.retrieve_patterns([], self.patterns[:])
             else:
-                self.retrieve_patterns(self.new_problem.solution.patterns_id, self.patterns)
+                self.retrieve_patterns(self.new_problem.solution.patterns_id, self.patterns[:])
         self.tlevel_patterns_solution.deiconify()
         self.tlevel_patterns_solution.grab_set()
 
@@ -565,15 +558,18 @@ class FormChildProblem:
                 self.trv_selected_patterns.focus())['values'])
             self.trv_selected_patterns.delete(self.trv_selected_patterns.selection())
 
-    def click_back(self):
+    def click_cancel_pat(self):
         """
-        Function activated when 'Back' button form Patterns form is pressed, it shows CRUD form of the current handled
-        'Problem'
+        Function activated when 'Cancel' button in Patterns form is pressed, it closes 'Patterns' selection pop-up window
         """
         self.back_window = True
-        # Remove selected patterns
-        for item in self.trv_selected_patterns.get_children():
-            self.trv_selected_patterns.delete(item)
+        self.close_tlevel_patterns()
+
+    def click_save_pat(self):
+        """
+        Function activated when 'Save' button in Patterns form is pressed, it closes 'Patterns' selection pop-up window
+        and saves current selection
+        """
         self.close_tlevel_patterns()
 
     def click_upload_file(self):
@@ -608,8 +604,6 @@ class FormChildProblem:
         if self.file is not None:  # if an image was already loaded
             self.canvas.delete(self.file.image)  # clear canvas
             self.file = None    # set file NULL
-        shutil.rmtree('./Resources/temp/')  # remove files that may had been retrieved from the DB
-        os.mkdir('./Resources/temp/')
 
     def show_file(self):
         """

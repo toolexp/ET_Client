@@ -2,15 +2,8 @@ from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox, PhotoIm
 from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message, CreateToolTip
+from Modules.Config.Visual import *
 
-TITLE_FONT = ("Arial", 18)
-SUBTITLE_FONT = ("Arial", 14)
-LABEL_FONT = ("Arial", 10)
-TEXT_FONT = ("Arial", 10)
-
-#TEXT_COLOR = "#1B5070"
-
-TEXT_COLOR = "#286ded"
 
 class FormParentAED:
     def __init__(self, window, title, connection):
@@ -174,7 +167,8 @@ class FormChildAED:
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:     # An error ocurred while deleting the item
                     if self.title == 'Designer':
-                        messagebox.showerror(title='Can not delete the item', message=self.connection.message.information[0])
+                        messagebox.showerror(title='Can not delete the item',
+                                             message=self.connection.message.information[0])
                 else:
                     self.retrieve_list()
         else:
@@ -237,11 +231,14 @@ class FormChildAED:
                     raise Exception('Error en guardar: tipo de usuario')
             else:
                 if self.title == 'Experimenter':
-                    self.directive = Message(action=18, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
+                    self.directive = Message(action=18, information=[self.id_selected, name_aux, surname_aux, email_aux,
+                                                                     passwd_aux])
                 elif self.title == 'Designer':
-                    self.directive = Message(action=23, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
+                    self.directive = Message(action=23, information=[self.id_selected, name_aux, surname_aux, email_aux,
+                                                                     passwd_aux])
                 elif self.title == 'Administrator':
-                    self.directive = Message(action=13, information=[self.id_selected, name_aux, surname_aux, email_aux, passwd_aux])
+                    self.directive = Message(action=13, information=[self.id_selected, name_aux, surname_aux, email_aux,
+                                                                     passwd_aux])
                 else:
                     raise Exception('Error en guardar: tipo de usuario')
             self.connection = self.directive.send_directive(self.connection)
@@ -264,7 +261,8 @@ class FormChildAED:
             self.show_frm()
 
     def validate_fields(self):
-        if len(self.txt_name.get()) != 0 and len(self.txt_surname.get()) != 0 and len(self.txt_email.get()) != 0 and len(self.txt_passwd.get()) != 0:
+        if len(self.txt_name.get()) != 0 and len(self.txt_surname.get()) != 0 and len(self.txt_email.get()) != 0 and \
+                len(self.txt_passwd.get()) != 0:
             return True
         else:
             return False

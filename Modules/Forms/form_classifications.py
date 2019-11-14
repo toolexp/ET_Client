@@ -2,13 +2,8 @@ from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Fra
 from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message, CreateToolTip
+from Modules.Config.Visual import *
 
-TITLE_FONT = ("Arial", 18)
-SUBTITLE_FONT = ("Arial", 14)
-LABEL_FONT = ("Arial", 10)
-TEXT_FONT = ("Arial", 10)
-
-TEXT_COLOR = "#286ded"
 
 class FormParentClassification:
     def __init__(self, window, connection):

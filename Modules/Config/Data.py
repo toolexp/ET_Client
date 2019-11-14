@@ -41,6 +41,10 @@ def verify_port(port):
         return True
 
 
+def wrap_text(string, lenght=90):
+    return '\n'.join(textwrap.wrap(string, lenght))
+
+
 class Designer:
     def __init__(self, id=0, name='', surname='', user='', password='', current_group='control', connection=None):
         self.id = id
@@ -436,7 +440,3 @@ class TimerClass:
 
     def stop(self):
         self.stop_var = True
-
-
-def wrap_text(string, lenght=90):
-    return '\n'.join(textwrap.wrap(string, lenght))

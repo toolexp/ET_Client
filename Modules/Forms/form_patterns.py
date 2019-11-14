@@ -3,15 +3,8 @@ from tkinter.constants import *
 from tkinter.ttk import Treeview, Notebook, Combobox, Style, Separator
 from Modules.Config.Data import CreateToolTip, Message, Template, Pattern, Category, File, wrap_text, Section
 from PIL import Image, ImageTk
+from Modules.Config.Visual import *
 import os
-import shutil
-
-TITLE_FONT = ("Arial", 18)
-SUBTITLE_FONT = ("Arial", 14)
-LABEL_FONT = ("Arial", 10)
-TEXT_FONT = ("Arial", 10)
-
-TEXT_COLOR = "#286ded"
 
 
 class FormParentPattern:
@@ -449,8 +442,6 @@ class FormChildPattern:
             self.go_back_form()
 
     def go_back_form(self):
-        shutil.rmtree('./Resources/temp/')
-        os.mkdir('./Resources/temp/')
         self.cbx_template['state'] = ACTIVE
         self.cbx_template.set('')
         self.cbx_template['values'] = []
