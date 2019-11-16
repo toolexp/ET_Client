@@ -64,17 +64,15 @@ class FormChildSection:
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
-        lbl_sep2 = Label(self.frm_child_list)
-        lbl_sep2.grid(row=0, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
-        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new.grid(row=0, column=0, pady=5, padx=5, sticky=E)
         btn_new_ttp = CreateToolTip(btn_new, 'New section')
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_edit.grid(row=1, column=0, pady=5, padx=5, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit section')
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete section')
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
 
@@ -169,22 +167,25 @@ class FormChildSection:
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.decide = False
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.frm_child_list.grid_forget()
-            self.directive = Message(action=35, information=[self.id_selected])
+            self.directive = Message(action=35, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
-            self.txt_name.insert('1.0', self.connection.message.information[0])
-            self.txt_description.insert('1.0', self.connection.message.information[1])
-            self.cbx_data.set(self.connection.message.information[2])
-            if self.connection.message.information[2] == 'Classification':
-                id_class = self.connection.message.information[3]
-                self.retrieve_classifications()
-                self.directive = Message(action=70, information=[id_class])
-                self.connection = self.directive.send_directive(self.connection)
-                self.cbx_classification.set(self.connection.message.information[0])
-                self.cbx_class_selected()
-                self.frm_aux2.grid(row=9, column=0, pady=20, padx=10, columnspan=5, rowspan=10, sticky=W)
-            self.frm_child_crud['text'] = 'Update section'
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+            if self.connection.message.action == 5:  # An error ocurred while trying to update the item
+                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+            else:
+                self.frm_child_list.grid_forget()
+                self.txt_name.insert('1.0', self.connection.message.information[0])
+                self.txt_description.insert('1.0', self.connection.message.information[1])
+                self.cbx_data.set(self.connection.message.information[2])
+                if self.connection.message.information[2] == 'Classification':
+                    id_class = self.connection.message.information[3]
+                    self.retrieve_classifications()
+                    self.directive = Message(action=70, information=[id_class])
+                    self.connection = self.directive.send_directive(self.connection)
+                    self.cbx_classification.set(self.connection.message.information[0])
+                    self.cbx_class_selected()
+                    self.frm_aux2.grid(row=9, column=0, pady=20, padx=10, columnspan=5, rowspan=10, sticky=W)
+                self.frm_child_crud['text'] = 'Update section'
+                self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

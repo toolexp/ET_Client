@@ -61,17 +61,15 @@ class FormChildClassification:
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
-        lbl_sep2 = Label(self.frm_child_list)
-        lbl_sep2.grid(row=0, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
-        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new.grid(row=0, column=0, pady=5, padx=5, sticky=E)
         btn_new_ttp = CreateToolTip(btn_new, 'New classification')
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_edit.grid(row=1, column=0, pady=5, padx=5, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit classification')
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete classification')
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
 
@@ -143,19 +141,22 @@ class FormChildClassification:
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.decide = False
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.directive = Message(action=70, information=[self.id_selected])
+            self.directive = Message(action=70, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
-            self.txt_name_class.insert('1.0', self.connection.message.information[0])
-            # Section to insert categories in textbox
-            length_string = 0
-            for item in self.connection.message.information[1]:
-                elements = item.split('¥')
-                self.txt_categories.insert('end-1c', elements[1] + ',')
-                length_string += len(elements[1]) + 1
-            self.txt_categories.delete('end-2c','end')
-            self.frm_child_crud['text'] = 'Update classification'
-            self.frm_child_list.grid_forget()
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+            if self.connection.message.action == 5:     # An error ocurred while trying to update the item
+                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+            else:
+                self.txt_name_class.insert('1.0', self.connection.message.information[0])
+                # Section to insert categories in textbox
+                length_string = 0
+                for item in self.connection.message.information[1]:
+                    elements = item.split('¥')
+                    self.txt_categories.insert('end-1c', elements[1] + ',')
+                    length_string += len(elements[1]) + 1
+                self.txt_categories.delete('end-2c', 'end')
+                self.frm_child_crud['text'] = 'Update classification'
+                self.frm_child_list.grid_forget()
+                self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

@@ -55,7 +55,7 @@ class FormParentDesigner:
         lbl_experimental_trv = Label(self.frm_parent, text='Select a scenario')
         lbl_experimental_trv.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_experimental_trv.grid(row=1, column=1, pady=5, sticky=NW)
-        lbl_problem_desc = Label(self.frm_parent, text='Annotations')
+        lbl_problem_desc = Label(self.frm_parent, text='Indications')
         lbl_problem_desc.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_problem_desc.grid(row=3, column=1, pady=5, sticky=NW)
         lbl_sep1 = Label(self.frm_parent)
@@ -95,23 +95,23 @@ class FormParentDesigner:
 
         # Experiment form
         frm_aux1 = Frame(self.frm_general)
-        self.lbl_component_title = Label(frm_aux1, text='Component {} of {}')
+        self.lbl_component_title = Label(frm_aux1, text='Problem {} of {}')
         self.lbl_component_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         self.lbl_component_title.grid(row=0, column=0, columnspan=6, pady=15, sticky=EW)
         sep_aux1 = Separator(frm_aux1, orient=HORIZONTAL)
         sep_aux1.grid(row=1, column=0, sticky=EW, columnspan=6)
         self.txt_hints = Text(frm_aux1, height=8, width=50)
-        self.txt_hints.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT, bg=defaultbg)
+        self.txt_hints.config(fg=TEXT_COLOR, font=LABEL_FONT, bg=defaultbg)
         self.txt_hints.grid(row=2, column=0, padx=25, pady=10, rowspan=2, sticky=NW)
         sep_aux2 = Separator(frm_aux1, orient=VERTICAL)
         sep_aux2.grid(row=2, column=1, sticky=NS, rowspan=2)
         lbl_problem = Label(frm_aux1, text='Design problem:')
-        lbl_problem.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        lbl_problem.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_problem.grid(row=2, column=2, pady=10, padx=25, sticky=NW)
         self.lbl_problem_title = Label(frm_aux1)
-        self.lbl_problem_title.config(font=TEXT_FONT)
+        self.lbl_problem_title.config(font=LABEL_FONT)
         self.lbl_problem_title.grid(row=2, column=3, pady=10, padx=25, sticky=NW)
-        self.txt_problem_desc = Text(frm_aux1, height=4, width=108)
+        self.txt_problem_desc = Text(frm_aux1, height=4, width=100)
         self.txt_problem_desc.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_problem_desc.grid(row=3, column=2, padx=25, pady=10, columnspan=2, sticky=NW)
         sep_aux3 = Separator(frm_aux1, orient=HORIZONTAL)
@@ -133,38 +133,44 @@ class FormParentDesigner:
         lbl_av_patterns = Label(tab_patterns, text='Patterns browser')
         lbl_av_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_av_patterns.grid(row=0, column=1, padx=10, pady=10, sticky=W)
-        lbl_sel_patterns = Label(tab_patterns, text='Selected patterns')
-        lbl_sel_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_sel_patterns.grid(row=0, column=4, pady=10, padx=10, sticky=W)
         lbl_content = Label(tab_patterns, text='Pattern content')
         lbl_content.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_content.grid(row=0, column=7, pady=10, padx=10, sticky=W)
+        lbl_content.grid(row=0, column=4, pady=10, padx=10, sticky=W)
+        lbl_sel_patterns = Label(tab_patterns, text='Selected patterns')
+        lbl_sel_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        lbl_sel_patterns.grid(row=0, column=8, pady=10, padx=10, sticky=W)
+
         lbl_sep3 = Label(tab_patterns)
-        lbl_sep3.grid(row=1, column=0, padx=10, pady=10)
+        lbl_sep3.grid(row=0, column=0, padx=10, pady=10)
         self.lbx_av_patterns = Listbox(tab_patterns, height=16, width=40, exportselection=0)
         self.lbx_av_patterns.grid(row=1, column=1, pady=10, sticky=W, rowspan=7)
         self.lbx_av_patterns.bind('<<ListboxSelect>>', self.select_available_pattern)
         vsb_trv_avpat = Scrollbar(tab_patterns, orient="vertical", command=self.lbx_av_patterns.yview)
         vsb_trv_avpat.grid(row=1, column=2, rowspan=7, pady=10, sticky=NS)
         self.lbx_av_patterns.configure(yscrollcommand=vsb_trv_avpat.set)
-        self.lbx_sel_paterns = Listbox(tab_patterns, height=16, width=40, exportselection=0)
-        self.lbx_sel_paterns.grid(row=1, column=4, pady=10, sticky=W, rowspan=7)
-        vsb_trv_selpat = Scrollbar(tab_patterns, orient="vertical", command=self.lbx_sel_paterns.yview)
-        vsb_trv_selpat.grid(row=1, column=5, rowspan=7, pady=10, sticky=NS)
-        self.lbx_sel_paterns.configure(yscrollcommand=vsb_trv_selpat.set)
         lbl_sep4 = Label(tab_patterns)
-        lbl_sep4.grid(row=1, column=6, padx=10, pady=10)
+        lbl_sep4.grid(row=0, column=3, padx=10, pady=10)
+        self.txt_pattern_content = Text(tab_patterns, height=16, width=70)
+        self.txt_pattern_content.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_pattern_content.grid(row=1, column=4, pady=10, sticky=W, rowspan=7)
+        vsb_txt_content = Scrollbar(tab_patterns, orient="vertical", command=self.txt_pattern_content.yview)
+        vsb_txt_content.grid(row=1, column=5, rowspan=7, pady=10, sticky=NS)
+        self.txt_pattern_content.configure(yscrollcommand=vsb_txt_content.set)
+        self.btn_view_diagram = Button(tab_patterns, text='View >>\ndiagram', command=self.click_expand_diagram)
+        self.btn_view_diagram.grid(row=1, column=6, padx=20, pady=10, sticky=W)
         btn_add = Button(tab_patterns, image=self.add_icon, command=self.click_add_patt)
-        btn_add.grid(row=2, column=3, padx=20)
+        btn_add.grid(row=2, column=7, padx=20)
         btn_add_ttp = CreateToolTip(btn_add, 'Add pattern')
         btn_remove = Button(tab_patterns, image=self.delete_icon, command=self.click_remove_patt)
-        btn_remove.grid(row=4, column=3, padx=20)
+        btn_remove.grid(row=4, column=7, padx=20)
         btn_remove_ttp = CreateToolTip(btn_remove, 'Remove pattern')
-        self.txt_pattern_content = Text(tab_patterns, height=16, width=70)
-        self.txt_pattern_content.config(font=TEXT_FONT)
-        self.txt_pattern_content.grid(row=1, column=7, padx=10, pady=10, sticky=W, rowspan=7)
-        self.btn_view_diagram = Button(tab_patterns, text='View >>\ndiagram', command=self.click_expand_diagram)
-        self.btn_view_diagram.grid(row=1, column=8, padx=10, pady=10, sticky=W)
+        self.lbx_sel_patterns = Listbox(tab_patterns, height=16, width=40, exportselection=0)
+        self.lbx_sel_patterns.grid(row=1, column=8, pady=10, sticky=W, rowspan=7)
+        vsb_trv_selpat = Scrollbar(tab_patterns, orient="vertical", command=self.lbx_sel_patterns.yview)
+        vsb_trv_selpat.grid(row=1, column=9, rowspan=7, pady=10, sticky=NS)
+        self.lbx_sel_patterns.configure(yscrollcommand=vsb_trv_selpat.set)
+        lbl_sep4 = Label(tab_patterns)
+        lbl_sep4.grid(row=0, column=10, padx=10, pady=10)
 
         tab_file = Frame(self.tab_control)
         self.tab_control.add(tab_file, text="File", padding=10)
@@ -182,8 +188,8 @@ class FormParentDesigner:
         self.canvas_solution.grid(row=0, column=1, padx=10, pady=10, rowspan=10, sticky=NS)
 
         tab_desc = Frame(self.tab_control)
-        self.tab_control.add(tab_desc, text="Description", padding=10)
-        self.txt_solution_desc = Text(tab_desc, height=10, width=160)
+        self.tab_control.add(tab_desc, text="Notes", padding=10)
+        self.txt_solution_desc = Text(tab_desc, height=10, width=170)
         self.txt_solution_desc.config(font=TEXT_FONT)
         self.txt_solution_desc.grid(row=0, column=0, padx=20, pady=20, sticky=W)
 
@@ -362,7 +368,7 @@ class FormParentDesigner:
                                         id_designer=self.current_designer.id, id_scenario_comp=scenario_comp_id)
             current_measurements.append(measurement_3)
             # Chosen patterns
-            measurement_4 = Measurement(value=str(self.lbx_sel_paterns.size()), id_metric=4,
+            measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()), id_metric=4,
                                         id_designer=self.current_designer.id, id_scenario_comp=scenario_comp_id)
             current_measurements.append(measurement_4)
             for item in current_measurements:
@@ -404,7 +410,7 @@ class FormParentDesigner:
             self.connection = self.directive.send_directive(self.connection)
 
     def validate_component_frm(self):
-        if self.lbx_sel_paterns.size() != 0:
+        if self.lbx_sel_patterns.size() != 0:
             if self.attached_file is not None:
                 if len(self.txt_solution_desc.get('1.0', 'end-1c')) != 0:
                     return 0
@@ -457,18 +463,18 @@ class FormParentDesigner:
                         self.selected_pattern = item
                         break
                 self.sel_patterns_ids.append(id_selected)   # Append pattern_id to selected patterns ids
-                self.lbx_sel_paterns.insert(END, self.selected_pattern.get_content_name())  # Insert pattern name into selected listbox patters
+                self.lbx_sel_patterns.insert(END, self.selected_pattern.get_content_name())  # Insert pattern name into selected listbox patters
 
     def click_remove_patt(self):
         """
         Removes a pattern from the selected pattern listbox (when available to the designer).
         """
-        element = self.lbx_sel_paterns.curselection()
+        element = self.lbx_sel_patterns.curselection()
         if element is not None:  # Check if listbox is selected
             if element:
                 index = element[0]
                 id_selected = self.sel_patterns_ids[index]
-                self.lbx_sel_paterns.delete(element)  # Remove from listbox
+                self.lbx_sel_patterns.delete(element)  # Remove from listbox
                 if id_selected in self.current_ideal_patterns and id_selected in self.selected_pattern_sol:  # Check if selected pattern matches ideal patterns and if the the selected pattern correspond to the one selected previously as the pattern solution
                     del self.selection_time[self.selected_pattern_sol.index(id_selected)]
                     self.selected_pattern_sol.remove(id_selected)
@@ -498,7 +504,7 @@ class FormParentDesigner:
         self.txt_problem_desc['state'] = NORMAL
         self.txt_problem_desc.delete('1.0', 'end-1c')
         self.lbx_av_patterns.delete(0, END)
-        self.lbx_sel_paterns.delete(0, END)
+        self.lbx_sel_patterns.delete(0, END)
         self.txt_pattern_content['state'] = NORMAL
         self.txt_pattern_content.delete('1.0', 'end-1c')
         self.txt_pattern_content['state'] = DISABLED
@@ -512,7 +518,7 @@ class FormParentDesigner:
         self.directive = Message(action=42, information=[self.scenario_components[index].id_DB, 1 if self.current_designer.current_group == 'control' else 2])
         self.connection = self.directive.send_directive(self.connection)
         self.available_patterns = Pattern.get_patterns(self.connection, self.connection.message.information)
-        self.lbl_component_title['text'] = 'Component {} of {}'.format(self.current_scenarios_counter + 1,
+        self.lbl_component_title['text'] = 'Problem {} of {}'.format(self.current_scenarios_counter + 1,
                                                                        len(self.scenario_components))
         # Make patterns visible if the patterns are available for current designer in current scenario component
         if self.current_designer.current_group == 'control' and self.scenario_components[index].id_patterns_cgroup:

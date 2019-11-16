@@ -76,23 +76,21 @@ class FormChildProblem:
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, rowspan=2, pady=25, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
-        lbl_sep2 = Label(self.frm_child_list)
-        lbl_sep2.grid(row=0, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
-        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new.grid(row=0, column=0, pady=5, padx=5, sticky=E)
         btn_new_ttp = CreateToolTip(btn_new, 'New problem')
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_edit.grid(row=1, column=0, pady=5, padx=5, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit problem')
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete problem')
         frm_aux4.grid(row=0, column=4, rowspan=2, pady=25, padx=25, sticky=NW)
         sep_problem = Separator(self.frm_child_list, orient=VERTICAL)
-        sep_problem.grid(row=0, column=5, sticky=NS, rowspan=2, padx=5)
+        sep_problem.grid(row=0, column=5, sticky=NS, rowspan=2, padx=25)
         lbl_sep3 = Label(self.frm_child_list)
-        lbl_sep3.grid(row=0, column=6, padx=25, pady=25)
+        lbl_sep3.grid(row=0, column=6, padx=15, pady=25)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_details.grid(row=0, column=7, sticky=W, pady=25)
@@ -102,10 +100,10 @@ class FormChildProblem:
         vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=8, pady=10, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
-        lbl_sep4 = Label(self.frm_child_list)
-        lbl_sep4.grid(row=0, column=9, padx=25, pady=25)
         self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
-        self.btn_view_diagram.grid(row=1, column=10, padx=25, sticky=NW)
+        self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
+        lbl_sep4 = Label(self.frm_child_list)
+        lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
 
         self.canvas_summary = Canvas(self.tlevel_diagram_summary, width=500, height=500)
         self.canvas_summary.config(background='white', borderwidth=1)
@@ -243,17 +241,17 @@ class FormChildProblem:
             # Adding elements in the list
             self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(problem_aux.name, 50)))
             self.txt_summary.insert('end-1c', "Description:\n{}\n\nIdeal Solution:\n".format(wrap_text(problem_aux.description, 50)))
-            self.txt_summary.insert('end-1c', "\tDiagram:\n\tClick right button to see diagram >>\n\n")
+            self.txt_summary.insert('end-1c', "-Diagram:\tClick right button to see diagram >>\n\n")
             if len(problem_aux.solution.patterns_id) == 0:
-                self.txt_summary.insert('end-1c', "\tThe ideal solution does not have associated patterns\n")
+                self.txt_summary.insert('end-1c', "-The ideal solution does not have associated patterns\n")
             else:
-                self.txt_summary.insert('end-1c', "\tAssociated patterns:\n")
+                self.txt_summary.insert('end-1c', "-Associated patterns:\n")
                 index = 0
                 for item in problem_aux.solution.patterns_id:
                     for item2 in self.patterns:
                         if item2.id == item:
                             break
-                    self.txt_summary.insert('end-1c', "\t{}) {}\n".format(index + 1, item2.get_content_name()))
+                    self.txt_summary.insert('end-1c', "{}) {}\n".format(index + 1, item2.get_content_name()))
                     index += 1
             self.txt_summary['state'] = DISABLED
 
@@ -316,36 +314,39 @@ class FormChildProblem:
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.decide = False # Important variable when saving, it indicates the 'Problem' is being modified
             # Retrieve selected problem
-            self.directive = Message(action=55, information=[self.id_selected])
+            self.directive = Message(action=55, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
-            self.new_problem = Problem(id=self.id_selected, name=self.connection.message.information[0],
-                                       description=self.connection.message.information[1])
-            id_sol = self.connection.message.information[2]
-            # Retrieve associated solution
-            self.directive = Message(action=60, information=[id_sol])
-            self.connection = self.directive.send_directive(self.connection)
-            solution_aux = Solution(id=id_sol, annotations=self.connection.message.information[0],
-                                    diagram_id=self.connection.message.information[1])
-            for item in self.connection.message.information[2]:
-                elements = item.split('¥')
-                solution_aux.patterns_id.append(int(elements[0]))
-            self.new_problem.solution = solution_aux
-            # Retrieve associated diagram
-            self.directive = Message(action=65, information=[solution_aux.diagram_id])
-            self.connection = self.directive.send_directive(self.connection)
-            self.file = File()
-            self.file.write_file(self.connection.message.information[0], self.connection.message.information[1])
-            # Fill visual components with retrieved information
-            self.txt_name_prob.insert('1.0', self.new_problem.name)
-            self.txt_description_prob.insert('1.0', self.new_problem.description)
-            self.txt_annotations.insert('1.0', self.new_problem.solution.annotations)
-            self.show_file()
-            self.frm_child_list.grid_forget()
-            self.txt_name_prob.focus_set()
-            self.title_form = 'Update Problem'
-            self.frm_child_crud['text'] = self.title_form
-            self.txt_name_prob.focus_set()
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+            if self.connection.message.action == 5:  # An error ocurred while trying to update the item
+                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+            else:
+                self.new_problem = Problem(id=self.id_selected, name=self.connection.message.information[0],
+                                           description=self.connection.message.information[1])
+                id_sol = self.connection.message.information[2]
+                # Retrieve associated solution
+                self.directive = Message(action=60, information=[id_sol])
+                self.connection = self.directive.send_directive(self.connection)
+                solution_aux = Solution(id=id_sol, annotations=self.connection.message.information[0],
+                                        diagram_id=self.connection.message.information[1])
+                for item in self.connection.message.information[2]:
+                    elements = item.split('¥')
+                    solution_aux.patterns_id.append(int(elements[0]))
+                self.new_problem.solution = solution_aux
+                # Retrieve associated diagram
+                self.directive = Message(action=65, information=[solution_aux.diagram_id])
+                self.connection = self.directive.send_directive(self.connection)
+                self.file = File()
+                self.file.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                # Fill visual components with retrieved information
+                self.txt_name_prob.insert('1.0', self.new_problem.name)
+                self.txt_description_prob.insert('1.0', self.new_problem.description)
+                self.txt_annotations.insert('1.0', self.new_problem.solution.annotations)
+                self.show_file()
+                self.frm_child_list.grid_forget()
+                self.txt_name_prob.focus_set()
+                self.title_form = 'Update Problem'
+                self.frm_child_crud['text'] = self.title_form
+                self.txt_name_prob.focus_set()
+                self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

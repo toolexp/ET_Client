@@ -1,4 +1,5 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage, Scrollbar
+from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage, Scrollbar, \
+    Toplevel
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Notebook, Combobox, Style, Separator
 from Modules.Config.Data import CreateToolTip, Message, Template, Pattern, Category, File, wrap_text, Section
@@ -35,6 +36,10 @@ class FormChildPattern:
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
         self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        self.tlevel_diagram_summary = Toplevel(frm_parent)
+        self.tlevel_diagram_summary.title('Diagram')
+        self.tlevel_diagram_summary.protocol("WM_DELETE_WINDOW", self.close_tlevel_diagram)
+        self.tlevel_diagram_summary.withdraw()
         self.initialize_components()
 
     def initialize_components(self):
@@ -68,23 +73,21 @@ class FormChildPattern:
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, rowspan=2, pady=25, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
-        lbl_sep2 = Label(self.frm_child_list)
-        lbl_sep2.grid(row=0, column=3, padx=25, pady=25)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
-        btn_new.grid(row=0, column=0, pady=10, padx=10, sticky=E)
+        btn_new.grid(row=0, column=0, pady=5, padx=5, sticky=E)
         btn_new_ttp = CreateToolTip(btn_new, 'New pattern')
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=1, column=0, pady=10, padx=10, sticky=E)
+        btn_edit.grid(row=1, column=0, pady=5, padx=5, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit pattern')
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=2, column=0, pady=10, padx=10, sticky=E)
+        btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete pattern')
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, rowspan=2, sticky=NW)
         sep_pattern = Separator(self.frm_child_list, orient=VERTICAL)
-        sep_pattern.grid(row=0, column=5, sticky=NS, rowspan=2, padx=5)
+        sep_pattern.grid(row=0, column=5, sticky=NS, rowspan=2, padx=25)
         lbl_sep3 = Label(self.frm_child_list)
-        lbl_sep3.grid(row=0, column=6, padx=25, pady=25)
+        lbl_sep3.grid(row=0, column=6, padx=15, pady=25)
         lbl_details = Label(self.frm_child_list, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_details.grid(row=0, column=7, sticky=W, pady=25)
@@ -94,8 +97,14 @@ class FormChildPattern:
         vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
+        self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
+        self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_list)
-        lbl_sep4.grid(row=0, column=9, padx=25, pady=25)
+        lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
+
+        self.canvas_summary = Canvas(self.tlevel_diagram_summary, width=500, height=500)
+        self.canvas_summary.config(background='white', borderwidth=1)
+        self.canvas_summary.grid()
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
@@ -318,38 +327,44 @@ class FormChildPattern:
 
     def click_update(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            self.initialize_variables()
-            self.decide = False
-            self.frm_child_list.grid_forget()
-            # Retrieve pattern from the list of available patterns
-            for item in self.patterns:
-                if item.id == self.id_selected_pattern:
-                    self.new_pattern = item
-                    break
-            # Retrieve content if neccesary
-            for index, item in enumerate(self.new_pattern.sections):
-                if item.diagram_id != 0:
-                    self.directive = Message(action=65,
-                                             information=[item.diagram_id])  # Ask for the diagram of this section
-                    self.connection = self.directive.send_directive(self.connection)
-                    file_aux = File()
-                    file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
-                    self.new_pattern.sections[index].file = file_aux
-                elif item.category_id != 0:
-                    self.directive = Message(action=75,
-                                             information=[item.category_id])  # Ask for the category of this section
-                    self.connection = self.directive.send_directive(self.connection)
-                    category_aux = Category(item.category_id, self.connection.message.information[0],
-                                            self.connection.message.information[1])
-                    self.new_pattern.sections[index].category = category_aux
+            # Just to check if the pattern is not associated to other components
+            self.directive = Message(action=45, information=[self.id_selected_pattern, 'validate'])
+            self.connection = self.directive.send_directive(self.connection)
+            if self.connection.message.action == 5:  # An error ocurred while trying to update the item
+                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+            else:
+                self.initialize_variables()
+                self.decide = False
+                self.frm_child_list.grid_forget()
+                # Retrieve pattern from the list of available patterns
+                for item in self.patterns:
+                    if item.id == self.id_selected_pattern:
+                        self.new_pattern = item
+                        break
+                # Retrieve content if neccesary
+                for index, item in enumerate(self.new_pattern.sections):
+                    if item.diagram_id != 0:
+                        self.directive = Message(action=65,
+                                                 information=[item.diagram_id])  # Ask for the diagram of this section
+                        self.connection = self.directive.send_directive(self.connection)
+                        file_aux = File()
+                        file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                        self.new_pattern.sections[index].file = file_aux
+                    elif item.category_id != 0:
+                        self.directive = Message(action=75,
+                                                 information=[item.category_id])  # Ask for the category of this section
+                        self.connection = self.directive.send_directive(self.connection)
+                        category_aux = Category(item.category_id, self.connection.message.information[0],
+                                                self.connection.message.information[1])
+                        self.new_pattern.sections[index].category = category_aux
 
-            # Fill visual components with pattern info
-            self.cbx_template.set(
-                '{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
-            self.cbx_template['state'] = DISABLED
-            self.set_trv_summary(self.new_pattern.sections)
-            self.frm_child_crud['text'] = 'Update Pattern'
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+                # Fill visual components with pattern info
+                self.cbx_template.set(
+                    '{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
+                self.cbx_template['state'] = DISABLED
+                self.set_trv_summary(self.new_pattern.sections)
+                self.frm_child_crud['text'] = 'Update Pattern'
+                self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
@@ -674,3 +689,18 @@ class FormChildPattern:
                     if item.category is None:
                         return False
         return True
+
+    def click_expand_diagram(self):
+        # Fill summary problem canvas with retrieved image
+        load = Image.open(self.file_aux.filename)
+        load = load.resize((500, 500), Image.ANTIALIAS)
+        self.render = ImageTk.PhotoImage(load)
+        self.canvas_summary.delete()
+        self.file_aux.image = self.canvas_summary.create_image(0, 0, anchor='nw',
+                                                                image=self.render)  # and display new image
+        self.tlevel_diagram_summary.deiconify()
+        self.tlevel_diagram_summary.grab_set()
+
+    def close_tlevel_diagram(self):
+        self.tlevel_diagram_summary.grab_release()
+        self.tlevel_diagram_summary.withdraw()
