@@ -363,13 +363,27 @@ class WindowHome:
         self.frm_parent_designer_gui.show_frm()
 
     def click_log_out(self):
-        msg = Message(comment='close_connection')
-        self.connection.create_message(msg)
-        self.connection.send_message()
-        self.connection.close_connection()
-        shutil.rmtree('./Resources/temp/')
-        os.mkdir('./Resources/temp/')
-        self.window.destroy()
+        if self.role != 2:
+            msg = Message(comment='close_connection')
+            self.connection.create_message(msg)
+            self.connection.send_message()
+            self.connection.close_connection()
+            shutil.rmtree('./Resources/temp/')
+            os.mkdir('./Resources/temp/')
+            self.window.destroy()
+        else:
+            # Cant log out if designer is running an experimental scenario
+            if not self.frm_parent_designer_gui.frm_general.grid_info():
+                msg = Message(comment='close_connection')
+                self.connection.create_message(msg)
+                self.connection.send_message()
+                self.connection.close_connection()
+                shutil.rmtree('./Resources/temp/')
+                os.mkdir('./Resources/temp/')
+                self.window.destroy()
+            else:
+                messagebox.showerror(title='Can not exit',
+                                     message='You must finish current experimental scenario to exit')
 
 
 if __name__ == '__main__':

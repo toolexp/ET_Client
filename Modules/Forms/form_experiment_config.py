@@ -348,6 +348,9 @@ class FormChildExConfig:
             # Retrieve selected experiment and its 'Experimental scenarios'
             self.retrieve_list()
             self.frm_child_exp_list.grid_forget()
+            if len(self.trv_available.get_children()) != 0:
+                self.trv_available.selection_set(self.trv_available.get_children()[0])
+                self.refresh_crud_buttons()
             self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_save_experiment(self):
@@ -1002,10 +1005,10 @@ class FormChildExConfig:
                         self.trv_available_patters_egroup.delete(object)
                         break
 
-    def refresh_crud_buttons(self, event):
+    def refresh_crud_buttons(self, event=None):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             values = self.trv_available.item(
-                self.trv_available.focus())['values']
+                self.trv_available.selection())['values']
             if values[3] == '':
                 self.btn_edit['state'] = NORMAL
                 self.btn_delete['state'] = NORMAL

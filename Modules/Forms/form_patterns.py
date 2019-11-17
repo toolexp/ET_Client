@@ -98,6 +98,7 @@ class FormChildPattern:
         vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
         self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
+        self.btn_view_diagram['state'] = DISABLED
         self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_list)
         lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
@@ -174,10 +175,10 @@ class FormChildPattern:
         lbl_upload.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_upload.grid(row=0, column=0, padx=20, pady=20, sticky=W)
         btn_open = Button(tab_file, image=self.open_icon, command=self.click_upload)
-        btn_open.grid(row=1, column=0, padx=20, pady=5, sticky=W)
+        btn_open.grid(row=1, column=0, padx=20, pady=5, sticky=E)
         btn_open_ttp = CreateToolTip(btn_open, 'Open file')
         btn_quit = Button(tab_file, image=self.remove_icon, command=self.click_remove)
-        btn_quit.grid(row=2, column=0, padx=20, pady=5, sticky=W)
+        btn_quit.grid(row=2, column=0, padx=20, pady=5, sticky=E)
         btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
         self.canvas = Canvas(tab_file, width=160, height=160)
         self.canvas.config(background='white', borderwidth=1)
@@ -246,8 +247,9 @@ class FormChildPattern:
         """
         self.get_patterns()
         self.retrieve_list()
-        self.trv_available.selection_set(self.trv_available.get_children()[0])
-        self.select_pattern_summary(None)
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
+            self.select_pattern_summary()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -259,7 +261,7 @@ class FormChildPattern:
         self.frm_child_list.grid_forget()
         # self.frm_child_crud.grid_forget()
 
-    def select_pattern_summary(self, event):
+    def select_pattern_summary(self, event=None):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.id_selected_pattern = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
             for item in self.patterns:
@@ -267,11 +269,20 @@ class FormChildPattern:
                     current_pattern = item
                     break
             # Clear summary txt box
+            self.btn_view_diagram['state'] = DISABLED
             self.txt_summary['state'] = NORMAL
             self.txt_summary.delete('1.0', 'end-1c')
             # Adding elements in the list
             for item in current_pattern.sections:
-                self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 60)))
+                if item.data_type == 'File': # If pattern has an associated diagram
+                    self.btn_view_diagram['state'] = NORMAL
+                    self.txt_summary.insert('end-1c', "{}:\nClick right button to see diagram >>\n\n".format(item.name))
+                    self.directive = Message(action=65, information=[item.diagram_id])  # Ask for the diagram of this section
+                    self.connection = self.directive.send_directive(self.connection)
+                    self.file_summary = File()
+                    self.file_summary.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                else:
+                    self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 60)))
             self.txt_summary['state'] = DISABLED
 
     def restart_components(self):
@@ -284,6 +295,7 @@ class FormChildPattern:
             self.canvas.delete(self.file.image)
             self.file = None
         self.cbx_category['values'] = []
+        self.cbx_category.set('')
         self.new_pattern = None
         self.selected_section = None
         self.tab_control.tab(0, state='disabled')
@@ -692,11 +704,11 @@ class FormChildPattern:
 
     def click_expand_diagram(self):
         # Fill summary problem canvas with retrieved image
-        load = Image.open(self.file_aux.filename)
+        load = Image.open(self.file_summary.filename)
         load = load.resize((500, 500), Image.ANTIALIAS)
         self.render = ImageTk.PhotoImage(load)
         self.canvas_summary.delete()
-        self.file_aux.image = self.canvas_summary.create_image(0, 0, anchor='nw',
+        self.file_summary.image = self.canvas_summary.create_image(0, 0, anchor='nw',
                                                                 image=self.render)  # and display new image
         self.tlevel_diagram_summary.deiconify()
         self.tlevel_diagram_summary.grab_set()

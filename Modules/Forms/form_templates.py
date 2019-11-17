@@ -184,7 +184,7 @@ class FormChildTemplate:
             elements = item.split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
 
-    def select_template_summary(self, event):
+    def select_template_summary(self, event=None):
         """
         Function activated when the event of selecting an item in the available templates TV is generated. It fills the
         summary text box with information of the selected template
@@ -206,15 +206,16 @@ class FormChildTemplate:
             index = 0
             for item in self.connection.message.information:
                 elements = item.split('¥')
-                self.txt_summary.insert('end-1c', "{}) {}\t{}\n".format(index + 1, elements[3], 'optional' if elements[7] == '' else 'mandatory'))
+                self.txt_summary.insert('end-1c', "{}) {}\t\t{}\n".format(index + 1, elements[3], 'optional' if elements[7] == '' else 'mandatory'))
                 index += 1
             self.txt_summary['state'] = DISABLED
 
 
     def show_frm(self):
         self.retrieve_list()
-        self.trv_available.selection_set(self.trv_available.get_children()[0])
-        self.select_template_summary(None)
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
+            self.select_template_summary()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):

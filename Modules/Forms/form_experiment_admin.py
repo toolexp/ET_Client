@@ -49,13 +49,15 @@ class FormChildExAdmin:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
+        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', 'Configured?'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
+        self.trv_available.heading('#3', text='Configured?', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
         self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
+        self.trv_available.column('#3', width=75, minwidth=75, stretch=NO, anchor=CENTER)
         self.trv_available.grid(row=0, column=1, sticky=W, pady=25)
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
@@ -110,7 +112,10 @@ class FormChildExAdmin:
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], wrap_text(elements[2], 72)))
+            self.directive = Message(action=82, information=[int(elements[0])])
+            self.connection = self.directive.send_directive(self.connection)
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], wrap_text(elements[2], 72),
+                                                                           '✓' if len(self.connection.message.information) != 0 else ''))
 
     def show_frm(self):
         """
@@ -139,7 +144,10 @@ class FormChildExAdmin:
                 self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
                 self.directive = Message(action=94, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
-                self.retrieve_list()
+                if self.connection.message.action == 5:  # An error ocurred while deleting the item
+                    messagebox.showerror(title='Can not delete the item', message=self.connection.message.information[0])
+                else:
+                    self.retrieve_list()
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 
@@ -158,22 +166,25 @@ class FormChildExAdmin:
         Function activated when 'Update' button is pressed
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            self.decide = False  # Important variable when saving, it indicates the 'Experimental scenario' is being modified
-            self.initialize_variables()
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
             # Retrieve selected experiment
-            self.directive = Message(action=95, information=[self.id_selected])
+            self.directive = Message(action=95, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
-            self.experiment = Experiment(id=self.id_selected, name=self.connection.message.information[0],
-                                         description=self.connection.message.information[1])
-            # Fill visual components with retrieved information
-            self.txt_name.insert('1.0', self.experiment.name)
-            self.txt_description.insert('1.0', self.experiment.description)
-            self.frm_child_list.grid_forget()
-            self.txt_name.focus_set()
-            self.title_form = 'Update'
-            self.frm_child_general['text'] = self.title_form + ' experiment'
-            self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+            if self.connection.message.action == 5:  # An error ocurred while trying to update the item
+                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+            else:
+                self.decide = False  # Important variable when saving, it indicates the 'Experimental scenario' is being modified
+                self.initialize_variables()
+                self.experiment = Experiment(id=self.id_selected, name=self.connection.message.information[0],
+                                             description=self.connection.message.information[1])
+                # Fill visual components with retrieved information
+                self.txt_name.insert('1.0', self.experiment.name)
+                self.txt_description.insert('1.0', self.experiment.description)
+                self.frm_child_list.grid_forget()
+                self.txt_name.focus_set()
+                self.title_form = 'Update'
+                self.frm_child_general['text'] = self.title_form + ' experiment'
+                self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(title='No selection', message='You must select an item')
 

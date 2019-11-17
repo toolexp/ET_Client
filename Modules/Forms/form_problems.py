@@ -1,6 +1,6 @@
 import os
 from tkinter import Label, LabelFrame, Text, Button, Canvas, messagebox, Frame, filedialog, PhotoImage, Toplevel, \
-    Scrollbar
+    Scrollbar, Listbox
 from tkinter.constants import *
 from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_text, CreateToolTip
 from tkinter.ttk import Treeview, Separator
@@ -101,6 +101,7 @@ class FormChildProblem:
         vsb_txt_sum.grid(row=1, column=8, pady=10, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
         self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
+        self.btn_view_diagram['state'] = DISABLED
         self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_list)
         lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
@@ -115,36 +116,51 @@ class FormChildProblem:
         frm_aux2.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_name = Label(frm_aux1, text='Name')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=50, sticky=NW)
+        lbl_name.grid(pady=10, padx=20, sticky=NW)
         lbl_description = Label(frm_aux1, text='Description')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_description.grid(pady=10, padx=50, sticky=NW)
+        lbl_description.grid(pady=10, padx=20, sticky=NW)
         self.txt_name_prob = Text(frm_aux1, height=1, width=60)
         self.txt_name_prob.config(font=TEXT_FONT)
-        self.txt_name_prob.grid(row=0, column=1, pady=10, padx=50,)
-        self.txt_description_prob = Text(frm_aux1, height=6, width=60)
+        self.txt_name_prob.grid(row=0, column=1, pady=10, padx=20)
+        self.txt_description_prob = Text(frm_aux1, height=5, width=60)
         self.txt_description_prob.config(font=TEXT_FONT)
-        self.txt_description_prob.grid(row=1, column=1, pady=10, padx=50,)
-        lbl_annotations = Label(frm_aux2, text='Notes \n(optional)')
+        self.txt_description_prob.grid(row=1, column=1, pady=10, padx=20)
+        lbl_annotations = Label(frm_aux2, text='Notes\n(optional)')
         lbl_annotations.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_annotations.grid(pady=10, padx=50, sticky=NW)
-        self.txt_annotations = Text(frm_aux2, height=6, width=60)
+        lbl_annotations.grid(pady=10, padx=20, sticky=NW)
+        self.txt_annotations = Text(frm_aux2, height=5, width=60)
         self.txt_annotations.config(font=TEXT_FONT)
-        self.txt_annotations.grid(row=0, column=1, pady=10, padx=50, columnspan=3)
+        self.txt_annotations.grid(row=0, column=1, pady=10, padx=20, columnspan=5)
         lbl_diagram = Label(frm_aux2, text='File')
         lbl_diagram.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_diagram.grid(row=1, column=0, pady=10, padx=50, sticky=NW)
+        lbl_diagram.grid(row=1, column=0, pady=10, padx=20, sticky=NW)
         btn_open = Button(frm_aux2, image=self.open_icon, command=self.click_upload_file)
-        btn_open.grid(row=1, column=2, padx=50, pady=10, sticky=W)
+        btn_open.grid(row=1, column=2, padx=20, pady=10, sticky=W)
         btn_open_ttp = CreateToolTip(btn_open, 'Open file')
         btn_quit = Button(frm_aux2, image=self.remove_icon, command=self.click_remove_file)
-        btn_quit.grid(row=2, column=2, padx=50, pady=10, sticky=W)
+        btn_quit.grid(row=2, column=2, padx=20, pady=10, sticky=W)
         btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
         self.canvas = Canvas(frm_aux2, width=160, height=160)
         self.canvas.config(background='white', borderwidth=1)
-        self.canvas.grid(row=1, column=1, padx=50, pady=10, rowspan=5, sticky=W)
+        self.canvas.grid(row=1, column=1, padx=20, pady=10, rowspan=5, sticky=W)
+        sep_aux1 = Separator(frm_aux2, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=6, sticky=NS, rowspan=6)
+        lbl_patterns = Label(frm_aux2, text='Patterns\n(optional)')
+        lbl_patterns.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_patterns.grid(row=0, column=7, pady=10, padx=20, sticky=NW)
+        lbl_sep5 = Label(frm_aux2)
+        lbl_sep5.grid(row=0, column=8, padx=10, pady=10)
+        self.txt_patterns = Text(frm_aux2, height=5, width=30)
+        self.txt_patterns.config(bg=defaultbg, font=TEXT_FONT)
+        self.txt_patterns.grid(row=0, column=9, pady=10, sticky=W)
+        vsb_txt_patterns = Scrollbar(frm_aux2, orient="vertical", command=self.txt_patterns.yview)
+        vsb_txt_patterns.grid(row=0, column=10, pady=10, sticky=NS)
+        self.txt_patterns.configure(yscrollcommand=vsb_txt_patterns.set)
+        lbl_sep4 = Label(frm_aux2)
+        lbl_sep4.grid(row=0, column=11, padx=10, pady=10)
         btn_patterns = Button(frm_aux2, text='Patterns of the solution >>', command=self.click_associate_patterns)
-        btn_patterns.grid(row=6, column=1, padx=50, pady=10, sticky=W)
+        btn_patterns.grid(row=1, column=9, padx=20, pady=10, sticky=W, columnspan=3)
 
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
         btn_save.grid(row=1, column=5, padx=35)
@@ -195,9 +211,9 @@ class FormChildProblem:
         btn_save_pat = Button(self.tlevel_patterns_solution, image=self.save_icon, command=self.click_save_pat)
         btn_save_pat.grid(row=0, column=10, padx=25, pady=10, sticky=SW)
         btn_save_pat_ttp = CreateToolTip(btn_save_pat, 'Save patterns')
-        btn_cancel_pat = Button(self.tlevel_patterns_solution, image=self.cancel_icon, command=self.click_cancel_pat)
-        btn_cancel_pat.grid(row=1, column=10, padx=25, pady=10, sticky=SW)
-        btn_cancel_pat_ttp = CreateToolTip(btn_cancel_pat, 'Cancel')
+        #btn_cancel_pat = Button(self.tlevel_patterns_solution, image=self.cancel_icon, command=self.click_cancel_pat)
+        #btn_cancel_pat.grid(row=1, column=10, padx=25, pady=10, sticky=SW)
+        #btn_cancel_pat_ttp = CreateToolTip(btn_cancel_pat, 'Cancel')
 
     def retrieve_list(self):
         """
@@ -218,7 +234,7 @@ class FormChildProblem:
             elements = item.split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(elements[1],))
 
-    def select_problem_summary(self, event):
+    def select_problem_summary(self, event=None):
         """
         Function activated when the event of selecting an item in the available problems TV is generated. It fills the
         summary textbox with information of the selected problem
@@ -263,8 +279,9 @@ class FormChildProblem:
         # more than once when switching between CRUD form and patterns selection form
         self.back_window = True
         self.retrieve_list()
-        self.trv_available.selection_set(self.trv_available.get_children()[0])
-        self.select_problem_summary(None)
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
+            self.select_problem_summary()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -341,6 +358,19 @@ class FormChildProblem:
                 self.txt_description_prob.insert('1.0', self.new_problem.description)
                 self.txt_annotations.insert('1.0', self.new_problem.solution.annotations)
                 self.show_file()
+                # Get patterns for the ideal solution if it has at least one
+                self.txt_patterns['state'] = NORMAL
+                if self.new_problem.solution.patterns_id:
+                    index = 0
+                    for item in self.new_problem.solution.patterns_id:
+                        for item2 in self.patterns:
+                            if item2.id == item:
+                                break
+                        self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1, item2.get_content_name()))
+                        index += 1
+                else:
+                    self.txt_patterns.insert('end-1c', "The ideal solution does not have associated patterns")
+                self.txt_patterns['state'] = DISABLED
                 self.frm_child_list.grid_forget()
                 self.txt_name_prob.focus_set()
                 self.title_form = 'Update Problem'
@@ -569,9 +599,22 @@ class FormChildProblem:
     def click_save_pat(self):
         """
         Function activated when 'Save' button in Patterns form is pressed, it closes 'Patterns' selection pop-up window
-        and saves current selection
+        and saves current selection. It also reloads patterns info in the summary text box
         """
         self.close_tlevel_patterns()
+        # Get selected patterns for the ideal solution
+        self.txt_patterns['state'] = NORMAL
+        self.txt_patterns.delete('1.0', 'end-1c')
+        if self.trv_selected_patterns.get_children():
+            index = 0
+            for item in self.trv_selected_patterns.get_children():
+                self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1,
+                                                                     wrap_text(self.trv_selected_patterns.item(item)['values'][0], 20)))
+                index += 1
+            self.txt_patterns['state'] = DISABLED
+        else:
+            self.txt_patterns.insert('end-1c', "The ideal solution does not have associated patterns")
+
 
     def click_upload_file(self):
         """
@@ -605,6 +648,9 @@ class FormChildProblem:
         if self.file is not None:  # if an image was already loaded
             self.canvas.delete(self.file.image)  # clear canvas
             self.file = None    # set file NULL
+        self.txt_patterns['state'] = NORMAL
+        self.txt_patterns.delete('1.0', 'end-1c')
+        self.txt_patterns['state'] = DISABLED
 
     def show_file(self):
         """
