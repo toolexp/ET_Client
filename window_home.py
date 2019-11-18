@@ -1,5 +1,6 @@
 import os
 import shutil
+import hashlib
 from tkinter import Tk, Menu, Toplevel, LabelFrame, Label, Entry, Button, messagebox
 from tkinter.ttk import Combobox
 from tkinter.constants import *
@@ -26,6 +27,7 @@ class WindowHome:
         #
         # Configuration of the window
         self.connection = connection
+        self.role = 1
         self.window = Tk()
         self.window.protocol("WM_DELETE_WINDOW", self.click_log_out)
         #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
@@ -96,12 +98,12 @@ class WindowHome:
                                                      user=self.connection.message.information[3],
                                                      password=self.connection.message.information[4],
                                                      connection=self.connection)
-                    if self.current_designer.password == self.txt_passwd.get():
+                    if self.current_designer.password == hashlib.sha1(self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
                         messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
                 elif self.role == 1:
-                    if self.connection.message.information[4] == self.txt_passwd.get():
+                    if self.connection.message.information[4] == hashlib.sha1(self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
                         messagebox.showerror(title='Password', message='The password you provided is wrong, retry')

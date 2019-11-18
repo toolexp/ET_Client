@@ -3,6 +3,7 @@ from tkinter.constants import *
 from tkinter.ttk import Treeview
 from Modules.Config.Data import Message, CreateToolTip
 from Modules.Config.Visual import *
+import hashlib
 
 
 class FormParentAED:
@@ -221,20 +222,23 @@ class FormChildAED:
             passwd_aux = self.txt_passwd.get()
             if self.decide:
                 if self.title == 'Experimenter':
-                    self.directive = Message(action=16, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                    self.directive = Message(action=16, information=[name_aux, surname_aux, email_aux,
+                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
                 elif self.title == 'Designer':
-                    self.directive = Message(action=21, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                    self.directive = Message(action=21, information=[name_aux, surname_aux, email_aux,
+                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
                 elif self.title == 'Administrator':
-                    self.directive = Message(action=11, information=[name_aux, surname_aux, email_aux, passwd_aux])
+                    self.directive = Message(action=11, information=[name_aux, surname_aux, email_aux,
+                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
                 else:
                     raise Exception('Error en guardar: tipo de usuario')
             else:
                 if self.title == 'Experimenter':
                     self.directive = Message(action=18, information=[self.id_selected, name_aux, surname_aux, email_aux,
-                                                                     passwd_aux])
+                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
                 elif self.title == 'Designer':
                     self.directive = Message(action=23, information=[self.id_selected, name_aux, surname_aux, email_aux,
-                                                                     passwd_aux])
+                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
                 elif self.title == 'Administrator':
                     self.directive = Message(action=13, information=[self.id_selected, name_aux, surname_aux, email_aux,
                                                                      passwd_aux])
