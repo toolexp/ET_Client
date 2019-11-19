@@ -1,6 +1,6 @@
 import os
 from tkinter import Label, LabelFrame, Text, Button, Canvas, messagebox, Frame, filedialog, PhotoImage, Toplevel, \
-    Scrollbar, Listbox
+    Scrollbar
 from tkinter.constants import *
 from Modules.Config.Data import Message, Problem, Solution, File, Pattern, wrap_text, CreateToolTip
 from tkinter.ttk import Treeview, Separator
@@ -181,7 +181,8 @@ class FormChildProblem:
         self.trv_available_patterns.column('#1', width=300, minwidth=200, stretch=NO)
         self.trv_available_patterns.bind("<Button-1>", self.click_trv_aptterns)
         self.trv_available_patterns.grid(row=0, column=1, rowspan=10, sticky=NW, pady=25)
-        vsb_trv_avp = Scrollbar(self.tlevel_patterns_solution, orient="vertical", command=self.trv_available_patterns.yview)
+        vsb_trv_avp = Scrollbar(self.tlevel_patterns_solution, orient="vertical",
+                                command=self.trv_available_patterns.yview)
         vsb_trv_avp.grid(row=0, column=2, rowspan=10, pady=25, sticky=NS)
         self.trv_available_patterns.configure(yscrollcommand=vsb_trv_avp.set)
         lbl_sep4 = Label(self.tlevel_patterns_solution)
@@ -195,7 +196,8 @@ class FormChildProblem:
         self.trv_selected_patterns.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_selected_patterns.bind("<Button-1>", self.click_trv_spatterns)
         self.trv_selected_patterns.grid(row=0, column=6, rowspan=10, sticky=NW, pady=25)
-        vsb_trv_sep = Scrollbar(self.tlevel_patterns_solution, orient="vertical", command=self.trv_selected_patterns.yview)
+        vsb_trv_sep = Scrollbar(self.tlevel_patterns_solution, orient="vertical",
+                                command=self.trv_selected_patterns.yview)
         vsb_trv_sep.grid(row=0, column=7, rowspan=10, pady=25, sticky=NS)
         self.trv_selected_patterns.configure(yscrollcommand=vsb_trv_sep.set)
         lbl_sep6 = Label(self.tlevel_patterns_solution)
@@ -211,9 +213,9 @@ class FormChildProblem:
         btn_save_pat = Button(self.tlevel_patterns_solution, image=self.save_icon, command=self.click_save_pat)
         btn_save_pat.grid(row=0, column=10, padx=25, pady=10, sticky=SW)
         btn_save_pat_ttp = CreateToolTip(btn_save_pat, 'Save patterns')
-        #btn_cancel_pat = Button(self.tlevel_patterns_solution, image=self.cancel_icon, command=self.click_cancel_pat)
-        #btn_cancel_pat.grid(row=1, column=10, padx=25, pady=10, sticky=SW)
-        #btn_cancel_pat_ttp = CreateToolTip(btn_cancel_pat, 'Cancel')
+        # btn_cancel_pat = Button(self.tlevel_patterns_solution, image=self.cancel_icon, command=self.click_cancel_pat)
+        # btn_cancel_pat.grid(row=1, column=10, padx=25, pady=10, sticky=SW)
+        # btn_cancel_pat_ttp = CreateToolTip(btn_cancel_pat, 'Cancel')
 
     def retrieve_list(self):
         """
@@ -241,8 +243,10 @@ class FormChildProblem:
         :param event:
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
-            self.directive = Message(action=55, information=[self.id_selected])  # ask for the content of the selected problem
+            self.id_selected = int(self.trv_available.item(self.trv_available.selection())[
+                                       'text'])  # Retrieve id of selected item from TreeView
+            self.directive = Message(action=55,
+                                     information=[self.id_selected])  # ask for the content of the selected problem
             self.connection = self.directive.send_directive(self.connection)
             problem_aux = Problem(id=self.id_selected, name=self.connection.message.information[0],
                                   description=self.connection.message.information[1],
@@ -256,7 +260,8 @@ class FormChildProblem:
             self.txt_summary.delete('1.0', 'end-1c')
             # Adding elements in the list
             self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(problem_aux.name, 50)))
-            self.txt_summary.insert('end-1c', "Description:\n{}\n\nIdeal Solution:\n".format(wrap_text(problem_aux.description, 50)))
+            self.txt_summary.insert('end-1c', "Description:\n{}\n\nIdeal Solution:\n".format(
+                wrap_text(problem_aux.description, 50)))
             self.txt_summary.insert('end-1c', "-Diagram:\tClick right button to see diagram >>\n\n")
             if len(problem_aux.solution.patterns_id) == 0:
                 self.txt_summary.insert('end-1c', "-The ideal solution does not have associated patterns\n")
@@ -298,18 +303,19 @@ class FormChildProblem:
         """
         if self.trv_available.selection() != '':
             # MessageBox asking confirmation
-            decision = messagebox.askyesno(title='Confirmation',
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
                 self.directive = Message(action=54, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:  # An error ocurred while deleting the item
-                    messagebox.showerror(title='Can not delete the item', message=self.connection.message.information[0])
+                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
+                                         message=self.connection.message.information[0])
                 else:
                     self.retrieve_list()
                     self.trv_available.selection_set(self.trv_available.get_children()[0])
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_new(self):
         """
@@ -329,12 +335,13 @@ class FormChildProblem:
         Function activated when 'Update' button is pressed
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            self.decide = False # Important variable when saving, it indicates the 'Problem' is being modified
+            self.decide = False  # Important variable when saving, it indicates the 'Problem' is being modified
             # Retrieve selected problem
             self.directive = Message(action=55, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # An error ocurred while trying to update the item
-                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+                messagebox.showerror(parent=self.frm_child_list, title='Can not update the item',
+                                     message=self.connection.message.information[0])
             else:
                 self.new_problem = Problem(id=self.id_selected, name=self.connection.message.information[0],
                                            description=self.connection.message.information[1])
@@ -378,7 +385,7 @@ class FormChildProblem:
                 self.txt_name_prob.focus_set()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_save(self):
         """
@@ -388,15 +395,16 @@ class FormChildProblem:
         saved immediately
         """
         if self.validate_fields():
-            if len(self.trv_selected_patterns.get_children()) == 0: # If no selected patterns for the solution
+            if len(self.trv_selected_patterns.get_children()) == 0:  # If no selected patterns for the solution
                 # MessageBox asking confirmation
-                decision = messagebox.askyesno(title='Confirmation',
+                decision = messagebox.askyesno(parent=self.frm_child_crud, title='Confirmation',
                                                message='Are you sure you don\'t want to add patterns to the solution?')
                 # Save problem and solution without patterns
                 if decision:
                     if self.decide:  # New Problem
                         # Create diagram in DB
-                        self.directive = Message(action=61, information=[self.file.file_bytes, self.file.name, 'ideal sol'])
+                        self.directive = Message(action=61,
+                                                 information=[self.file.file_bytes, self.file.name, 'ideal sol'])
                         self.connection = self.directive.send_directive(self.connection)
                         id_diagram = self.connection.message.information[0]
                         # Create object for the solution and the problem
@@ -410,17 +418,19 @@ class FormChildProblem:
                         self.connection = self.directive.send_directive(self.connection)
                         id_solution = self.connection.message.information[0]
                         # Create the problem in DB
-                        self.directive = Message(action=51, information=[self.new_problem.name,self.new_problem.description,
-                                                                         id_solution])
+                        self.directive = Message(action=51,
+                                                 information=[self.new_problem.name, self.new_problem.description,
+                                                              id_solution])
                         self.connection = self.directive.send_directive(self.connection)
-                    else:   # Modifying problem
+                    else:  # Modifying problem
                         # Updating problem and solution object
                         self.new_problem.name = self.txt_name_prob.get('1.0', 'end-1c')
                         self.new_problem.description = self.txt_description_prob.get('1.0', 'end-1c')
                         self.new_problem.solution.annotations = self.txt_annotations.get('1.0', 'end-1c')
                         # Update current diagram in DB
                         self.directive = Message(action=63, information=[self.new_problem.solution.diagram_id,
-                                                                         self.file.file_bytes, self.file.name, 'ideal sol'])
+                                                                         self.file.file_bytes, self.file.name,
+                                                                         'ideal sol'])
                         self.connection = self.directive.send_directive(self.connection)
                         # Update the ideal solution in DB
                         self.directive = Message(action=58, information=[self.new_problem.solution.id,
@@ -486,7 +496,8 @@ class FormChildProblem:
                 self.frm_child_crud.grid_forget()
                 self.show_frm()
         else:
-            messagebox.showwarning(title='Missing information', message='Some fields are empty')
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='Some fields are empty')
 
     def click_associate_patterns(self):
         """
@@ -535,7 +546,8 @@ class FormChildProblem:
         Function activated when 'Cancel' button is pressed in CRUD form, it goes back to the 'Problems' home page
         """
         # MessageBox asking confirmation
-        decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
+        decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
+                                       message='Are you sure you want to cancel?')
         if decision:
             self.clear_fields()
             self.frm_child_crud.grid_forget()
@@ -545,7 +557,8 @@ class FormChildProblem:
         """
         Function that validates empty mandatory visual fields and the diagram
         """
-        if len(self.txt_name_prob.get('1.0','end-1c')) != 0 and len(self.txt_description_prob.get('1.0','end-1c')) != 0\
+        if len(self.txt_name_prob.get('1.0', 'end-1c')) != 0 and len(
+                self.txt_description_prob.get('1.0', 'end-1c')) != 0 \
                 and self.file is not None:
             return True
         else:
@@ -609,12 +622,12 @@ class FormChildProblem:
             index = 0
             for item in self.trv_selected_patterns.get_children():
                 self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1,
-                                                                     wrap_text(self.trv_selected_patterns.item(item)['values'][0], 20)))
+                                                                     wrap_text(self.trv_selected_patterns.item(item)[
+                                                                                   'values'][0], 20)))
                 index += 1
             self.txt_patterns['state'] = DISABLED
         else:
             self.txt_patterns.insert('end-1c', "The ideal solution does not have associated patterns")
-
 
     def click_upload_file(self):
         """
@@ -647,7 +660,7 @@ class FormChildProblem:
         self.txt_annotations.delete('1.0', 'end-1c')
         if self.file is not None:  # if an image was already loaded
             self.canvas.delete(self.file.image)  # clear canvas
-            self.file = None    # set file NULL
+            self.file = None  # set file NULL
         self.txt_patterns['state'] = NORMAL
         self.txt_patterns.delete('1.0', 'end-1c')
         self.txt_patterns['state'] = DISABLED
@@ -662,7 +675,7 @@ class FormChildProblem:
         self.render = ImageTk.PhotoImage(load)
         if self.file.image is not None:  # if an image was already loaded
             self.canvas.delete(self.file.image)  # remove the previous image
-        self.file.image = self.canvas.create_image(0, 0, anchor='nw', image=self.render)    # and display new image
+        self.file.image = self.canvas.create_image(0, 0, anchor='nw', image=self.render)  # and display new image
 
     def click_expand_diagram(self):
         # Fill summary problem canvas with retrieved image
@@ -671,7 +684,7 @@ class FormChildProblem:
         self.render = ImageTk.PhotoImage(load)
         self.canvas_summary.delete()
         self.file_aux.image = self.canvas_summary.create_image(0, 0, anchor='nw',
-                                                                image=self.render)  # and display new image
+                                                               image=self.render)  # and display new image
         self.tlevel_diagram_summary.deiconify()
         self.tlevel_diagram_summary.grab_set()
 

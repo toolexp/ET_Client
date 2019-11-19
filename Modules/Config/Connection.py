@@ -4,8 +4,7 @@ from pickle import dumps, loads
 HEADER_SIZE = 10  # Length that indicates the number of characters in the stream
 
 
-class Connection():
-
+class Connection:
 
     def __init__(self, c_socket='', message='', stream=b''):
         self.c_socket = c_socket
@@ -33,7 +32,7 @@ class Connection():
             msg = self.c_socket.recv(20)
             if header_ctrl:
                 msg_len = int(msg[:HEADER_SIZE].decode('utf-8'))
-                print('The length of the stream is: {}'.format(str(msg_len)))
+                print('Server sent stream of length: {}'.format(msg_len))
                 header_ctrl = False
 
             self.stream += msg

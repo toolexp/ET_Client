@@ -5,22 +5,6 @@ import datetime
 from tkinter import Toplevel, Label
 
 
-class Message:
-
-    def __init__(self, action=0, comment='', information=None):
-        if information is None:
-            information = []
-        self.action = action
-        self.comment = comment
-        self.information = information
-
-    def send_directive(self, connection):
-        connection.create_message(self)
-        connection.send_message()
-        connection.receive_message()
-        return connection
-
-
 def verify_ip(ip):
     try:
         digits = ip.split('.')
@@ -43,6 +27,44 @@ def verify_port(port):
 
 def wrap_text(string, lenght=90):
     return '\n'.join(textwrap.wrap(string, lenght))
+
+
+class Category:
+    def __init__(self, id=0, name='', classification_id=0):
+        self.id = id
+        self.name = name
+        self.classification_id = classification_id
+
+
+class CreateToolTip(object):
+    """
+    Create a tooltip for a given widget
+    """
+
+    def __init__(self, widget, text='widget info'):
+        self.widget = widget
+        self.text = text
+        self.widget.bind("<Enter>", self.enter)
+        self.widget.bind("<Leave>", self.close)
+
+    def enter(self, event=None):
+        x = y = 0
+        x, y, cx, cy = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 25
+        y += self.widget.winfo_rooty() + 20
+        # creates a toplevel window
+        self.tw = Toplevel(self.widget)
+        # Leaves only the label and removes the app window
+        self.tw.wm_overrideredirect(True)
+        self.tw.wm_geometry("+%d+%d" % (x, y))
+        label = Label(self.tw, text=self.text, justify='left',
+                      background='white', relief='solid', borderwidth=1,
+                      font=("arial", "8", "normal"))
+        label.pack(ipadx=1)
+
+    def close(self, event=None):
+        if self.tw:
+            self.tw.destroy()
 
 
 class Designer:
@@ -80,11 +102,126 @@ class DesignersGroup:
         self.description = description
 
 
-class Template:
+class Experiment:
     def __init__(self, id=0, name='', description=''):
         self.id = id
         self.name = name
         self.description = description
+
+
+class ExperimentalSC:
+    def __init__(self, id=0, name='', description='', access_code='', scenario_availability=True, scenario_lock=False,
+                 id_experiment=None, id_control_group=None, id_experimental_group=None, experiment=None,
+                 control_group=None, experimental_group=None, connection=None):
+        self.id = id
+        self.name = name
+        self.description = description
+        self.access_code = access_code
+        self.scenario_availability = scenario_availability
+        self.scenario_lock = scenario_lock
+        self.id_experiment = id_experiment
+        self.id_control_group = id_control_group
+        self.id_experimental_group = id_experimental_group
+        self.experiment = experiment
+        self.control_group = control_group
+        self.experimental_group = experimental_group
+        self.connection = connection
+        if self.connection is not None:
+            self.retrieve_components()
+
+    def retrieve_components(self):
+        if self.id_experiment is not None:
+            self.directive = Message(action=95, information=[self.id_experiment])
+            self.connection = self.directive.send_directive(self.connection)
+            self.control_group = Experiment(id=self.id_experiment, name=self.connection.message.information[0],
+                                                description=self.connection.message.information[1])
+        if self.id_control_group is not None:
+            self.directive = Message(action=30, information=[self.id_control_group])
+            self.connection = self.directive.send_directive(self.connection)
+            self.control_group = DesignersGroup(id=self.id_control_group, name=self.connection.message.information[0],
+                                                description=self.connection.message.information[1])
+        if self.id_experimental_group is not None:
+            self.directive = Message(action=30, information=[self.id_experimental_group])
+            self.connection = self.directive.send_directive(self.connection)
+            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
+                                                     name=self.connection.message.information[0],
+                                                     description=self.connection.message.information[1])
+
+
+class File:
+
+    def __init__(self, name='', file=None, file_bytes=None, filename=None, image=None):
+        self.name = name
+        self.file = file
+        self.file_bytes = file_bytes
+        self.filename = filename
+        self.image = image
+
+    def read_file(self, filename):
+        self.filename = filename
+        self.file = open(self.filename, 'rb')
+        self.file_bytes = self.file.read()
+        self.name = self.file.name.split('/')[-1]
+
+    def write_file(self, name, file_bytes):
+        self.name = name
+        self.file_bytes = file_bytes
+        path = './Resources/temp/'
+        self.filename = path + name
+        self.file = open(self.filename, 'wb')
+        self.file.write(self.file_bytes)
+        self.file.close()
+
+
+class Measurement:
+    def __init__(self, id=0, value='', date=datetime.datetime.now(), id_metric=None, id_designer=None,
+                 id_scenario_comp=None, metric=None, designer=None, scenario_comp=None, connection=None):
+        self.id = id
+        self.value = value
+        self.date = date
+        self.id_metric = id_metric
+        self.id_designer = id_designer
+        self.id_scenario_comp = id_scenario_comp
+        self.metric = metric
+        self.designer = designer
+        self.scenario_comp = scenario_comp
+        self.connection = connection
+        '''if self.connection is not None:
+            self.retrieve_components()'''
+
+    '''def retrieve_components(self):
+        if self.id_metric is not None:
+            self.directive = Message(action=95, information=[self.id_metric])
+            self.connection = self.directive.send_directive(self.connection)
+            self.metric = Metric(id=self.id_metric, name=self.connection.message.information[0],
+                                 description=self.connection.message.information[1])
+        if self.id_designer is not None:
+            self.directive = Message(action=30, information=[self.id_designer])
+            self.connection = self.directive.send_directive(self.connection)
+            self.control_group = Designer(id=self.id_designer, name=self.connection.message.information[0],
+                                                description=self.connection.message.information[1])
+        if self.id_scenario_comp is not None:
+            self.directive = Message(action=30, information=[self.id_experimental_group])
+            self.connection = self.directive.send_directive(self.connection)
+            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
+                                                     name=self.connection.message.information[0],
+                                                     description=self.connection.message.information[1])'''
+
+
+class Message:
+
+    def __init__(self, action=0, comment='', information=None):
+        if information is None:
+            information = []
+        self.action = action
+        self.comment = comment
+        self.information = information
+
+    def send_directive(self, connection):
+        connection.create_message(self)
+        connection.send_message()
+        connection.receive_message()
+        return connection
 
 
 class Pattern:
@@ -165,75 +302,6 @@ class Pattern:
         return patterns
 
 
-class Section:
-    def __init__(self, temp_section_id=0, template_id=0, section_id=0, name='', description='', data_type='',
-                 position=0,
-                 mandatory='✓', classification_id=0, pattern_section_id=0, diagram_id=0, category_id=0, content='',
-                 file=None, category=None):
-        self.temp_section_id = temp_section_id
-        self.template_id = template_id
-        self.section_id = section_id
-        self.name = name
-        self.description = description
-        self.data_type = data_type
-        self.position = position
-        self.mandatory = mandatory
-        if classification_id != 'None':
-            self.classification_id = int(classification_id)
-        else:
-            self.classification_id = 0
-        if diagram_id != 'None':
-            self.diagram_id = int(diagram_id)
-        else:
-            self.diagram_id = 0
-        if category_id != 'None':
-            self.category_id = int(category_id)
-        else:
-            self.category_id = 0
-        self.pattern_section_id = pattern_section_id
-        self.content = content
-        self.file = file
-        self.category = category
-
-    def get_mandatory_bool(self):
-        if self.mandatory == '✓':
-            return True
-        else:
-            return False
-
-
-class Category:
-    def __init__(self, id=0, name='', classification_id=0):
-        self.id = id
-        self.name = name
-        self.classification_id = classification_id
-
-
-class File:
-
-    def __init__(self, name='', file=None, file_bytes=None, filename=None, image=None):
-        self.name = name
-        self.file = file
-        self.file_bytes = file_bytes
-        self.filename = filename
-        self.image = image
-
-    def read_file(self, filename):
-        self.filename = filename
-        self.file = open(self.filename, 'rb')
-        self.file_bytes = self.file.read()
-        self.name = self.file.name.split('/')[-1]
-
-    def write_file(self, name, file_bytes):
-        self.name = name
-        self.file_bytes = file_bytes
-        path = './Resources/temp/'
-        self.filename = path + name
-        self.file = open(self.filename, 'wb')
-        self.file.write(self.file_bytes)
-        self.file.close()
-
-
 class Problem:
     def __init__(self, id=0, name='', description='', id_solution=None, solution=None, connection=None):
         self.id = id
@@ -254,55 +322,6 @@ class Problem:
                                      patterns_id=[])
             for item in self.connection.message.information[2]:
                 self.solution.patterns_id.append(int(item.split('¥')[0]))
-
-
-class Solution:
-    def __init__(self, id=0, annotations='', patterns_id=None, diagram_id=0):
-        if patterns_id is None:
-            patterns_id = []
-        self.id = id
-        self.annotations = annotations
-        self.patterns_id = patterns_id
-        self.diagram_id = diagram_id
-
-
-class ExperimentalSC:
-    def __init__(self, id=0, name='', description='', access_code='', scenario_availability=True, scenario_lock=False,
-                 id_experiment=None, id_control_group=None, id_experimental_group=None, experiment=None,
-                 control_group=None, experimental_group=None, connection=None):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.access_code = access_code
-        self.scenario_availability = scenario_availability
-        self.scenario_lock = scenario_lock
-        self.id_experiment = id_experiment
-        self.id_control_group = id_control_group
-        self.id_experimental_group = id_experimental_group
-        self.experiment = experiment
-        self.control_group = control_group
-        self.experimental_group = experimental_group
-        self.connection = connection
-        if self.connection is not None:
-            self.retrieve_components()
-
-    def retrieve_components(self):
-        if self.id_experiment is not None:
-            self.directive = Message(action=95, information=[self.id_experiment])
-            self.connection = self.directive.send_directive(self.connection)
-            self.control_group = Experiment(id=self.id_experiment, name=self.connection.message.information[0],
-                                                description=self.connection.message.information[1])
-        if self.id_control_group is not None:
-            self.directive = Message(action=30, information=[self.id_control_group])
-            self.connection = self.directive.send_directive(self.connection)
-            self.control_group = DesignersGroup(id=self.id_control_group, name=self.connection.message.information[0],
-                                                description=self.connection.message.information[1])
-        if self.id_experimental_group is not None:
-            self.directive = Message(action=30, information=[self.id_experimental_group])
-            self.connection = self.directive.send_directive(self.connection)
-            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
-                                                     name=self.connection.message.information[0],
-                                                     description=self.connection.message.information[1])
 
 
 class ScenarioComponent:
@@ -349,77 +368,58 @@ class ScenarioComponent:
                     self.id_patterns_egroup.append(int(elements[3]))
 
 
-class Experiment:
+class Section:
+    def __init__(self, temp_section_id=0, template_id=0, section_id=0, name='', description='', data_type='',
+                 position=0,
+                 mandatory='✓', classification_id=0, pattern_section_id=0, diagram_id=0, category_id=0, content='',
+                 file=None, category=None):
+        self.temp_section_id = temp_section_id
+        self.template_id = template_id
+        self.section_id = section_id
+        self.name = name
+        self.description = description
+        self.data_type = data_type
+        self.position = position
+        self.mandatory = mandatory
+        if classification_id != 'None':
+            self.classification_id = int(classification_id)
+        else:
+            self.classification_id = 0
+        if diagram_id != 'None':
+            self.diagram_id = int(diagram_id)
+        else:
+            self.diagram_id = 0
+        if category_id != 'None':
+            self.category_id = int(category_id)
+        else:
+            self.category_id = 0
+        self.pattern_section_id = pattern_section_id
+        self.content = content
+        self.file = file
+        self.category = category
+
+    def get_mandatory_bool(self):
+        if self.mandatory == '✓':
+            return True
+        else:
+            return False
+
+
+class Solution:
+    def __init__(self, id=0, annotations='', patterns_id=None, diagram_id=0):
+        if patterns_id is None:
+            patterns_id = []
+        self.id = id
+        self.annotations = annotations
+        self.patterns_id = patterns_id
+        self.diagram_id = diagram_id
+
+
+class Template:
     def __init__(self, id=0, name='', description=''):
         self.id = id
         self.name = name
         self.description = description
-
-
-class Measurement:
-    def __init__(self, id=0, value='', date=datetime.datetime.now(), id_metric=None, id_designer=None,
-                 id_scenario_comp=None, metric=None, designer=None, scenario_comp=None, connection=None):
-        self.id = id
-        self.value = value
-        self.date = date
-        self.id_metric = id_metric
-        self.id_designer = id_designer
-        self.id_scenario_comp = id_scenario_comp
-        self.metric = metric
-        self.designer = designer
-        self.scenario_comp = scenario_comp
-        self.connection = connection
-        '''if self.connection is not None:
-            self.retrieve_components()'''
-
-    '''def retrieve_components(self):
-        if self.id_metric is not None:
-            self.directive = Message(action=95, information=[self.id_metric])
-            self.connection = self.directive.send_directive(self.connection)
-            self.metric = Metric(id=self.id_metric, name=self.connection.message.information[0],
-                                 description=self.connection.message.information[1])
-        if self.id_designer is not None:
-            self.directive = Message(action=30, information=[self.id_designer])
-            self.connection = self.directive.send_directive(self.connection)
-            self.control_group = Designer(id=self.id_designer, name=self.connection.message.information[0],
-                                                description=self.connection.message.information[1])
-        if self.id_scenario_comp is not None:
-            self.directive = Message(action=30, information=[self.id_experimental_group])
-            self.connection = self.directive.send_directive(self.connection)
-            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
-                                                     name=self.connection.message.information[0],
-                                                     description=self.connection.message.information[1])'''
-
-
-class CreateToolTip(object):
-    """
-    Create a tooltip for a given widget
-    """
-
-    def __init__(self, widget, text='widget info'):
-        self.widget = widget
-        self.text = text
-        self.widget.bind("<Enter>", self.enter)
-        self.widget.bind("<Leave>", self.close)
-
-    def enter(self, event=None):
-        x = y = 0
-        x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 20
-        # creates a toplevel window
-        self.tw = Toplevel(self.widget)
-        # Leaves only the label and removes the app window
-        self.tw.wm_overrideredirect(True)
-        self.tw.wm_geometry("+%d+%d" % (x, y))
-        label = Label(self.tw, text=self.text, justify='left',
-                      background='white', relief='solid', borderwidth=1,
-                      font=("arial", "8", "normal"))
-        label.pack(ipadx=1)
-
-    def close(self, event=None):
-        if self.tw:
-            self.tw.destroy()
 
 
 class TimerClass:

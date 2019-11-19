@@ -5,7 +5,7 @@ from tkinter import Tk, Menu, Toplevel, LabelFrame, Label, Entry, Button, messag
 from tkinter.ttk import Combobox
 from tkinter.constants import *
 from Modules.Config.Connection import Connection
-from Modules.Config.Data import Message, verify_port, verify_ip, Designer
+from Modules.Config.Data import Message, Designer
 from Modules.Config.Visual import *
 
 from Modules.Forms.form_AED import FormParentAED
@@ -19,8 +19,10 @@ from Modules.Forms.form_classifications import FormParentClassification
 from Modules.Forms.form_experiment_admin import FormParentExAdmin
 from Modules.Forms.form_designer_gui import FormParentDesigner
 
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 65450        # The port used by the server
+json_config = json.load(open('config.json', 'r'))
+HOST = json_config["server"]["address"]     # The server's hostname or IP address
+PORT = json_config["server"]["port"]        # The port used by the server
+
 
 class WindowHome:
     def __init__(self, connection):
@@ -30,10 +32,10 @@ class WindowHome:
         self.role = 1
         self.window = Tk()
         self.window.protocol("WM_DELETE_WINDOW", self.click_log_out)
-        #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
-        #self.window.geometry('%dx%d+0+0' % (1024, 778))
+        # w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
+        # self.window.geometry('%dx%d+0+0' % (1024, 778))
         self.window.geometry('%dx%d+0+0' % (1500, 778))
-        #self.window.geometry('%dx%d+0+0' % (w, h))
+        # self.window.geometry('%dx%d+0+0' % (w, h))
         self.window.resizable(0, 0)
         self.window.title('Tool for experimenting')
         self.window.withdraw()
@@ -77,8 +79,9 @@ class WindowHome:
         self.tlevel_login.grab_set()
 
     def click_login(self):
-        if len(self.txt_email.get()) != 0 and len(self.txt_passwd.get()) != 0 and len(self.cbx_role.get()) != 0:    # validate empty fileds in login form
-            if self.cbx_role.get() == 'Experimenter':   # directive (action) changes in accordance of the role
+        if len(self.txt_email.get()) != 0 and len(self.txt_passwd.get()) != 0 and len(
+                self.cbx_role.get()) != 0:  # validate empty fileds in login form
+            if self.cbx_role.get() == 'Experimenter':  # directive (action) changes in accordance of the role
                 self.role = 1
                 self.directive = Message(action=20, information=[self.txt_email.get(), 'login'])
             elif self.cbx_role.get() == 'Designer':
@@ -89,8 +92,9 @@ class WindowHome:
                 self.directive = Message(action=15, information=[self.txt_email.get(), 'login'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # The user does not exist
-                messagebox.showerror(title='E-mail', message=self.connection.message.information[0])
-            else:   # block to validate the inserted password
+                messagebox.showerror(parent=self.tlevel_login, title='E-mail',
+                                     message=self.connection.message.information[0])
+            else:  # block to validate the inserted password
                 if self.role == 2:
                     self.current_designer = Designer(id=self.connection.message.information[0],
                                                      name=self.connection.message.information[1],
@@ -103,12 +107,14 @@ class WindowHome:
                     else:
                         messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
                 elif self.role == 1:
-                    if self.connection.message.information[4] == hashlib.sha1(self.txt_passwd.get().encode()).hexdigest():
+                    if self.connection.message.information[4] == hashlib.sha1(
+                            self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
                         messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
                 elif self.role == 3:
-                    if self.connection.message.information[4] == self.txt_passwd.get():
+                    if self.connection.message.information[4] == hashlib.sha1(
+                            self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
                         messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
@@ -153,7 +159,7 @@ class WindowHome:
         elif self.role == 2:  # logged as designer
             self.frm_parent_designer_gui = FormParentDesigner(self.window, connection, self.current_designer)
             self.click_designer_gui()
-        elif self.role == 3: # logged as administrator
+        elif self.role == 3:  # logged as administrator
             administration_menu = Menu(menu_bar, tearoff=0)
             users_menu = Menu(administration_menu, tearoff=0)
             users_menu.add_command(label='Administrators', command=self.click_administrators)
@@ -375,7 +381,19 @@ class WindowHome:
             self.window.destroy()
         else:
             # Cant log out if designer is running an experimental scenario
-            if not self.frm_parent_designer_gui.frm_general.grid_info():
+            try:
+                if not self.frm_parent_designer_gui.frm_general.grid_info():
+                    msg = Message(comment='close_connection')
+                    self.connection.create_message(msg)
+                    self.connection.send_message()
+                    self.connection.close_connection()
+                    shutil.rmtree('./Resources/temp/')
+                    os.mkdir('./Resources/temp/')
+                    self.window.destroy()
+                else:
+                    messagebox.showerror(title='Can not exit',
+                                         message='You must finish current experimental scenario to exit')
+            except:
                 msg = Message(comment='close_connection')
                 self.connection.create_message(msg)
                 self.connection.send_message()
@@ -383,24 +401,12 @@ class WindowHome:
                 shutil.rmtree('./Resources/temp/')
                 os.mkdir('./Resources/temp/')
                 self.window.destroy()
-            else:
-                messagebox.showerror(title='Can not exit',
-                                     message='You must finish current experimental scenario to exit')
 
 
 if __name__ == '__main__':
     connection = Connection()
     try:
-        # Ask user for Socket info
-        host = input('Insert ip address of the server to connect:\n')
-        port = input('Inset the port number of the server to connect (>1023):\n')
-        if verify_ip(host) and verify_port(port):  # Verify values inserted, if OK the set connection with inserted values
-            connection.create_connection(host, int(port))
-            print('Client connecting to IP {} in PORT {}'.format(host, port))
-        else:  # Otherwise set connection with default values
-            connection.create_connection(HOST, PORT)
-            print("Can't verify inserted values...")
-            print('Client connecting to IP {} in PORT {}'.format(HOST, str(PORT)))
+        connection.create_connection(HOST, PORT)
         app = WindowHome(connection)
         app.window.mainloop()
     except Exception as e:

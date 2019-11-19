@@ -307,17 +307,18 @@ class FormChildPattern:
         Method that removes a selected pattern from the initial list (changes are updated in DB)
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            decision = messagebox.askyesno(title='Confirmation',
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
                 self.directive = Message(action=44, information=[self.id_selected_pattern])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:  # An error ocurred while deleting the item
-                    messagebox.showerror(title='Can not delete the item', message=self.connection.message.information[0])
+                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
+                                         message=self.connection.message.information[0])
                 else:
                     self.go_back_form()
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_new(self):
         """
@@ -343,7 +344,8 @@ class FormChildPattern:
             self.directive = Message(action=45, information=[self.id_selected_pattern, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # An error ocurred while trying to update the item
-                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+                messagebox.showerror(parent=self.frm_child_list, title='Can not update the item',
+                                     message=self.connection.message.information[0])
             else:
                 self.initialize_variables()
                 self.decide = False
@@ -378,7 +380,7 @@ class FormChildPattern:
                 self.frm_child_crud['text'] = 'Update Pattern'
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_save(self):
         if self.new_pattern is not None and self.selected_section is not None:
@@ -460,11 +462,12 @@ class FormChildPattern:
                             raise Exception('Error retrieving data type of section to be created')
                 self.go_back_form()
             else:
-                messagebox.showwarning(title='Missing information',
+                messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                        message='There are mandatory fields that need to be filled!')
 
     def click_cancel(self):
-        decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
+        decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
+                                       message='Are you sure you want to cancel?')
         if decision:
             self.go_back_form()
 

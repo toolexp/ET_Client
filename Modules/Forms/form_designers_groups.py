@@ -160,19 +160,19 @@ class FormChildDG:
 
     def click_delete(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            decision = messagebox.askyesno(title='Confirmation',
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
                 self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
                 self.directive = Message(action=29, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:  # An error ocurred while deleting the item
-                    messagebox.showerror(title='Can not delete the item',
+                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
                                          message=self.connection.message.information[0])
                 else:
                     self.retrieve_list()
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_new(self):
         self.decide = True
@@ -192,7 +192,8 @@ class FormChildDG:
             self.directive = Message(action=30, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:     # An error ocurred while trying to update the item
-                messagebox.showerror(title='Can not update the item', message=self.connection.message.information[0])
+                messagebox.showerror(parent=self.frm_child_list, title='Can not update the item',
+                                     message=self.connection.message.information[0])
             else:
                 self.txt_name.insert('1.0', self.connection.message.information[0])
                 self.txt_description.insert('1.0', self.connection.message.information[1])
@@ -206,7 +207,7 @@ class FormChildDG:
                 self.txt_name.focus_set()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def retrieve_designers(self, s_designers, a_designers):
         for item in self.trv_available_designers.get_children():
@@ -260,11 +261,12 @@ class FormChildDG:
             self.frm_child_crud.grid_forget()
             self.show_frm()
         else:
-            messagebox.showwarning(title='Missing information',
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
 
     def click_cancel(self):
-        decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
+        decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
+                                       message='Are you sure you want to cancel?')
         if decision:
             self.clear_fields()
             self.frm_child_crud.grid_forget()

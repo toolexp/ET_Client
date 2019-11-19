@@ -338,19 +338,19 @@ class FormParentDesigner:
         the system saves the important information (solutions and measurements) and then continue to the next scenario
         component if available, otherwise the experiment will be closed
         """
-        decision = messagebox.askyesno(title='Confirmation',
+        decision = messagebox.askyesno(parent=self.frm_general, title='Confirmation',
                                        message="Are you sure you want to continue? Yo won't be able to make any change later")
         if decision: # Confirmation of action
             if self.save_changes():
                 self.current_scenarios_counter += 1
                 if self.current_scenarios_counter == len(self.scenario_components): # If no more scenario components available
-                    messagebox.showinfo(title='Experimental scenario finished',
+                    messagebox.showinfo(parent=self.frm_general, title='Experimental scenario finished',
                                            message="This concludes the execution of the experimental scenario. Thank you!")
                     self.clear_visual_components()
                     self.hide_frm()
                     self.show_frm()
                 else: # If another scenario component available
-                    messagebox.showinfo(title='Next component',
+                    messagebox.showinfo(parent=self.frm_general, title='Next component',
                                         message="You are about to start a new component, press Ok when you are ready.")
                     self.clear_visual_components()
                     self.initialize_component_variables()
@@ -399,13 +399,13 @@ class FormParentDesigner:
             self.connection = self.directive.send_directive(self.connection)
             return True
         elif validation_option == 1:
-            messagebox.showwarning(title='Missing information',
+            messagebox.showwarning(parent=self.frm_general, title='Missing information',
                                    message="You haven't selected any pattern")
         elif validation_option == 2:
-            messagebox.showwarning(title='Missing information',
+            messagebox.showwarning(parent=self.frm_general, title='Missing information',
                                    message="You haven't attached any file")
         else:
-            messagebox.showwarning(title='Missing information',
+            messagebox.showwarning(parent=self.frm_general, title='Missing information',
                                    message='You must add annotations to your solution')
         return False
 

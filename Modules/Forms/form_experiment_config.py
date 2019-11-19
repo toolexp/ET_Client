@@ -490,7 +490,7 @@ class FormChildExConfig:
             self.btn_copy_patterns['state'] = DISABLED
             self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_update(self):
         """
@@ -542,7 +542,7 @@ class FormChildExConfig:
             self.frm_child_general['text'] = self.title_form + ' experimental scenario'
             self.frm_child_general.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_delete(self):
         """
@@ -550,7 +550,7 @@ class FormChildExConfig:
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             # MessageBox asking confirmation
-            decision = messagebox.askyesno(title='Confirmation',
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
                 self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
@@ -558,7 +558,7 @@ class FormChildExConfig:
                 self.connection = self.directive.send_directive(self.connection)
                 self.retrieve_list()
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def show_buttons_create_update(self):
         """
@@ -670,24 +670,25 @@ class FormChildExConfig:
                     self.connection = self.directive.send_directive(self.connection)
             self.click_back_general()
         elif validation_option == 1:
-            messagebox.showwarning(title='Missing information',
+            messagebox.showwarning(parent=self.frm_child_general, title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
         elif validation_option == 2:
-            messagebox.showwarning(title='Designers',
+            messagebox.showwarning(parent=self.frm_child_general, title='Designers',
                                    message='Control group and experimental group cant be the same')
         elif validation_option == 3:
-            messagebox.showwarning(title='Scenario components',
+            messagebox.showwarning(parent=self.frm_child_general, title='Scenario components',
                                    message='You must insert at least one scenario component')
         else:
-            messagebox.showwarning(title='Designers', message='At least one designer belongs to control and experimental '
-                                                              'group. Please check the selected groups')
+            messagebox.showwarning(parent=self.frm_child_general, title='Designers',
+                                   message='At least one designer belongs to control and experimental group. Please '
+                                           'check the selected groups')
 
     def click_cancel(self):
         """
         Function activated when 'Cancel' button is pressed in General form, it goes back to the 'Experimental scenarios'
         home page
         """
-        decision = messagebox.askyesno(title='Cancel', message='Are you sure you want to cancel?')
+        decision = messagebox.askyesno(parent=self.frm_child_general, title='Cancel', message='Are you sure you want to cancel?')
         if decision:
             self.click_back_general()
 
@@ -700,12 +701,12 @@ class FormChildExConfig:
             self.tlevel_problem.deiconify()
             self.tlevel_problem.grab_set()
         else:
-            messagebox.showwarning(title='No design problems', message='All design problems are already configured '
-                                                                       'within this scenario')
+            messagebox.showwarning(parent=self.frm_child_general, title='No design problems',
+                                   message='All design problems are already configured within this scenario')
 
     def click_delete_component(self):
         if self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'] != '':
-            decision = messagebox.askyesno(title='Confirmation', message='Are you sure you want to delete the item?')
+            decision = messagebox.askyesno(parent=self.frm_child_general, title='Confirmation', message='Are you sure you want to delete the item?')
             if decision:
                 id_selected = int(self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'])
                 for item in self.scenario_components:
@@ -718,7 +719,7 @@ class FormChildExConfig:
                     self.scenario_components.remove(item)   # Remove sc component from local variable
                 self.trv_scenario_components.delete(self.trv_scenario_components.selection())   # Remove sc component from TRV
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_general, title='No selection', message='You must select an item')
 
     '''def click_edit_component(self):
         if self.trv_scenario_components.item(self.trv_scenario_components.selection())['text'] != '':
@@ -731,7 +732,7 @@ class FormChildExConfig:
             self.show_current_problem(self.current_sc_comp.problem)
             self.cbx_problem['state'] = DISABLED
         else:
-            messagebox.showwarning(title='No selection', message='You must select an item')'''
+            messagebox.showwarning(parent=self.frm_child_general, title='No selection', message='You must select an item')'''
 
     def click_save_sc_component(self):
         validation_option = self.validate_problem_frm()  # Validate any issue associated with problem selection
@@ -791,9 +792,11 @@ class FormChildExConfig:
                     self.tlevel_problem.grab_release()
                     self.tlevel_problem.withdraw()
         elif validation_option == 1:
-            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information', message='You must select a problem!')
+            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
+                                   message='You must select a problem!')
         else:
-            messagebox.showwarning(parent=self.tlevel_problem, title='Repeated problem', message='The selected problem has been already chosen')
+            messagebox.showwarning(parent=self.tlevel_problem, title='Repeated problem',
+                                   message='The selected problem has been already chosen')
 
     def click_cancel_sc_component(self):
         self.current_sc_comp = None
