@@ -128,7 +128,7 @@ class FormChildSection:
         # Adding elements into the list
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], wrap_text(elements[2],75) ,
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], wrap_text(elements[2], 70),
                                                                            elements[3]))
 
     def show_frm(self):

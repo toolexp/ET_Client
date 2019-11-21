@@ -101,7 +101,6 @@ class FormChildProblem:
         vsb_txt_sum.grid(row=1, column=8, pady=10, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
         self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
-        self.btn_view_diagram['state'] = DISABLED
         self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_list)
         lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
