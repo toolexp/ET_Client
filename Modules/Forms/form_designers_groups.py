@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
-from tkinter.ttk import Treeview
-from Modules.Config.Data import Message, CreateToolTip
+from tkinter.ttk import Treeview, Separator
+from Modules.Config.Data import Message, CreateToolTip, wrap_text
 from Modules.Config.Visual import *
 
 
@@ -130,14 +130,18 @@ class FormChildDG:
         btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
         btn_remove.grid(row=5, column=3)
         btn_remove_ttp = CreateToolTip(btn_remove, 'Remove designer')
+        frm_aux1.grid(row=0, column=0, pady=20, padx=20, rowspan=5)
+        frm_aux2.grid(row=5, column=0, pady=20, padx=20, rowspan=5)
+
+        sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=1, sticky=NS, rowspan=10)
+
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=1, column=5, padx=25)
+        btn_save.grid(row=1, column=2, padx=25)
         btn_save_ttp = CreateToolTip(btn_save, 'Save designers group')
         btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=2, column=5, padx=25)
+        btn_cancel.grid(row=2, column=2, padx=25)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
-        frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5, rowspan=5)
-        frm_aux2.grid(row=8, column=0, pady=20, padx=40, columnspan=5, rowspan=10)
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -147,10 +151,12 @@ class FormChildDG:
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2], elements[3]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2], elements[3]))
 
     def show_frm(self):
         self.retrieve_list()
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -196,7 +202,7 @@ class FormChildDG:
                                      message=self.connection.message.information[0])
             else:
                 self.txt_name.insert('1.0', self.connection.message.information[0])
-                self.txt_description.insert('1.0', self.connection.message.information[1])
+                self.txt_description.insert('1.0', wrap_text(self.connection.message.information[1], 65))
                 s_designers = self.connection.message.information[2]
                 self.directive = Message(action=22, information=[])
                 self.connection = self.directive.send_directive(self.connection)

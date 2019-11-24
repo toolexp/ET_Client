@@ -404,6 +404,8 @@ class FormChildExConfig:
         Displays the home page of the 'Experiments configuration'
         """
         self.retrieve_experiments()
+        if len(self.trv_available_exp.get_children()) != 0:
+            self.trv_available_exp.selection_set(self.trv_available_exp.get_children()[0])
         self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -458,7 +460,7 @@ class FormChildExConfig:
                                       id_problem=int(elements[2]), connection=self.connection))
             # Fill visual components with retrieved information
             self.txt_name.insert('1.0', self.experimental_scenario.name)
-            self.txt_description.insert('1.0', self.experimental_scenario.description)
+            self.txt_description.insert('1.0', wrap_text(self.experimental_scenario.description, 85))
             self.txt_access_code.insert('1.0', self.experimental_scenario.access_code)
             self.cbx_cgroup.set(self.experimental_scenario.control_group.name)
             self.cbx_egroup.set(self.experimental_scenario.experimental_group.name)
@@ -523,7 +525,7 @@ class FormChildExConfig:
                                                                   id_problem=int(elements[2]), connection=self.connection))
             # Fill visual components with retrieved information
             self.txt_name.insert('1.0', self.experimental_scenario.name)
-            self.txt_description.insert('1.0', self.experimental_scenario.description)
+            self.txt_description.insert('1.0', wrap_text(self.experimental_scenario.description, 85))
             self.txt_access_code.insert('1.0', self.experimental_scenario.access_code)
             self.cbx_cgroup.set(self.experimental_scenario.control_group.name)
             self.cbx_egroup.set(self.experimental_scenario.experimental_group.name)
@@ -975,7 +977,7 @@ class FormChildExConfig:
         # Insert description of the current problem into visual component
         self.txt_problem_desc['state'] = NORMAL
         self.txt_problem_desc.delete('1.0', 'end-1c')
-        self.txt_problem_desc.insert('1.0', problem.description)
+        self.txt_problem_desc.insert('1.0', wrap_text(problem.description, 85))
         self.txt_problem_desc['state'] = DISABLED
 
     def clear_fields(self):

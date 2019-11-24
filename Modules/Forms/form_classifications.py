@@ -1,6 +1,6 @@
 from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Frame, Scrollbar
 from tkinter.constants import *
-from tkinter.ttk import Treeview
+from tkinter.ttk import Treeview, Separator
 from Modules.Config.Data import Message, CreateToolTip
 from Modules.Config.Visual import *
 
@@ -78,22 +78,24 @@ class FormChildClassification:
         self.frm_class.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_class = Label(self.frm_child_crud, text='Name')
         lbl_class.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_class.grid(pady=10, padx=50, sticky=W)
+        lbl_class.grid(pady=10, padx=20, sticky=W)
         lbl_desc_categories = Label(self.frm_child_crud, text='Enter categories separated by a comma ","')
         lbl_desc_categories.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_desc_categories.grid(pady=10, padx=50, columnspan=2, sticky=W)
+        lbl_desc_categories.grid(pady=10, padx=20, columnspan=2, sticky=W)
         lbl_categories = Label(self.frm_child_crud, text='Categories')
         lbl_categories.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_categories.grid(pady=10, padx=50, sticky=NW)
+        lbl_categories.grid(pady=10, padx=20, sticky=NW)
         self.txt_name_class = Text(self.frm_child_crud, height=1, width=50, font=TEXT_FONT)
-        self.txt_name_class.grid(row=0, column=1, padx=10, pady=10, sticky=W)
-        self.txt_categories = Text(self.frm_child_crud, height=10, width=50, font=TEXT_FONT)
-        self.txt_categories.grid(row=2, column=1, padx=10, pady=10, sticky=W)
+        self.txt_name_class.grid(row=0, column=1, padx=20, pady=10, sticky=W)
+        self.txt_categories = Text(self.frm_child_crud, height=7, width=50, font=TEXT_FONT)
+        self.txt_categories.grid(row=2, column=1, padx=20, pady=10, sticky=W)
+        sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=3, sticky=NS, rowspan=3)
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=3, padx=20)
+        btn_save.grid(row=0, column=4, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save classification')
         btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=3, padx=20)
+        btn_cancel.grid(row=1, column=4, padx=20)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
     def retrieve_list(self):
@@ -109,6 +111,8 @@ class FormChildClassification:
 
     def show_frm(self):
         self.retrieve_list()
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):

@@ -55,9 +55,7 @@ class FormChildPattern:
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
         self.style = Style()
         self.style.layout('TNotebook.Tab', [])  # turn off tabs
-        #self.style.theme_use("clam")
         self.style.configure("Treeview", foreground="gray", rowheight=50)
-        #self.style.layout('TNotebook.Tab', [])  # turn off tabs
         defaultbg = self.frm_child_crud.cget('bg')
 
         # Components for List FRM
@@ -109,57 +107,58 @@ class FormChildPattern:
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
-
         lbl_template = Label(frm_aux1, text='Select a template')
         lbl_template.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_template.grid(pady=10, padx=10, sticky=W)
-
-        self.cbx_template = Combobox(frm_aux1, state="readonly", width=125)
+        lbl_template.grid(pady=10, padx=20, sticky=W)
+        self.cbx_template = Combobox(frm_aux1, state="readonly", width=60)
         self.cbx_template.config(font=TEXT_FONT)
         self.cbx_template.grid(row=0, column=1, columnspan=3, pady=10, padx=10, sticky=W)
         self.cbx_template.bind("<<ComboboxSelected>>", self.cbx_template_selected)
-        btn_save = Button(frm_aux1, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=4, padx=30)
-        btn_save_ttp = CreateToolTip(btn_save, 'Save pattern')
-        btn_cancel = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=4, padx=30)
-        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
+
+        sep_aux1 = Separator(self.frm_child_crud, orient=HORIZONTAL)
+        sep_aux1.grid(row=1, column=0, sticky=EW)
+        sep_aux2 = Separator(self.frm_child_crud, orient=VERTICAL)
+        sep_aux2.grid(row=0, column=1, sticky=NS, rowspan=3)
 
         self.frm_aux2 = Frame(self.frm_child_crud)
-
         lbl_section = Label(self.frm_aux2, text='Select a section')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_section.grid(pady=10, padx=10, sticky=NW)
+        lbl_section.grid(row=0, column=1, pady=10, sticky=NW)
         lbl_sep5 = Label(self.frm_aux2)
-        lbl_sep5.grid(row=0, column=1, padx=10, pady=10)
+        lbl_sep5.grid(row=1, column=0, padx=10, pady=10)
         self.trv_summary = Treeview(self.frm_aux2, height=6, columns=('Section', 'Mandatory', 'Completed'))
         self.trv_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_summary.heading('#1', text='Section', anchor=CENTER)
         self.trv_summary.heading('#2', text='Mandatory', anchor=CENTER)
         self.trv_summary.heading('#3', text='Completed', anchor=CENTER)
         self.trv_summary.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_summary.column('#1', width=80, minwidth=80, stretch=NO)
-        self.trv_summary.column('#2', width=80, minwidth=80, stretch=NO, anchor=CENTER)
-        self.trv_summary.column('#3', width=80, minwidth=80, stretch=NO, anchor=CENTER)
+        self.trv_summary.column('#1', width=100, minwidth=100, stretch=NO)
+        self.trv_summary.column('#2', width=70, minwidth=70, stretch=NO, anchor=CENTER)
+        self.trv_summary.column('#3', width=70, minwidth=70, stretch=NO, anchor=CENTER)
         self.trv_summary.bind("<ButtonRelease-1>", self.trv_section_selected)
-        self.trv_summary.grid(row=0, column=2, rowspan=3, sticky=W, pady=10)
+        self.trv_summary.grid(row=1, column=1, rowspan=3, sticky=W, pady=10)
         vsb_trv_sum = Scrollbar(self.frm_aux2, orient="vertical", command=self.trv_summary.yview)
-        vsb_trv_sum.grid(row=0, column=3, rowspan=3, pady=10, sticky=NS)
+        vsb_trv_sum.grid(row=1, column=2, rowspan=3, pady=10, sticky=NS)
         self.trv_summary.configure(yscrollcommand=vsb_trv_sum.set)
         lbl_sep6 = Label(self.frm_aux2)
-        lbl_sep6.grid(row=0, column=4, padx=10, pady=10)
+        lbl_sep6.grid(row=1, column=3, padx=20, pady=10)
 
         lbl_desc_section = Label(self.frm_aux2, text='Description')
         lbl_desc_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_desc_section.grid(row=0, column=5, pady=10, padx=50, sticky=NE)
+        lbl_desc_section.grid(row=0, column=4, pady=10, sticky=NW)
 
-        self.txt_desc_section = Text(self.frm_aux2, height=4, width=65)
+        self.txt_desc_section = Text(self.frm_aux2, height=4, width=70)
         self.txt_desc_section.config(background=defaultbg, font=TEXT_FONT)
-        self.txt_desc_section.grid(row=0, column=6, pady=10, padx=20, sticky=W)
+        self.txt_desc_section.grid(row=1, column=4, pady=10, sticky=W)
+        vsb_txt_desc = Scrollbar(self.frm_aux2, orient="vertical", command=self.txt_desc_section.yview)
+        vsb_txt_desc.grid(row=1, column=5, pady=10, sticky=NS)
+        self.txt_desc_section.configure(yscrollcommand=vsb_txt_desc.set)
+        lbl_sep7 = Label(self.frm_aux2)
+        lbl_sep7.grid(row=1, column=6, padx=20, pady=10)
 
         lbl_section = Label(self.frm_aux2, text='Content')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_section.grid(row=1, column=5, pady=10, padx=50, sticky=NE)
+        lbl_section.grid(row=2, column=4, pady=10, sticky=NW)
 
         self.tab_control = Notebook(self.frm_aux2)
         tab_desc = Frame(self.tab_control)
@@ -194,12 +193,22 @@ class FormChildPattern:
         self.cbx_category.grid(row=1, column=0, pady=20, padx=20, sticky=W)
         self.cbx_category.bind("<<ComboboxSelected>>", self.cbx_category_selected)
 
-        self.tab_control.grid(row=1, column=6, padx=20, pady=10, sticky=W)
+        self.tab_control.grid(row=3, column=4, pady=10, sticky=W)
         self.tab_control.tab(0, state='disabled')
         self.tab_control.tab(1, state='disabled')
         self.tab_control.tab(2, state='disabled')
-        frm_aux1.grid(row=1, column=0, pady=20, padx=10, columnspan=4, rowspan=3, sticky=E)
-        self.frm_aux2.grid(row=5, column=0, pady=10, padx=10, columnspan=3, rowspan=10, sticky=E)
+
+        frm_aux3 = Frame(self.frm_child_crud)
+        btn_save = Button(frm_aux3, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=2, padx=20, pady=5)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save pattern')
+        btn_cancel = Button(frm_aux3, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=1, column=2, padx=20, pady=5)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
+
+        frm_aux1.grid(row=0, column=0, sticky=W)
+        self.frm_aux2.grid(row=2, column=0, sticky=E)
+        frm_aux3.grid(row=0, column=2, sticky=E, pady=5)
 
     def initialize_variables(self):
         """
@@ -256,10 +265,9 @@ class FormChildPattern:
         """
         Hide the Patterns administration Forms
         """
-        # self.click_cancel()
-        #self.style.layout('TNotebook.Tab')  # turn on tabs
         self.frm_child_list.grid_forget()
-        # self.frm_child_crud.grid_forget()
+        self.frm_child_crud.grid_forget()
+        self.go_back_form(decision='hide')
 
     def select_pattern_summary(self, event=None):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
@@ -282,7 +290,7 @@ class FormChildPattern:
                     self.file_summary = File()
                     self.file_summary.write_file(self.connection.message.information[0], self.connection.message.information[1])
                 else:
-                    self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 60)))
+                    self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 65)))
             self.txt_summary['state'] = DISABLED
 
     def restart_components(self):
@@ -471,7 +479,7 @@ class FormChildPattern:
         if decision:
             self.go_back_form()
 
-    def go_back_form(self):
+    def go_back_form(self, decision='back'):
         self.cbx_template['state'] = ACTIVE
         self.cbx_template.set('')
         self.cbx_template['values'] = []
@@ -479,7 +487,8 @@ class FormChildPattern:
         self.initialize_variables()
         self.frm_child_crud.grid_forget()
         self.trv_available.focus_set()
-        self.show_frm()
+        if decision != 'hide':
+            self.show_frm()
 
     def click_upload(self):
         """
@@ -618,7 +627,7 @@ class FormChildPattern:
         # user of the GUI.
         self.txt_desc_section['state'] = NORMAL
         self.txt_desc_section.delete('1.0', 'end-1c')
-        self.txt_desc_section.insert('1.0', self.selected_section.description)
+        self.txt_desc_section.insert('1.0', wrap_text(self.selected_section.description, 75))
         self.txt_desc_section['state'] = DISABLED
 
         # This section retrieve the content of the selected section and displays (depending of the data_type) it
@@ -627,7 +636,7 @@ class FormChildPattern:
             self.tab_control.tab(0, state='normal')
             self.tab_control.select(0)
             if self.selected_section.content != '':
-                self.txt_section.insert('1.0', self.selected_section.content)
+                self.txt_section.insert('1.0', wrap_text(self.selected_section.content, 65))
             self.txt_section.focus_set()
         elif self.selected_section.data_type == 'File':
             self.tab_control.tab(1, state='normal')

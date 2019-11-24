@@ -258,9 +258,9 @@ class FormChildProblem:
             self.txt_summary['state'] = NORMAL
             self.txt_summary.delete('1.0', 'end-1c')
             # Adding elements in the list
-            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(problem_aux.name, 50)))
+            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(problem_aux.name, 55)))
             self.txt_summary.insert('end-1c', "Description:\n{}\n\nIdeal Solution:\n".format(
-                wrap_text(problem_aux.description, 50)))
+                wrap_text(problem_aux.description, 55)))
             self.txt_summary.insert('end-1c', "-Diagram:\tClick right button to see diagram >>\n\n")
             if len(problem_aux.solution.patterns_id) == 0:
                 self.txt_summary.insert('end-1c', "-The ideal solution does not have associated patterns\n")
@@ -361,8 +361,8 @@ class FormChildProblem:
                 self.file.write_file(self.connection.message.information[0], self.connection.message.information[1])
                 # Fill visual components with retrieved information
                 self.txt_name_prob.insert('1.0', self.new_problem.name)
-                self.txt_description_prob.insert('1.0', self.new_problem.description)
-                self.txt_annotations.insert('1.0', self.new_problem.solution.annotations)
+                self.txt_description_prob.insert('1.0', wrap_text(self.new_problem.description, 65))
+                self.txt_annotations.insert('1.0', wrap_text(self.new_problem.solution.annotations, 65))
                 self.show_file()
                 # Get patterns for the ideal solution if it has at least one
                 self.txt_patterns['state'] = NORMAL
@@ -372,7 +372,7 @@ class FormChildProblem:
                         for item2 in self.patterns:
                             if item2.id == item:
                                 break
-                        self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1, item2.get_content_name()))
+                        self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1, wrap_text(item2.get_content_name(), 30)))
                         index += 1
                 else:
                     self.txt_patterns.insert('end-1c', "The ideal solution does not have associated patterns")
@@ -622,7 +622,7 @@ class FormChildProblem:
             for item in self.trv_selected_patterns.get_children():
                 self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1,
                                                                      wrap_text(self.trv_selected_patterns.item(item)[
-                                                                                   'values'][0], 20)))
+                                                                                   'values'][0], 30)))
                 index += 1
             self.txt_patterns['state'] = DISABLED
         else:

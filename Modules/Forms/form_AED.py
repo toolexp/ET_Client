@@ -1,6 +1,6 @@
 from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
-from tkinter.ttk import Treeview
+from tkinter.ttk import Treeview, Separator
 from Modules.Config.Data import Message, CreateToolTip
 from Modules.Config.Visual import *
 import hashlib
@@ -82,31 +82,40 @@ class FormChildAED:
         frm_aux = Frame(self.frm_child_crud)
         lbl_name = Label(frm_aux, text='Name')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=50, sticky=W)
+        lbl_name.grid(pady=10, padx=20, sticky=W)
         lbl_surname = Label(frm_aux, text='Surname')
         lbl_surname.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_surname.grid(pady=10, padx=50, sticky=W)
+        lbl_surname.grid(pady=10, padx=20, sticky=W)
         lbl_email = Label(frm_aux, text='E-mail')
         lbl_email.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_email.grid(pady=10, padx=50, sticky=W)
+        lbl_email.grid(pady=10, padx=20, sticky=W)
         lbl_passwd = Label(frm_aux, text='Password')
         lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_passwd.grid(pady=10, padx=50, sticky=W)
+        lbl_passwd.grid(pady=10, padx=20, sticky=W)
+        lbl_passwd = Label(frm_aux, text='Confirm password')
+        lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_passwd.grid(pady=10, padx=20, sticky=W)
         self.txt_name = Entry(frm_aux)
-        self.txt_name.grid(row=0, column=1, padx=50)
+        self.txt_name.grid(row=0, column=1, padx=20)
         self.txt_surname = Entry(frm_aux)
-        self.txt_surname.grid(row=1, column=1, padx=50)
+        self.txt_surname.grid(row=1, column=1, padx=20)
         self.txt_email = Entry(frm_aux)
-        self.txt_email.grid(row=2, column=1, padx=50)
+        self.txt_email.grid(row=2, column=1, padx=20)
         self.txt_passwd = Entry(frm_aux, show="*")
-        self.txt_passwd.grid(row=3, column=1, padx=50)
+        self.txt_passwd.grid(row=3, column=1, padx=20)
+        self.txt_passwd_conf = Entry(frm_aux, show="*")
+        self.txt_passwd_conf.grid(row=4, column=1, padx=20)
+        frm_aux.grid(row=0, column=0, pady=10, padx=20, rowspan=10)
+
+        sep_aux2 = Separator(self.frm_child_crud, orient=VERTICAL)
+        sep_aux2.grid(row=0, column=1, sticky=NS, rowspan=10)
+
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=1, column=5, padx=20)
+        btn_save.grid(row=1, column=2, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save ' + self.title.lower())
         btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=2, column=5, padx=20)
+        btn_cancel.grid(row=2, column=2, padx=20)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
-        frm_aux.grid(row=1, column=0, pady=20, padx=100, columnspan=5,rowspan=10)
 
     def retrieve_list(self):
         """
@@ -129,13 +138,15 @@ class FormChildAED:
         # Adding elements in the list
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('','end',text=elements[0], values=(elements[1], elements[2], elements[3]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2], elements[3]))
 
     def show_frm(self):
         """
         Show the List form when the User administration is called
         """
         self.retrieve_list()
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -217,7 +228,8 @@ class FormChildAED:
         """
         Saves information of the user inserted into the visual components and sends to the server
         """
-        if self.validate_fields():
+        validation_option = self.validate_fields()
+        if validation_option == 0:
             name_aux = self.txt_name.get()
             surname_aux = self.txt_surname.get()
             email_aux = self.txt_email.get()
@@ -250,10 +262,12 @@ class FormChildAED:
             self.clear_fields()
             self.frm_child_crud.grid_forget()
             self.show_frm()
+        elif validation_option == 1:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Password field',
+                                   message='The passwords you provided are not the same')
         else:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
-
 
     def click_cancel(self):
         """
@@ -268,10 +282,13 @@ class FormChildAED:
 
     def validate_fields(self):
         if len(self.txt_name.get()) != 0 and len(self.txt_surname.get()) != 0 and len(self.txt_email.get()) != 0 and \
-                len(self.txt_passwd.get()) != 0:
-            return True
+                len(self.txt_passwd.get()) != 0 and len(self.txt_passwd_conf.get()) != 0:
+            if self.txt_passwd.get() == self.txt_passwd_conf.get():
+                return 0
+            else:
+                return 1
         else:
-            return False
+            return 2
 
     def clear_fields(self):
         self.txt_name.delete(0, END)

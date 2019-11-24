@@ -57,13 +57,11 @@ class FormChildTemplate:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description'))
+        self.trv_available = Treeview(self.frm_child_list, height=7, columns='Name')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
-        self.trv_available.heading('#2', text='Description', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_available.column('#1', width=100, minwidth=100, stretch=NO)
-        self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
+        self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_template_summary)
         self.trv_available.grid(row=0, column=1, rowspan=2, sticky=W, pady=25)
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
@@ -182,7 +180,7 @@ class FormChildTemplate:
         # Adding elements into the list
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(wrap_text(elements[1], 305), ))
 
     def select_template_summary(self, event=None):
         """
@@ -198,8 +196,8 @@ class FormChildTemplate:
             self.directive = Message(action=40, information=[self.id_selected]) # ask for the template
             self.connection = self.directive.send_directive(self.connection)
             # Insert template's name and description
-            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(self.connection.message.information[0], 50)))
-            self.txt_summary.insert('end-1c', "Description:\n{}\n\nSections:\n".format(wrap_text(self.connection.message.information[1], 50)))
+            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(self.connection.message.information[0], 55)))
+            self.txt_summary.insert('end-1c', "Description:\n{}\n\nSections:\n".format(wrap_text(self.connection.message.information[1], 55)))
             self.directive = Message(action=77, information=[self.id_selected])  # ask for the sections of the selected template
             self.connection = self.directive.send_directive(self.connection)
             # Adding elements in the summary text box
@@ -259,7 +257,7 @@ class FormChildTemplate:
                                      message=self.connection.message.information[0])
             else:
                 self.txt_name.insert('1.0', self.connection.message.information[0])
-                self.txt_description.insert('1.0', self.connection.message.information[1])
+                self.txt_description.insert('1.0', wrap_text(self.connection.message.information[1], 65))
                 s_sections = self.connection.message.information[2]
                 self.directive = Message(action=32, information=[])
                 self.connection = self.directive.send_directive(self.connection)
@@ -304,13 +302,6 @@ class FormChildTemplate:
                 self.trv_available_sections.focus())['text']
             self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], '✓'))
             self.trv_available_sections.delete(self.trv_available_sections.selection())
-            '''elif decision == False:
-                values = self.trv_available_sections.item(
-                    self.trv_available_sections.focus())['values']
-                text = self.trv_available_sections.item(
-                    self.trv_available_sections.focus())['text']
-                self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], ''))
-                self.trv_available_sections.delete(self.trv_available_sections.selection())'''
 
     def click_remove(self):
         if self.trv_selected_sections.item(self.trv_selected_sections.selection())['text'] != '' and \

@@ -132,6 +132,8 @@ class FormChildExAdmin:
         Displays the home page of the 'Experiments'
         """
         self.retrieve_list()
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -191,7 +193,7 @@ class FormChildExAdmin:
                                              description=self.connection.message.information[1])
                 # Fill visual components with retrieved information
                 self.txt_name.insert('1.0', self.experiment.name)
-                self.txt_description.insert('1.0', self.experiment.description)
+                self.txt_description.insert('1.0', wrap_text(self.experiment.description, 85))
                 self.frm_child_list.grid_forget()
                 self.txt_name.focus_set()
                 self.title_form = 'Update'

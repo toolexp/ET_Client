@@ -1,6 +1,6 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
-from tkinter.ttk import Treeview, Combobox
+from tkinter.ttk import Treeview, Combobox, Separator
 from Modules.Config.Data import Message, wrap_text, CreateToolTip
 from Modules.Config.Visual import *
 
@@ -117,7 +117,6 @@ class FormChildSection:
         self.lbx_category = Listbox(self.frm_aux2, font=TEXT_FONT, height=8, width=40, selectmode='none')
         self.lbx_category.config(bg=defaultbg)
         self.lbx_category.grid(row=1, column=1, pady=10, padx=10, sticky=W)
-        #self.frm_aux2.grid(row=20, column=0, pady=20, padx=10, columnspan=5, rowspan=10)
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -133,6 +132,8 @@ class FormChildSection:
 
     def show_frm(self):
         self.retrieve_list()
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -175,7 +176,7 @@ class FormChildSection:
             else:
                 self.frm_child_list.grid_forget()
                 self.txt_name.insert('1.0', self.connection.message.information[0])
-                self.txt_description.insert('1.0', self.connection.message.information[1])
+                self.txt_description.insert('1.0', wrap_text(self.connection.message.information[1], 65))
                 self.cbx_data.set(self.connection.message.information[2])
                 if self.connection.message.information[2] == 'Classification':
                     id_class = self.connection.message.information[3]
