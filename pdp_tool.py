@@ -32,10 +32,10 @@ class WindowHome:
         self.role = 1
         self.window = Tk()
         self.window.protocol("WM_DELETE_WINDOW", self.click_log_out)
-        # w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
+        w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
         # self.window.geometry('%dx%d+0+0' % (1024, 778))
-        self.window.geometry('%dx%d+0+0' % (1500, 778))
-        # self.window.geometry('%dx%d+0+0' % (w, h))
+        #self.window.geometry('%dx%d+0+0' % (1500, 778))
+        self.window.geometry('%dx%d+0+0' % (w, h))
         self.window.resizable(0, 0)
         self.window.title('Tool for experimenting')
         self.window.withdraw()
