@@ -419,13 +419,20 @@ class FormParentDesigner:
             self.connection = self.directive.send_directive(self.connection)
 
     def validate_component_frm(self):
-        if self.lbx_sel_patterns.size() != 0:
+        if self.pattern_decision:
+            if self.lbx_sel_patterns.size() != 0:
+                if self.attached_file is not None:
+                    if len(self.txt_solution_desc.get('1.0', 'end-1c')) != 0:
+                        return 0
+                    return 3
+                return 2
+            return 1
+        else:
             if self.attached_file is not None:
                 if len(self.txt_solution_desc.get('1.0', 'end-1c')) != 0:
                     return 0
                 return 3
             return 2
-        return 1
 
     def click_attach_file(self):
         """
@@ -543,14 +550,17 @@ class FormParentDesigner:
             self.txt_hints.insert('1.0', wrap_text(INDICATIONS["PATTERNS"], 60))
             self.tab_control.tab(0, state='normal')
             self.tab_control.select(0)
+            self.pattern_decision = True
         elif self.current_designer.current_group == 'experimental' and self.scenario_components[index].id_patterns_egroup:
             self.txt_hints.insert('1.0', wrap_text(INDICATIONS["PATTERNS"], 60))
             self.tab_control.tab(0, state='normal')
             self.tab_control.select(0)
+            self.pattern_decision = True
         else:
             self.txt_hints.insert('1.0', wrap_text(INDICATIONS["NO PATTERNS"], 60))
             self.tab_control.tab(0, state='disabled')
             self.tab_control.select(1)
+            self.pattern_decision = False
         self.txt_hints['state'] = DISABLED
         self.lbl_problem_title['text'] = self.scenario_components[index].problem.name
         self.txt_problem_desc.insert('1.0', wrap_text(self.scenario_components[index].problem.description, 110))

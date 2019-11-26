@@ -82,29 +82,28 @@ class FormChildAED:
         frm_aux = Frame(self.frm_child_crud)
         lbl_name = Label(frm_aux, text='Name')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=20, sticky=W)
+        lbl_name.grid(row=0, column=0, pady=10, padx=20, sticky=W)
         lbl_surname = Label(frm_aux, text='Surname')
         lbl_surname.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_surname.grid(pady=10, padx=20, sticky=W)
+        lbl_surname.grid(row=1, column=0, pady=10, padx=20, sticky=W)
         lbl_email = Label(frm_aux, text='E-mail')
         lbl_email.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_email.grid(pady=10, padx=20, sticky=W)
-        lbl_passwd = Label(frm_aux, text='Password')
-        lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_passwd.grid(pady=10, padx=20, sticky=W)
-        lbl_passwd = Label(frm_aux, text='Confirm password')
-        lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_passwd.grid(pady=10, padx=20, sticky=W)
+        lbl_email.grid(row=2, column=0, pady=10, padx=20, sticky=W)
+        self.lbl_old_passwd = Label(frm_aux, text='Old password')
+        self.lbl_old_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        self.lbl_passwd = Label(frm_aux, text='New password')
+        self.lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        self.lbl_passwd_conf = Label(frm_aux, text='Confirm new password')
+        self.lbl_passwd_conf.config(fg=TEXT_COLOR, font=LABEL_FONT)
         self.txt_name = Entry(frm_aux)
         self.txt_name.grid(row=0, column=1, padx=20)
         self.txt_surname = Entry(frm_aux)
         self.txt_surname.grid(row=1, column=1, padx=20)
         self.txt_email = Entry(frm_aux)
         self.txt_email.grid(row=2, column=1, padx=20)
+        self.txt_old_passwd= Entry(frm_aux, show="*")
         self.txt_passwd = Entry(frm_aux, show="*")
-        self.txt_passwd.grid(row=3, column=1, padx=20)
         self.txt_passwd_conf = Entry(frm_aux, show="*")
-        self.txt_passwd_conf.grid(row=4, column=1, padx=20)
         frm_aux.grid(row=0, column=0, pady=10, padx=20, rowspan=10)
 
         sep_aux2 = Separator(self.frm_child_crud, orient=VERTICAL)
@@ -191,6 +190,10 @@ class FormChildAED:
         self.frm_child_list.grid_forget()
         self.txt_name.focus_set()
         self.frm_child_crud['text'] = 'New ' + self.title.lower()
+        self.lbl_passwd.grid(row=3, column=0, pady=10, padx=20, sticky=W)
+        self.lbl_passwd_conf.grid(row=4, column=0, pady=10, padx=20, sticky=W)
+        self.txt_passwd.grid(row=3, column=1, padx=20)
+        self.txt_passwd_conf.grid(row=4, column=1, padx=20)
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
@@ -216,10 +219,16 @@ class FormChildAED:
                 self.txt_name.insert(0, self.connection.message.information[0])
                 self.txt_surname.insert(0, self.connection.message.information[1])
                 self.txt_email.insert(0, self.connection.message.information[2])
-                self.txt_passwd.insert(0, self.connection.message.information[3])
+                self.current_password = self.connection.message.information[3]
                 self.frm_child_list.grid_forget()
                 self.txt_name.focus_set()
                 self.frm_child_crud['text'] = 'Update ' + self.title.lower()
+                self.lbl_old_passwd.grid(row=3, column=0, pady=10, padx=20, sticky=W)
+                self.lbl_passwd.grid(row=4, column=0, pady=10, padx=20, sticky=W)
+                self.lbl_passwd_conf.grid(row=5, column=0, pady=10, padx=20, sticky=W)
+                self.txt_old_passwd.grid(row=3, column=1, padx=20)
+                self.txt_passwd.grid(row=4, column=1, padx=20)
+                self.txt_passwd_conf.grid(row=5, column=1, padx=20)
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
@@ -265,6 +274,9 @@ class FormChildAED:
         elif validation_option == 1:
             messagebox.showwarning(parent=self.frm_child_crud, title='Password field',
                                    message='The passwords you provided are not the same')
+        elif validation_option == 3:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Old password field',
+                                   message='The old password is incorrect')
         else:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
@@ -283,10 +295,19 @@ class FormChildAED:
     def validate_fields(self):
         if len(self.txt_name.get()) != 0 and len(self.txt_surname.get()) != 0 and len(self.txt_email.get()) != 0 and \
                 len(self.txt_passwd.get()) != 0 and len(self.txt_passwd_conf.get()) != 0:
-            if self.txt_passwd.get() == self.txt_passwd_conf.get():
-                return 0
+            if self.decide:
+                if self.txt_passwd.get() == self.txt_passwd_conf.get():
+                    return 0
+                else:
+                    return 1
             else:
-                return 1
+                if self.current_password == hashlib.sha1(self.txt_old_passwd.get().encode()).hexdigest():
+                    if self.txt_passwd.get() == self.txt_passwd_conf.get():
+                        return 0
+                    else:
+                        return 1
+                else:
+                    return 3
         else:
             return 2
 
@@ -294,4 +315,12 @@ class FormChildAED:
         self.txt_name.delete(0, END)
         self.txt_surname.delete(0, END)
         self.txt_email.delete(0, END)
+        self.txt_old_passwd.delete(0, END)
         self.txt_passwd.delete(0, END)
+        self.txt_passwd_conf.delete(0, END)
+        self.lbl_old_passwd.grid_forget()
+        self.lbl_passwd.grid_forget()
+        self.lbl_passwd_conf.grid_forget()
+        self.txt_old_passwd.grid_forget()
+        self.txt_passwd.grid_forget()
+        self.txt_passwd_conf.grid_forget()

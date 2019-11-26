@@ -205,7 +205,7 @@ class FormChildSection:
             else:
                 if type_aux == 'Classification':
                     id_class = self.classifications[self.cbx_classification.current()]
-                    self.directive = Message(action=33,information=[self.id_selected, name_aux, description_aux,
+                    self.directive = Message(action=33, information=[self.id_selected, name_aux, description_aux,
                                                                     type_aux, id_class])
                 else:
                     self.directive = Message(action=33, information=[self.id_selected, name_aux, description_aux,

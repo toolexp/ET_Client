@@ -375,7 +375,7 @@ class FormChildProblem:
                         self.txt_patterns.insert('end-1c', "{}) {}\n".format(index + 1, wrap_text(item2.get_content_name(), 30)))
                         index += 1
                 else:
-                    self.txt_patterns.insert('end-1c', "The ideal solution does not have associated patterns")
+                    self.txt_patterns.insert('end-1c', wrap_text("The ideal solution does not have associated patterns", 30))
                 self.txt_patterns['state'] = DISABLED
                 self.frm_child_list.grid_forget()
                 self.txt_name_prob.focus_set()

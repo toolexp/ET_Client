@@ -1,7 +1,7 @@
 {
   "server": {
-    "address": "172.31.47.44",
-    "port": 60000
+    "address": "127.0.0.1",
+    "port": 65450
   },
   "visual_font": {
     "type": "Arial",
