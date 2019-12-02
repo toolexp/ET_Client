@@ -8,17 +8,17 @@ from Modules.Config.Visual import *
 
 class FormParentExConfig:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildExConfig(self.frm_parent, self.lbl_experiment_title, connection)
 
     def initialize_components(self):
         self.lbl_experiment_title = Label(self.frm_parent, text='Experiment configuration')
         self.lbl_experiment_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        self.lbl_experiment_title.grid(row=0, column=0, pady=30)
+        self.lbl_experiment_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -43,9 +43,9 @@ class FormChildExConfig:
 
     def initialize_components(self):
         """
-        Method that initialize the visual components for each form associated with the local administration
+        Method that initialize the visual components for each form associated with the configuration of experiments
         """
-        # Resources for the Forms
+        # Button icons used in the forms
         self.new_icon = PhotoImage(file=r"./Resources/create.png")
         self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
         self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
@@ -59,14 +59,14 @@ class FormChildExConfig:
         self.view_icon = PhotoImage(file=r"./Resources/view.png")
         defaultbg = self.frm_child_general.cget('bg')
 
-        # Components for experiments list FRM
+        # Components for Experiments List form (list of experiments)
         lbl_sep1 = Label(self.frm_child_exp_list)
         lbl_sep1.grid(row=1, column=0, padx=25, pady=25)
         lbl_select_exp = Label(self.frm_child_exp_list, text=wrap_text('Here is a list of configurable experiments, '
                                                                        'select one to configure', 80), anchor=W)
         lbl_select_exp.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_select_exp.grid(row=0, column=1, pady=25, sticky=W)
-        self.trv_available_exp = Treeview(self.frm_child_exp_list, height=7, columns=('Name', 'Description'))
+        self.trv_available_exp = Treeview(self.frm_child_exp_list, height=15, columns=('Name', 'Description'))
         self.trv_available_exp.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_exp.heading('#1', text='Name', anchor=CENTER)
         self.trv_available_exp.heading('#2', text='Description', anchor=CENTER)
@@ -82,7 +82,7 @@ class FormChildExConfig:
         btn_select.grid(row=1, column=4, pady=25, padx=30, sticky=W)
         btn_select_ttp = CreateToolTip(btn_select, 'Access experiment')
 
-        # Components for List FRM
+        # Components for Experimental scenarios List form (list of experimental scenarios)
         lbl_sep3 = Label(self.frm_child_list)
         lbl_sep3.grid(row=1, column=0, padx=25, pady=25)
         lbl_scenario_desc = Label(self.frm_child_list, text=wrap_text('In this section you can configure the '
@@ -93,7 +93,7 @@ class FormChildExConfig:
                                                                       'description', 80), anchor=W)
         lbl_scenario_desc.config(font=SUBTITLE2_FONT, fg=TEXT_COLOR)
         lbl_scenario_desc.grid(row=0, column=1, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', 'Available?',
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Description', 'Available?',
                                                                               'Locked?'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -138,7 +138,7 @@ class FormChildExConfig:
         frm_aux4.grid(row=1, column=4, pady=25, padx=25, sticky=NW)
         frm_aux5.grid(row=2, column=4, pady=25, padx=25, sticky=SW)
 
-        # Components for General info FRM
+        # Components for General info form, where each experimental scenario may be configured
         lbl_name = Label(self.frm_child_general, text='Name')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
@@ -176,7 +176,7 @@ class FormChildExConfig:
         lbl_general_components.grid(row=12, column=0, pady=10, padx=50, sticky=W)
         lbl_sep5 = Label(self.frm_child_general)
         lbl_sep5.grid(row=12, column=1, padx=50, pady=10)
-        self.trv_scenario_components = Treeview(self.frm_child_general, height=3, columns=('Problem',
+        self.trv_scenario_components = Treeview(self.frm_child_general, height=6, columns=('Problem',
                                                                                            'Control group patterns?',
                                                                                            'Expm. group patterns?'))
         self.trv_scenario_components.heading('#0', text='ID', anchor=CENTER)
@@ -206,7 +206,7 @@ class FormChildExConfig:
         self.btn_back_general = Button(self.frm_child_general, image=self.back_icon, command=self.click_back_general)
         btn_back_general_ttp = CreateToolTip(self.btn_back_general, 'Go back')
 
-        # Components for configuring a problem of the scenario component FRM
+        # Components Problem configuration Top Level window (scenario components configuration)
         frm_aux2 = Frame(self.tlevel_problem)
         lbl_problem = Label(frm_aux2, text='Design Problem')
         lbl_problem.config(fg=TEXT_COLOR, font=LABEL_FONT)
@@ -221,7 +221,7 @@ class FormChildExConfig:
         self.txt_problem_desc = Text(frm_aux2, height=6, width=80)
         self.txt_problem_desc.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_problem_desc.grid(row=1, column=1, padx=50, pady=10, rowspan=6)
-
+        # Buttons of the Problem configuration Top Level window
         self.btn_save_scomp = Button(frm_aux2, image=self.save_icon, command=self.click_save_sc_component)
         btn_save_scomp_ttp = CreateToolTip(self.btn_save_scomp, 'Save')
         self.btn_cancel_scomp = Button(frm_aux2, image=self.cancel_icon, command=self.click_cancel_sc_component)
@@ -229,7 +229,6 @@ class FormChildExConfig:
         self.btn_back_scomp = Button(frm_aux2, image=self.back_icon, command=self.click_cancel_sc_component)
         btn_back_scomp_ttp = CreateToolTip(self.btn_back_scomp, 'Go back')
         frm_aux2.grid(row=0, column=0, pady=20, padx=10, columnspan=7, rowspan=5)
-
         # Components for adding patterns to the designers groups
         frm_aux3 = LabelFrame(self.tlevel_problem, text='Select available patterns for control group:')
         frm_aux3.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
@@ -237,7 +236,7 @@ class FormChildExConfig:
         frm_aux6.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_sep7 = Label(frm_aux3)
         lbl_sep7.grid(row=0, column=0, padx=10, pady=10)
-        self.trv_available_patters_cgroup = Treeview(frm_aux3, height=4, columns='Patterns')
+        self.trv_available_patters_cgroup = Treeview(frm_aux3, height=10, columns='Patterns')
         self.trv_available_patters_cgroup.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_patters_cgroup.heading('#1', text='Patterns', anchor=CENTER)
         self.trv_available_patters_cgroup.column('#0', width=0, minwidth=20, stretch=NO)
@@ -251,7 +250,7 @@ class FormChildExConfig:
         lbl_sep8.grid(row=0, column=3, padx=10, pady=10)
         lbl_sep9 = Label(frm_aux3)
         lbl_sep9.grid(row=0, column=5, padx=10, pady=10)
-        self.trv_selected_patterns_cgroup = Treeview(frm_aux3, height=4, columns=('Available patterns',))
+        self.trv_selected_patterns_cgroup = Treeview(frm_aux3, height=10, columns=('Available patterns',))
         self.trv_selected_patterns_cgroup.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_patterns_cgroup.heading('#1', text='Available patterns', anchor=CENTER)
         self.trv_selected_patterns_cgroup.column('#0', width=0, minwidth=20, stretch=NO)
@@ -263,7 +262,6 @@ class FormChildExConfig:
         self.trv_selected_patterns_cgroup.configure(yscrollcommand=vsb_trv_selcg.set)
         lbl_sep10 = Label(frm_aux3)
         lbl_sep10.grid(row=0, column=8, padx=10, pady=10)
-
         self.btn_add_cg = Button(frm_aux3, image=self.add_icon, command=self.click_add_cgroup)
         self.btn_add_cg.grid(row=3, column=4)
         btn_add_cg_ttp = CreateToolTip(self.btn_add_cg, 'Add pattern')
@@ -271,14 +269,12 @@ class FormChildExConfig:
         self.btn_remove_cg.grid(row=4, column=4)
         btn_remove_cg_ttp = CreateToolTip(self.btn_remove_cg, 'Remove pattern')
         frm_aux3.grid(row=5, column=0, pady=20, padx=10, rowspan=10)
-
         self.btn_copy_patterns = Button(self.tlevel_problem, image=self.copy_icon, command=self.click_copy_patterns)
         self.btn_copy_patterns.grid(row=10, column=1, padx=5)
         btn_copy_patterns_ttp = CreateToolTip(self.btn_copy_patterns, 'Copy patterns')
-
         lbl_sep11 = Label(frm_aux6)
         lbl_sep11.grid(row=0, column=0, padx=10, pady=10)
-        self.trv_available_patters_egroup = Treeview(frm_aux6, height=4, columns='Patterns')
+        self.trv_available_patters_egroup = Treeview(frm_aux6, height=10, columns='Patterns')
         self.trv_available_patters_egroup.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_patters_egroup.heading('#1', text='Patterns', anchor=CENTER)
         self.trv_available_patters_egroup.column('#0', width=0, minwidth=20, stretch=NO)
@@ -292,7 +288,7 @@ class FormChildExConfig:
         lbl_sep12.grid(row=0, column=3, padx=10, pady=10)
         lbl_sep13 = Label(frm_aux6)
         lbl_sep13.grid(row=0, column=5, padx=10, pady=10)
-        self.trv_selected_patterns_egroup = Treeview(frm_aux6, height=4, columns=('Available patterns',))
+        self.trv_selected_patterns_egroup = Treeview(frm_aux6, height=10, columns=('Available patterns',))
         self.trv_selected_patterns_egroup.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_patterns_egroup.heading('#1', text='Available patterns', anchor=CENTER)
         self.trv_selected_patterns_egroup.column('#0', width=0, minwidth=20, stretch=NO)
@@ -314,7 +310,7 @@ class FormChildExConfig:
 
     def initialize_variables(self):
         """
-        Method that set the local variables to its initial state (empty) and retrieve info from the server
+        Method that set the local variables to its initial state (empty) and retrieve info from the database
         """
         # Retrieve available problems from the server
         self.problems = []
@@ -327,7 +323,6 @@ class FormChildExConfig:
 
         # Retrieve available patterns from the server
         self.patterns = Pattern.get_available_patterns(self.connection)
-
         # Retrieve available designers groups from the server
         self.designers_group = []
         self.directive = Message(action=27)
@@ -335,7 +330,6 @@ class FormChildExConfig:
         for item in self.connection.message.information:
             elements = item.split('¥')
             self.designers_group.append(DesignersGroup(id=int(elements[0]), name=elements[1], description=elements[2]))
-
         # Other important variables for internal use
         self.directive = Message()
         self.current_sc_comp = None
@@ -343,6 +337,10 @@ class FormChildExConfig:
         self.experimental_scenario = None
 
     def select_experiment(self, event=None):
+        """
+        This function is activated when the 'Click Experiments TreeView' event ocurrs, it indicates than an experiments
+        has been selected
+        """
         if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
             self.id_selected_exp = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
             # Retrieve selected experiment and its 'Experimental scenarios'
@@ -354,7 +352,10 @@ class FormChildExConfig:
             self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_save_experiment(self):
-        # Save changes of availability in experimental scenarios
+        """
+        Function activated when 'Save experiment' button is pressed, it saves availability of each exerimental scenario
+        configured
+        """
         index = 0
         for item in self.trv_available.get_children():
             aux_av = True if self.trv_available.item(item)['values'][2] == '✓' else False
@@ -363,9 +364,14 @@ class FormChildExConfig:
                                                                  int(self.trv_available.item(item)['text']), aux_av])
                 self.connection = self.directive.send_directive(self.connection)
             index += 1
+        # Return to Experiments list home form
         self.click_cancel_experiment()
 
     def click_cancel_experiment(self):
+        """
+        Function activated when 'Cancel experiment' button is pressed, it hides the Experimental scenarios List form
+        without saving any changes that may be done. It returns to Experiments list home form
+        """
         self.frm_child_list.grid_forget()
         self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
@@ -401,7 +407,7 @@ class FormChildExConfig:
 
     def show_frm(self):
         """
-        Displays the home page of the 'Experiments configuration'
+        Displays the home list of the 'Experiments' form
         """
         self.retrieve_experiments()
         if len(self.trv_available_exp.get_children()) != 0:
@@ -410,7 +416,7 @@ class FormChildExConfig:
 
     def hide_frm(self):
         """
-        Hides all forms that ar curently active
+        Hides all forms that are currently active
         """
         self.clear_fields()
         self.hide_buttons()
@@ -419,6 +425,10 @@ class FormChildExConfig:
         self.frm_child_general.grid_forget()
 
     def click_new(self):
+        """
+        Function activated when 'New' button is pressed, allows user to create a new experimetal scenario. Shows visual
+        components for the creation of an experiment
+        """
         self.decide = True
         self.initialize_variables()
         self.show_buttons_create_update()
@@ -431,7 +441,9 @@ class FormChildExConfig:
 
     def click_view(self):
         """
-        Function activated when 'View' experimental scenario button is pressed
+        Function activated when 'View' experimental scenario button is pressed. It allows the user to view information
+        of the selected experimental scenario, but can not make any changes. It also loads special buttons for this
+        function (view button)
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.initialize_variables()  # Retrieve information to show in visual components
@@ -474,7 +486,6 @@ class FormChildExConfig:
                 else:
                     self.trv_scenario_components.insert('', 'end', text=item.id, values=(item.problem.name, '✓', '✓'))
             self.frm_child_list.grid_forget()
-            #self.txt_name.focus_set()
             self.title_form = 'View'
             self.frm_child_general['text'] = self.title_form + ' experimental scenario'
             self.btn_view_comp.grid(row=12, column=5, padx=10)
@@ -496,10 +507,12 @@ class FormChildExConfig:
 
     def click_update(self):
         """
-        Function activated when 'Update' button is pressed
+        Function activated when 'Update' button is pressed, allows user to modify an existing experimental scenario.
+        Shows visual components for the modification of an experimental scenario, fill visual components with current
+        information
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            self.decide = False # Important variable when saving, it indicates the 'Experimental scenario' is being modified
+            self.decide = False  # Important variable when saving, it indicates the 'Experimental scenario' is being modified
             self.initialize_variables()  # Retrieve information to show in visual components
             self.show_buttons_create_update()
             self.load_designers()
@@ -548,7 +561,7 @@ class FormChildExConfig:
 
     def click_delete(self):
         """
-        Function activated when 'Delete' button is pressed
+        Function activated when 'Delete' button is pressed, it removes an experimental scenario from the database
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             # MessageBox asking confirmation
@@ -579,6 +592,9 @@ class FormChildExConfig:
         self.trv_selected_patterns_egroup.configure(selectmode='browse')
 
     def hide_buttons(self):
+        """
+        Hides all buttons in forms
+        """
         self.btn_new_comp.grid_forget()
         self.btn_delete_comp.grid_forget()
         self.btn_view_comp.grid_forget()
@@ -622,6 +638,9 @@ class FormChildExConfig:
             self.tlevel_problem.title(self.title_form + ' component')
             self.tlevel_problem.deiconify()
             self.tlevel_problem.grab_set()
+        else:
+            messagebox.showwarning(parent=self.frm_child_general, title='No selection',
+                                   message='You must select an item')
 
     def click_save_general(self):
         validation_option = self.validate_general_frm() # Validate any problem with info inserted into visual components
@@ -1022,6 +1041,10 @@ class FormChildExConfig:
                 self.btn_delete['state'] = DISABLED
 
     def switch_availability(self, event):
+        """
+        This function is activated when the 'Double click Experimental scenarios TreeView' event ocurrs, it switches the
+        availability if an experimental scenario
+        """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             values = self.trv_available.item(
                 self.trv_available.focus())['values']

@@ -10,17 +10,17 @@ from Modules.Config.Visual import *
 
 class FormParentProblem:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildProblem(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_experimenter_title = Label(self.frm_parent, text='Problems')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experimenter_title.grid(row=0, column=0, pady=30)
+        lbl_experimenter_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -66,7 +66,7 @@ class FormChildProblem:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns='Name')
+        self.trv_available = Treeview(self.frm_child_list, height=20, columns='Name')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
@@ -104,7 +104,6 @@ class FormChildProblem:
         self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_list)
         lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
-
         self.canvas_summary = Canvas(self.tlevel_diagram_summary, width=500, height=500)
         self.canvas_summary.config(background='white', borderwidth=1)
         self.canvas_summary.grid()
@@ -119,12 +118,12 @@ class FormChildProblem:
         lbl_description = Label(frm_aux1, text='Description')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=20, sticky=NW)
-        self.txt_name_prob = Text(frm_aux1, height=1, width=60)
+        self.txt_name_prob = Text(frm_aux1, height=1, width=50)
         self.txt_name_prob.config(font=TEXT_FONT)
-        self.txt_name_prob.grid(row=0, column=1, pady=10, padx=20)
-        self.txt_description_prob = Text(frm_aux1, height=5, width=60)
+        self.txt_name_prob.grid(row=0, column=1, pady=10, padx=20, sticky=W)
+        self.txt_description_prob = Text(frm_aux1, height=5, width=70)
         self.txt_description_prob.config(font=TEXT_FONT)
-        self.txt_description_prob.grid(row=1, column=1, pady=10, padx=20)
+        self.txt_description_prob.grid(row=1, column=1, pady=10, padx=20, sticky=W)
         lbl_annotations = Label(frm_aux2, text='Notes\n(optional)')
         lbl_annotations.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_annotations.grid(pady=10, padx=20, sticky=NW)
@@ -160,20 +159,21 @@ class FormChildProblem:
         lbl_sep4.grid(row=0, column=11, padx=10, pady=10)
         btn_patterns = Button(frm_aux2, text='Patterns of the solution >>', command=self.click_associate_patterns)
         btn_patterns.grid(row=1, column=9, padx=20, pady=10, sticky=W, columnspan=3)
-
+        frm_aux1.grid(row=0, column=0, rowspan=10)
+        frm_aux2.grid(row=10, column=0, padx=10, pady=10)
+        sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=1, sticky=NS, rowspan=11)
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=1, column=5, padx=35)
+        btn_save.grid(row=1, column=2, padx=30)
         btn_save_ttp = CreateToolTip(btn_save, 'Save')
         btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=2, column=5, padx=35)
+        btn_cancel.grid(row=2, column=2, padx=30)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
-        frm_aux1.grid(row=1, column=0, pady=10, padx=10, columnspan=5, rowspan=5)
-        frm_aux2.grid(row=8, column=0, pady=10, padx=10, columnspan=5, rowspan=10)
 
         # Components for patterns selection
         lbl_sep3 = Label(self.tlevel_patterns_solution)
         lbl_sep3.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available_patterns = Treeview(self.tlevel_patterns_solution, height=5, columns=('Available patterns',))
+        self.trv_available_patterns = Treeview(self.tlevel_patterns_solution, height=10, columns=('Available patterns',))
         self.trv_available_patterns.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_patterns.heading('#1', text='Available patterns', anchor=CENTER)
         self.trv_available_patterns.column('#0', width=0, minwidth=20, stretch=NO)
@@ -188,7 +188,7 @@ class FormChildProblem:
         lbl_sep4.grid(row=0, column=3, padx=25, pady=25)
         lbl_sep5 = Label(self.tlevel_patterns_solution)
         lbl_sep5.grid(row=0, column=5, padx=25, pady=25)
-        self.trv_selected_patterns = Treeview(self.tlevel_patterns_solution, height=5, columns=('Selected patterns',))
+        self.trv_selected_patterns = Treeview(self.tlevel_patterns_solution, height=10, columns=('Selected patterns',))
         self.trv_selected_patterns.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_patterns.heading('#1', text='Selected patterns', anchor=CENTER)
         self.trv_selected_patterns.column('#0', width=0, minwidth=20, stretch=NO)

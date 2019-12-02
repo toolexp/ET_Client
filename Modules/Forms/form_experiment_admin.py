@@ -1,23 +1,23 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
-from tkinter.ttk import Treeview
+from tkinter.ttk import Treeview, Separator
 from Modules.Config.Data import Message, CreateToolTip, Experiment, wrap_text
 from Modules.Config.Visual import *
 
 
 class FormParentExAdmin:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildExAdmin(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_experiment_title = Label(self.frm_parent, text='Experiments')
         lbl_experiment_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experiment_title.grid(row=0, column=0, pady=30)
+        lbl_experiment_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -37,9 +37,9 @@ class FormChildExAdmin:
 
     def initialize_components(self):
         """
-        Method that initialize the visual components for each form associated with the local administration
+        Method that initialize the visual components for each form associated with the administration of experiments
         """
-        # Resources for the Forms
+        # Button icons used in the forms
         self.new_icon = PhotoImage(file=r"./Resources/create.png")
         self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
         self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
@@ -47,10 +47,10 @@ class FormChildExAdmin:
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
         self.finish_icon = PhotoImage(file=r"./Resources/finish.png")
 
-        # Components for List FRM
+        # Components for List form (list of experiments)
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', 'Configured?',
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Description', 'Configured?',
                                                                               'Finished?'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
@@ -83,7 +83,7 @@ class FormChildExAdmin:
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
         frm_aux5.grid(row=1, column=4, pady=25, padx=25, sticky=SW)
 
-        # Components for General info FRM
+        # Components for General info form, where each experiment may be configured
         lbl_name = Label(self.frm_child_general, text='Name')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(pady=10, padx=50, sticky=W)
@@ -96,11 +96,13 @@ class FormChildExAdmin:
         self.txt_description = Text(self.frm_child_general, height=8, width=80)
         self.txt_description.config(font=TEXT_FONT)
         self.txt_description.grid(row=1, column=1, padx=50, pady=10, rowspan=8)
+        sep_aux1 = Separator(self.frm_child_general, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=2, sticky=NS, rowspan=9)
         btn_save = Button(self.frm_child_general, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=2, padx=20)
+        btn_save.grid(row=0, column=3, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save experiment')
         btn_cancel = Button(self.frm_child_general, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=2, padx=20)
+        btn_cancel.grid(row=1, column=3, padx=20)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
     def initialize_variables(self):
@@ -112,7 +114,7 @@ class FormChildExAdmin:
 
     def retrieve_list(self):
         """
-        This function shows the existing 'Experiments' in the home TreeView
+        Function that shows the existing 'Experiments' in the home list (TreeView)
         """
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
@@ -129,7 +131,7 @@ class FormChildExAdmin:
 
     def show_frm(self):
         """
-        Displays the home page of the 'Experiments'
+        Displays the home list of the 'Experiments' form
         """
         self.retrieve_list()
         if len(self.trv_available.get_children()) != 0:
@@ -138,7 +140,7 @@ class FormChildExAdmin:
 
     def hide_frm(self):
         """
-        Hides all forms that ar curently active
+        Hides all forms that are currently active
         """
         self.clear_fields()
         self.frm_child_list.grid_forget()
@@ -146,7 +148,7 @@ class FormChildExAdmin:
 
     def click_delete(self):
         """
-        Function activated when 'Delete' button is pressed
+        Function activated when 'Delete' button is pressed, it removes an experiment from the database
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             # MessageBox asking confirmation
@@ -165,6 +167,10 @@ class FormChildExAdmin:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_new(self):
+        """
+        Function activated when 'New' button is pressed, allows user to create a new experiment. Shows visual components
+        for the creation of an experiment
+        """
         self.decide = True
         self.initialize_variables()
         self.experiment = Experiment()
@@ -176,7 +182,8 @@ class FormChildExAdmin:
 
     def click_update(self):
         """
-        Function activated when 'Update' button is pressed
+        Function activated when 'Update' button is pressed, allows user to modify an existing experiment. Shows visual
+        components for the modification of an experiment, fill visual components with current information
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
@@ -203,7 +210,11 @@ class FormChildExAdmin:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_save(self):
-        if len(self.txt_name.get('1.0','end-1c')) != 0 and len(self.txt_description.get('1.0','end-1c')) != 0:
+        """
+        Function that saves all inserted information of a new experiment (if it is being created) or saves changes made
+        to a selected experiment (updated)
+        """
+        if len(self.txt_name.get('1.0', 'end-1c')) != 0 and len(self.txt_description.get('1.0', 'end-1c')) != 0:
             self.experiment.name = self.txt_name.get('1.0', 'end-1c')
             self.experiment.description = self.txt_description.get('1.0', 'end-1c')
             if self.decide:
@@ -223,8 +234,8 @@ class FormChildExAdmin:
 
     def click_cancel(self):
         """
-        Function activated when 'Cancel' button is pressed in General form, it goes back to the 'Experimental scenarios'
-         home page
+        Function activated when 'Cancel' button is pressed in General form, it goes back to the 'Experiments' list home
+        form (hides all active forms an show the list form)
         """
         decision = messagebox.askyesno(parent=self.frm_child_general, title='Cancel',
                                        message='Are you sure you want to cancel?')
@@ -234,13 +245,16 @@ class FormChildExAdmin:
             self.show_frm()
 
     def clear_fields(self):
+        """
+        Function that clear visual components tat may be fulfilled by the user when adding/editing information
+        """
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
 
     def click_finish_experiment(self):
         """
-        Finish an experiment and generates a report for it. After finishing it, its structure wont be able to be modified,
-        neither its information
+        Function activated when 'Finish experiment' button is pressed. Finishes an experiment and generates a report
+        for it. After finishing it, its structure wont be able to be modified, neither its information
         """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             values = self.trv_available.item(
@@ -253,7 +267,9 @@ class FormChildExAdmin:
                     self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
                     self.directive = Message(action=93, information=[self.id_selected, 'finish'])
                     self.connection = self.directive.send_directive(self.connection)
+                    ################
                     # Here generate the report
+                    ################
                     self.retrieve_list()
             else:
                 messagebox.showwarning(parent=self.frm_child_list, title='Experiment finished',

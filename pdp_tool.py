@@ -32,10 +32,12 @@ class WindowHome:
         self.role = 1
         self.window = Tk()
         self.window.protocol("WM_DELETE_WINDOW", self.click_log_out)
-        w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
+        #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
         # self.window.geometry('%dx%d+0+0' % (1024, 778))
         #self.window.geometry('%dx%d+0+0' % (1500, 778))
-        self.window.geometry('%dx%d+0+0' % (w, h))
+        #self.window.geometry('%dx%d+0+0' % (w, h))
+        # Place window on top left corner
+        self.window.geometry('+%d+%d' % (0, 0))
         self.window.resizable(0, 0)
         self.window.title('Tool for experimenting')
         self.window.withdraw()
@@ -105,21 +107,24 @@ class WindowHome:
                     if self.current_designer.password == hashlib.sha1(self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
-                        messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
+                        messagebox.showerror(parent=self.tlevel_login, title='Password',
+                                             message='The password you provided is wrong, retry')
                 elif self.role == 1:
                     if self.connection.message.information[4] == hashlib.sha1(
                             self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
-                        messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
+                        messagebox.showerror(parent=self.tlevel_login, title='Password',
+                                             message='The password you provided is wrong, retry')
                 elif self.role == 3:
                     if self.connection.message.information[4] == hashlib.sha1(
                             self.txt_passwd.get().encode()).hexdigest():
                         self.access_system()
                     else:
-                        messagebox.showerror(title='Password', message='The password you provided is wrong, retry')
+                        messagebox.showerror(parent=self.tlevel_login, title='Password',
+                                             message='The password you provided is wrong, retry')
         else:
-            messagebox.showwarning(title='Missing information', message='Fill all the fields')
+            messagebox.showwarning(parent=self.tlevel_login, title='Missing information', message='Fill all the fields')
 
     def access_system(self):
         # Components (tool bar) will be shown depending on the role of the user
@@ -391,7 +396,7 @@ class WindowHome:
                     os.mkdir('./Resources/temp/')
                     self.window.destroy()
                 else:
-                    messagebox.showerror(title='Can not exit',
+                    messagebox.showerror(parent=self.window, title='Can not exit',
                                          message='You must finish current experimental scenario to exit')
             except:
                 msg = Message(comment='close_connection')

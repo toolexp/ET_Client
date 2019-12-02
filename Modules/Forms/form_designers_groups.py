@@ -7,17 +7,17 @@ from Modules.Config.Visual import *
 
 class FormParentDG:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildDG(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_experimenter_title = Label(self.frm_parent, text='Designers groups')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experimenter_title.grid(row=0, column=0, pady=30)
+        lbl_experimenter_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -52,7 +52,7 @@ class FormChildDG:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', '# members'))
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Description', '# members'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
@@ -96,7 +96,7 @@ class FormChildDG:
         lbl_selected_d = Label(frm_aux2, text='Selected designers')
         lbl_selected_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_d.grid(row=0, column=5, pady=10, sticky=W)
-        self.trv_available_designers = Treeview(frm_aux2, height=5, columns=('Name', 'Surname'))
+        self.trv_available_designers = Treeview(frm_aux2, height=10, columns=('Name', 'Surname'))
         self.trv_available_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_designers.heading('#1', text='Name', anchor=CENTER)
         self.trv_available_designers.heading('#2', text='Surname', anchor=CENTER)
@@ -112,7 +112,7 @@ class FormChildDG:
         lbl_sep2.grid(row=1, column=2, padx=10, pady=10)
         lbl_sep3 = Label(frm_aux2)
         lbl_sep3.grid(row=1, column=4, padx=10, pady=10)
-        self.trv_selected_designers = Treeview(frm_aux2, height=5, columns=('Name', 'Surname'))
+        self.trv_selected_designers = Treeview(frm_aux2, height=10, columns=('Name', 'Surname'))
         self.trv_selected_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_designers.heading('#1', text='Name', anchor=CENTER)
         self.trv_selected_designers.heading('#2', text='Surname', anchor=CENTER)

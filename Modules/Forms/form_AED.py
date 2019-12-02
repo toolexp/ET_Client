@@ -8,7 +8,7 @@ import hashlib
 
 class FormParentAED:
     def __init__(self, window, title, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.title = title
         self.initialize_components()
         self.frm_child = FormChildAED(self.frm_parent, title, connection)
@@ -16,10 +16,10 @@ class FormParentAED:
     def initialize_components(self):
         lbl_experimenter_title = Label(self.frm_parent, text=self.title + 's')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experimenter_title.grid(row=0, column=0, pady=30)
+        lbl_experimenter_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10, sticky=NSEW)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -53,7 +53,7 @@ class FormChildAED:
         # Components for List Form
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Surname', 'E-mail'))
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Surname', 'E-mail'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Surname', anchor=CENTER)

@@ -7,17 +7,17 @@ from Modules.Config.Visual import *
 
 class FormParentClassification:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildClassification(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_title = Label(self.frm_parent, text='Classifications')
         lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_title.grid(row=0, column=0, pady=30)
+        lbl_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -50,7 +50,7 @@ class FormChildClassification:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', '# categories'))
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', '# categories'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='# categories', anchor=CENTER)
@@ -74,28 +74,33 @@ class FormChildClassification:
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
 
         # Components CRUD
-        self.frm_class = LabelFrame(self.frm_child_crud, text='New classification')
+        self.frm_class = LabelFrame(self.frm_child_crud)
         self.frm_class.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_class = Label(self.frm_child_crud, text='Name')
         lbl_class.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_class.grid(pady=10, padx=20, sticky=W)
-        lbl_desc_categories = Label(self.frm_child_crud, text='Enter categories separated by a comma ","')
+        lbl_class.grid(row=0, column=0, pady=10, padx=20, sticky=W)
+        lbl_desc_categories = Label(self.frm_child_crud, text='Enter categories separated by an Enter (\\n)')
         lbl_desc_categories.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_desc_categories.grid(pady=10, padx=20, columnspan=2, sticky=W)
+        lbl_desc_categories.grid(row=1, column=0, pady=10, padx=20, columnspan=4, sticky=W)
         lbl_categories = Label(self.frm_child_crud, text='Categories')
         lbl_categories.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_categories.grid(pady=10, padx=20, sticky=NW)
+        lbl_categories.grid(row=2, column=0, pady=10, padx=20, sticky=NW)
+        lbl_sep2 = Label(self.frm_child_crud)
+        lbl_sep2.grid(row=2, column=1, padx=20, pady=10)
         self.txt_name_class = Text(self.frm_child_crud, height=1, width=50, font=TEXT_FONT)
-        self.txt_name_class.grid(row=0, column=1, padx=20, pady=10, sticky=W)
-        self.txt_categories = Text(self.frm_child_crud, height=7, width=50, font=TEXT_FONT)
-        self.txt_categories.grid(row=2, column=1, padx=20, pady=10, sticky=W)
+        self.txt_name_class.grid(row=0, column=2, columnspan=2, pady=10, sticky=W)
+        self.txt_categories = Text(self.frm_child_crud, height=10, width=50, font=TEXT_FONT)
+        self.txt_categories.grid(row=2, column=2, pady=10, sticky=W)
+        vsb_txt_cat = Scrollbar(self.frm_child_crud, orient="vertical", command=self.txt_categories.yview)
+        vsb_txt_cat.grid(row=2, column=3, pady=10, sticky=NS)
+        self.txt_categories.configure(yscrollcommand=vsb_txt_cat.set)
         sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
-        sep_aux1.grid(row=0, column=3, sticky=NS, rowspan=3)
+        sep_aux1.grid(row=0, column=4, sticky=NS, rowspan=3, padx=20)
         btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=4, padx=20)
+        btn_save.grid(row=0, column=5, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save classification')
         btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=4, padx=20)
+        btn_cancel.grid(row=1, column=5, padx=20)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
     def retrieve_list(self):
@@ -140,6 +145,7 @@ class FormChildClassification:
         self.decide = True
         self.frm_child_list.grid_forget()
         self.frm_child_crud['text'] = 'New Classification'
+        self.txt_name_class.focus_set()
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
@@ -157,26 +163,29 @@ class FormChildClassification:
                 length_string = 0
                 for item in self.connection.message.information[1]:
                     elements = item.split('¥')
-                    self.txt_categories.insert('end-1c', elements[1] + ',')
+                    self.txt_categories.insert('end-1c', elements[1] + '\n')
                     length_string += len(elements[1]) + 1
                 self.txt_categories.delete('end-2c', 'end')
                 self.frm_child_crud['text'] = 'Update classification'
                 self.frm_child_list.grid_forget()
+                self.txt_name_class.focus_set()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_save(self):
-        if self.validate_fields():
+        validation_opt = self.validate_fields()
+        if validation_opt == 0:
             name_aux = self.txt_name_class.get('1.0', 'end-1c')
             if self.decide:
                 self.directive = Message(action=66, information=[name_aux])
                 self.connection = self.directive.send_directive(self.connection)
                 id_classification = self.connection.message.information[0]
-                categories_aux = self.txt_categories.get('1.0', 'end-1c').split(',')
+                categories_aux = self.txt_categories.get('1.0', 'end-1c').split('\n')
                 for item in categories_aux:
-                    self.directive = Message(action=71, information=[item, id_classification])
-                    self.connection = self.directive.send_directive(self.connection)
+                    if item:    # None blank space will be saved
+                        self.directive = Message(action=71, information=[item, id_classification])
+                        self.connection = self.directive.send_directive(self.connection)
             else:
                 # Update classification name
                 self.directive = Message(action=68, information=[self.id_selected, name_aux])
@@ -185,16 +194,20 @@ class FormChildClassification:
                 self.directive = Message(action=74, information=[self.id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 # Create categories for the current classification
-                categories_aux = self.txt_categories.get('1.0', 'end-1c').split(',')
+                categories_aux = self.txt_categories.get('1.0', 'end-1c').split('\n')
                 for item in categories_aux:
-                    self.directive = Message(action=71, information=[item, self.id_selected])
-                    self.connection = self.directive.send_directive(self.connection)
+                    if item:
+                        self.directive = Message(action=71, information=[item, self.id_selected])
+                        self.connection = self.directive.send_directive(self.connection)
             self.clear_fields()
             self.frm_child_crud.grid_forget()
             self.show_frm()
-        else:
+        elif validation_opt == 1:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='There are mandatory fields that need to be filled!')
+        else:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Category problem',
+                                   message='A category can not be empty!')
 
     def click_cancel(self):
         decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
@@ -205,10 +218,15 @@ class FormChildClassification:
             self.show_frm()
 
     def validate_fields(self):
-        if len(self.txt_name_class.get('1.0','end-1c')) != 0 and len(self.txt_categories.get('1.0','end-1c')) != 0:
-            return True
+        if len(self.txt_name_class.get('1.0', 'end-1c')) != 0 and len(self.txt_categories.get('1.0', 'end-1c')) != 0:
+            categories_aux = self.txt_categories.get('1.0', 'end-1c').split('\n')
+            for item in categories_aux:
+                for char in item:
+                    if char.isspace() or char == '\t' or not char or char == '\n':
+                        return 2
+            return 0
         else:
-            return False
+            return 1
 
     def clear_fields(self):
         self.txt_name_class.delete('1.0', 'end-1c')

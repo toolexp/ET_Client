@@ -7,17 +7,17 @@ from Modules.Config.Visual import *
 
 class FormParentSection:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildSection(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_experimenter_title = Label(self.frm_parent, text='Sections')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experimenter_title.grid(row=0, column=0, pady=30)
+        lbl_experimenter_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -51,7 +51,7 @@ class FormChildSection:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns=('Name', 'Description', 'Data Type'))
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Description', 'Data Type'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.heading('#2', text='Description', anchor=CENTER)
@@ -80,43 +80,55 @@ class FormChildSection:
         self.frm_aux1 = Frame(self.frm_child_crud)
         lbl_type = Label(self.frm_aux1, text='Data type')
         lbl_type.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_type.grid(pady=10, padx=50, sticky=W)
+        lbl_type.grid(row=0, column=0, pady=10, padx=50, sticky=W)
         lbl_name = Label(self.frm_aux1, text='Name')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=50, sticky=W)
-        lbl_description = Label(self.frm_aux1, text='Description')
+        lbl_name.grid(row=1, column=0, pady=10, padx=50, sticky=W)
+        lbl_description = Label(self.frm_aux1, text='Description\t')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_description.grid(pady=10, padx=50, sticky=W)
+        lbl_description.grid(row=2, column=0, pady=10, padx=50, sticky=NW)
         self.cbx_data = Combobox(self.frm_aux1, state="readonly")
         self.cbx_data['values'] = ['Text', 'File', 'Classification']
-        self.cbx_data.grid(row=0, column=1, pady=10, padx=10, sticky=W)
+        self.cbx_data.grid(row=0, column=2, pady=10, sticky=W)
         self.cbx_data.bind("<<ComboboxSelected>>", self.cbx_data_selected)
         self.txt_name = Text(self.frm_aux1, height=1, width=60, font=TEXT_FONT)
-        self.txt_name.grid(row=1, column=1, padx=10, sticky=W)
+        self.txt_name.grid(row=1, column=2, pady=10, sticky=W)
+        lbl_sep2 = Label(self.frm_aux1)
+        lbl_sep2.grid(row=0, column=1, rowspan=3, padx=10, pady=10)
         self.txt_description = Text(self.frm_aux1, height=6, width=60, font=TEXT_FONT)
-        self.txt_description.grid(row=2, column=1, padx=10, rowspan=6, pady=10, sticky=W)
+        self.txt_description.grid(row=2, column=2, pady=10, sticky=W)
+        vsb_txt_desc = Scrollbar(self.frm_aux1, orient="vertical", command=self.txt_description.yview)
+        vsb_txt_desc.grid(row=2, column=3, pady=10, sticky=NS)
+        self.txt_description.configure(yscrollcommand=vsb_txt_desc.set)
+        sep_aux1 = Separator(self.frm_aux1, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=4, sticky=NS, rowspan=4, padx=20)
         btn_save = Button(self.frm_aux1, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=3, padx=40)
+        btn_save.grid(row=0, column=5, padx=20)
         btn_save_ttp = CreateToolTip(btn_save, 'Save section')
         btn_cancel = Button(self.frm_aux1, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=3, padx=40)
+        btn_cancel.grid(row=1, column=5, padx=20)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
-        self.frm_aux1.grid(row=1, column=0, pady=20, padx=10, columnspan=5, rowspan=10)
+        self.frm_aux1.grid()
 
         # Frame for showing available classifications
         self.frm_aux2 = Frame(self.frm_aux1)
-        lbl_class = Label(self.frm_aux2, text='Select classification')
+        lbl_class = Label(self.frm_aux2, text='Classification\t')
         lbl_class.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_class.grid(pady=10, padx=50, sticky=W)
+        lbl_class.grid(row=0, column=0, pady=10, padx=50, sticky=W)
         lbl_category = Label(self.frm_aux2, text='Categories')
         lbl_category.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_category.grid(pady=10, padx=50, sticky=NW)
+        lbl_category.grid(row=1, column=0, pady=10, padx=50, sticky=NW)
+        lbl_sep3 = Label(self.frm_aux2)
+        lbl_sep3.grid(row=0, column=1, rowspan=2, padx=10, pady=10)
         self.cbx_classification = Combobox(self.frm_aux2, state="readonly")
         self.cbx_classification.bind("<<ComboboxSelected>>", self.cbx_class_selected)
-        self.cbx_classification.grid(row=0, column=1, pady=10, padx=10, sticky=NW)
-        self.lbx_category = Listbox(self.frm_aux2, font=TEXT_FONT, height=8, width=40, selectmode='none')
+        self.cbx_classification.grid(row=0, column=2, pady=10, sticky=NW)
+        self.lbx_category = Listbox(self.frm_aux2, font=TEXT_FONT, height=10, width=50, selectmode='none')
         self.lbx_category.config(bg=defaultbg)
-        self.lbx_category.grid(row=1, column=1, pady=10, padx=10, sticky=W)
+        self.lbx_category.grid(row=1, column=2, pady=10, sticky=W)
+        vsb_lbx_cat = Scrollbar(self.frm_aux2, orient="vertical", command=self.lbx_category.yview)
+        vsb_lbx_cat.grid(row=1, column=3, pady=10, sticky=NS)
+        self.lbx_category.configure(yscrollcommand=vsb_lbx_cat.set)
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -185,7 +197,7 @@ class FormChildSection:
                     self.connection = self.directive.send_directive(self.connection)
                     self.cbx_classification.set(self.connection.message.information[0])
                     self.cbx_class_selected()
-                    self.frm_aux2.grid(row=9, column=0, pady=20, padx=10, columnspan=5, rowspan=10, sticky=W)
+                    self.frm_aux2.grid(row=3, column=0, columnspan=4, sticky=W)
                 self.frm_child_crud['text'] = 'Update section'
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
@@ -229,7 +241,7 @@ class FormChildSection:
     def cbx_data_selected(self, event):
         if self.cbx_data.get() == 'Classification':
             self.retrieve_classifications()
-            self.frm_aux2.grid(row=9, column=0, pady=20, padx=10, columnspan=5, rowspan=10, sticky=W)
+            self.frm_aux2.grid(row=3, column=0, columnspan=4, sticky=W)
         else:
             self.frm_aux2.grid_forget()
         self.txt_name.focus_set()

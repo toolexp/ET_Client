@@ -7,17 +7,17 @@ from Modules.Config.Visual import *
 
 class FormParentTemplate:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildTemplate(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_experimenter_title = Label(self.frm_parent, text='Templates')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experimenter_title.grid(row=0, column=0, pady=30)
+        lbl_experimenter_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -57,7 +57,7 @@ class FormChildTemplate:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=7, columns='Name')
+        self.trv_available = Treeview(self.frm_child_list, height=20, columns='Name')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
@@ -103,25 +103,19 @@ class FormChildTemplate:
         lbl_description = Label(frm_aux1, text='Description')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(pady=10, padx=50, sticky=NW)
-        self.txt_name = Text(frm_aux1, height=1, width=60)
+        self.txt_name = Text(frm_aux1, height=1, width=50)
         self.txt_name.config(font=TEXT_FONT)
-        self.txt_name.grid(row=0, column=1, padx=10)
-        self.txt_description = Text(frm_aux1, height=3, width=60)
+        self.txt_name.grid(row=0, column=1, padx=10, sticky=W)
+        self.txt_description = Text(frm_aux1, height=4, width=70)
         self.txt_description.config(font=TEXT_FONT)
-        self.txt_description.grid(row=1, column=1, padx=10, pady=10)
-        btn_save = Button(frm_aux1, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=2, padx=30, sticky=W)
-        btn_save_ttp = CreateToolTip(btn_save, 'Save template')
-        btn_cancel = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=2, padx=30, sticky=NW)
-        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
+        self.txt_description.grid(row=1, column=1, padx=10, pady=10, sticky=W)
         lbl_available_d = Label(frm_aux2, text='Available sections')
         lbl_available_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
         lbl_selected_d = Label(frm_aux2, text='Selected sections')
         lbl_selected_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_selected_d.grid(row=0, column=5, pady=10, sticky=W)
-        self.trv_available_sections = Treeview(frm_aux2, height=5, columns=('Name', 'Data Type'))
+        self.trv_available_sections = Treeview(frm_aux2, height=10, columns=('Name', 'Data Type'))
         self.trv_available_sections.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_sections.heading('#1', text='Name', anchor=CENTER)
         self.trv_available_sections.heading('#2', text='Data Type', anchor=CENTER)
@@ -137,7 +131,7 @@ class FormChildTemplate:
         lbl_sep3.grid(row=1, column=2, padx=10, pady=10)
         lbl_sep4 = Label(frm_aux2)
         lbl_sep4.grid(row=1, column=4, padx=10, pady=10)
-        self.trv_selected_sections = Treeview(frm_aux2, height=5, columns=('Name', 'Data type', 'Mandatory'))
+        self.trv_selected_sections = Treeview(frm_aux2, height=10, columns=('Name', 'Data type', 'Mandatory'))
         self.trv_selected_sections.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_sections.heading('#1', text='Name', anchor=CENTER)
         self.trv_selected_sections.heading('#2', text='Data type', anchor=CENTER)
@@ -168,8 +162,16 @@ class FormChildTemplate:
         btn_down = Button(frm_aux2, image=self.down_arrow, command=self.click_down)
         btn_down.grid(row=5, column=7)
         btn_down_ttp = CreateToolTip(btn_down, 'Move down')
-        frm_aux1.grid(row=1, column=0, pady=20, padx=40, columnspan=5, rowspan=5)
-        frm_aux2.grid(row=8, column=0, padx=40, columnspan=5, rowspan=10)
+        frm_aux1.grid(row=0, column=0, padx=40, pady=10, rowspan=10)
+        frm_aux2.grid(row=10, column=0, padx=40, pady=10)
+        sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
+        sep_aux1.grid(row=0, column=1, sticky=NS, rowspan=11)
+        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=2, padx=30, sticky=W)
+        btn_save_ttp = CreateToolTip(btn_save, 'Save template')
+        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=1, column=2, padx=30, sticky=W)
+        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
 
     def retrieve_list(self):
         # Remove existing elements in the list

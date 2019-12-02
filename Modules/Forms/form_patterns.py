@@ -10,17 +10,17 @@ import os
 
 class FormParentPattern:
     def __init__(self, window, connection):
-        self.frm_parent = LabelFrame(window)
+        self.frm_parent = Frame(window)
         self.initialize_components()
         self.frm_child = FormChildPattern(self.frm_parent, connection)
 
     def initialize_components(self):
         lbl_experimenter_title = Label(self.frm_parent, text='Patterns')
         lbl_experimenter_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_experimenter_title.grid(row=0, column=0, pady=30)
+        lbl_experimenter_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
-        self.frm_parent.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_parent.grid(row=0, column=0)
         self.frm_child.show_frm()
 
     def hide_frm(self):
@@ -55,15 +55,15 @@ class FormChildPattern:
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
         self.style = Style()
         self.style.layout('TNotebook.Tab', [])  # turn off tabs
-        self.style.configure("Treeview", foreground="gray", rowheight=50)
+        #self.style.configure("Treeview", foreground="gray", rowheight=50)
         defaultbg = self.frm_child_crud.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=8, columns='Pattern')
+        self.trv_available = Treeview(self.frm_child_list, height=20, columns='Name')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available.heading('#1', text='Pattern', anchor=CENTER)
+        self.trv_available.heading('#1', text='Name', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_pattern_summary)
@@ -126,7 +126,7 @@ class FormChildPattern:
         lbl_section.grid(row=0, column=1, pady=10, sticky=NW)
         lbl_sep5 = Label(self.frm_aux2)
         lbl_sep5.grid(row=1, column=0, padx=10, pady=10)
-        self.trv_summary = Treeview(self.frm_aux2, height=6, columns=('Section', 'Mandatory', 'Completed'))
+        self.trv_summary = Treeview(self.frm_aux2, height=12, columns=('Section', 'Mandatory', 'Completed'))
         self.trv_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_summary.heading('#1', text='Section', anchor=CENTER)
         self.trv_summary.heading('#2', text='Mandatory', anchor=CENTER)
