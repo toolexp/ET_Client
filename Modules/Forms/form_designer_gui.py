@@ -440,7 +440,7 @@ class FormParentDesigner:
         Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
         """
         if self.attached_file is None:
-            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select JPEG file",
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
                                                   filetypes=[("jpeg", "*.jpg")])
             if not filename:
                 return  # user cancelled; stop this method

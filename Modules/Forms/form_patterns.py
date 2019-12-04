@@ -126,7 +126,7 @@ class FormChildPattern:
         lbl_section.grid(row=0, column=1, pady=10, sticky=NW)
         lbl_sep5 = Label(self.frm_aux2)
         lbl_sep5.grid(row=1, column=0, padx=10, pady=10)
-        self.trv_summary = Treeview(self.frm_aux2, height=12, columns=('Section', 'Mandatory', 'Completed'))
+        self.trv_summary = Treeview(self.frm_aux2, height=15, columns=('Section', 'Mandatory', 'Completed'))
         self.trv_summary.heading('#0', text='ID', anchor=CENTER)
         self.trv_summary.heading('#1', text='Section', anchor=CENTER)
         self.trv_summary.heading('#2', text='Mandatory', anchor=CENTER)
@@ -170,15 +170,15 @@ class FormChildPattern:
 
         tab_file = Frame(self.tab_control)
         self.tab_control.add(tab_file)
-        lbl_upload = Label(tab_file, text='Load a file for this section: ')
+        lbl_upload = Label(tab_file, text='Load an image for this section: ')
         lbl_upload.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_upload.grid(row=0, column=0, padx=20, pady=20, sticky=W)
         btn_open = Button(tab_file, image=self.open_icon, command=self.click_upload)
         btn_open.grid(row=1, column=0, padx=20, pady=5, sticky=E)
-        btn_open_ttp = CreateToolTip(btn_open, 'Open file')
+        btn_open_ttp = CreateToolTip(btn_open, 'Open image')
         btn_quit = Button(tab_file, image=self.remove_icon, command=self.click_remove)
         btn_quit.grid(row=2, column=0, padx=20, pady=5, sticky=E)
-        btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
+        btn_quit_ttp = CreateToolTip(btn_quit, 'Remove image')
         self.canvas = Canvas(tab_file, width=160, height=160)
         self.canvas.config(background='white', borderwidth=1)
         self.canvas.grid(row=0, column=1, padx=20, pady=10, rowspan=5, sticky=E)
@@ -495,7 +495,7 @@ class FormChildPattern:
         Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
         """
         if self.file is None:
-            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select JPEG file",
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
                                                   filetypes=[("jpeg", "*.jpg")])
             if not filename:
                 return  # user cancelled; stop this method

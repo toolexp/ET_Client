@@ -10,12 +10,12 @@ class FormParentReport:
     def __init__(self, window, connection):
         self.frm_parent = Frame(window)
         self.initialize_components()
-        self.frm_child = FormChildReport(self.frm_parent, self.lbl_report_title, connection)
+        self.frm_child = FormChildReport(self.frm_parent, connection)
 
     def initialize_components(self):
-        self.lbl_report_title = Label(self.frm_parent, text='Experiment Report')
-        self.lbl_report_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        self.lbl_report_title.grid(row=0, column=0, pady=20)
+        lbl_report_title = Label(self.frm_parent, text='Experiment Report')
+        lbl_report_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
+        lbl_report_title.grid(row=0, column=0, pady=20)
 
     def show_frm(self):
         self.frm_parent.grid(row=0, column=0)
@@ -27,8 +27,7 @@ class FormParentReport:
 
 
 class FormChildReport:
-    def __init__(self, frm_parent, title_parent, connection):
-        self.title_parent = title_parent
+    def __init__(self, frm_parent, connection):
         self.connection = connection
         self.id_selected = 0
         self.frm_child_exp_list = LabelFrame(frm_parent)
@@ -104,7 +103,7 @@ class FormChildReport:
         btn_select_comp.grid(row=1, column=6, pady=25, padx=30, sticky=W)
         btn_select_comp_ttp = CreateToolTip(btn_select_comp, 'View component report')
         btn_back_sc = Button(self.frm_child_sc_list, image=self.back_icon, command=self.click_back_scenario)
-        btn_back_sc.grid(row=2, column=6, pady=25, padx=30, sticky=W)
+        btn_back_sc.grid(row=2, column=6, pady=5, padx=30, sticky=W)
         btn_back_sc_ttp = CreateToolTip(btn_back_sc, 'Go back')
 
         # Components for Component form (summary and details)
@@ -117,17 +116,21 @@ class FormChildReport:
         lbl_problem_desc.grid(row=1, column=0, pady=25, padx=25, sticky=NW)
         self.lbl_problem_cont = Label(frm_aux1)
         self.lbl_problem_cont.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        self.lbl_problem_cont.grid(row=2, column=3, pady=10, padx=50)
-        self.txt_problem_desc = Text(frm_aux1, height=6, width=80)
+        self.lbl_problem_cont.grid(row=0, column=1, pady=25, padx=25, sticky=W)
+        self.txt_problem_desc = Text(frm_aux1, height=5, width=60)
         self.txt_problem_desc.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_problem_desc.grid(row=1, column=1, padx=50, pady=10, rowspan=6)
+        self.txt_problem_desc.grid(row=1, column=1, padx=25, pady=25, rowspan=6, sticky=W)
+        lbl_legend = Label(frm_aux1, text='Legend:\n\nM1 > Solution time\nM2 > Selection time\nM3 > '
+                                          'Viewed patterns\nM4 > Chosen patterns')
+        lbl_legend.config(fg=TEXT_COLOR, font=LABEL_FONT, justify=LEFT)
+        lbl_legend.grid(row=0, column=2, pady=25, padx=25, sticky=W, rowspan=6, columnspan=2)
         frm_aux2 = LabelFrame(self.frm_child_component, text='Control group')
         frm_aux2.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_sep4 = Label(frm_aux2)
-        lbl_sep4.grid(row=0, column=0, padx=25, pady=25, rowspan=15)
+        lbl_sep4.grid(row=0, column=0, padx=25, pady=10, rowspan=12)
         lbl_summary_cg = Label(frm_aux2, text='Summary', anchor=W)
         lbl_summary_cg.config(font=LABEL_FONT, fg=TEXT_COLOR)
-        lbl_summary_cg.grid(row=0, column=1, pady=25, columnspan=2)
+        lbl_summary_cg.grid(row=0, column=1, pady=10, columnspan=2, sticky=W)
         self.trv_summary_cg = Treeview(frm_aux2, height=5, columns=('Variable', 'M1', 'M2', 'M3', 'M4'))
         self.trv_summary_cg.heading('#0', text='ID', anchor=CENTER)
         self.trv_summary_cg.heading('#1', text='Variable', anchor=CENTER)
@@ -136,19 +139,19 @@ class FormChildReport:
         self.trv_summary_cg.heading('#4', text='M3', anchor=CENTER)
         self.trv_summary_cg.heading('#5', text='M4', anchor=CENTER)
         self.trv_summary_cg.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_summary_cg.column('#1', width=30, minwidth=30, stretch=NO)
+        self.trv_summary_cg.column('#1', width=130, minwidth=130, stretch=NO)
         self.trv_summary_cg.column('#2', width=30, minwidth=30, stretch=NO)
         self.trv_summary_cg.column('#3', width=30, minwidth=30, stretch=NO)
         self.trv_summary_cg.column('#4', width=30, minwidth=30, stretch=NO)
         self.trv_summary_cg.column('#5', width=30, minwidth=30, stretch=NO)
-        self.trv_summary_cg.grid(row=1, column=1, rowspan=5, sticky=W, pady=25)
+        self.trv_summary_cg.grid(row=1, column=1, rowspan=5, sticky=W, pady=10)
         vsb_trv_sumcg = Scrollbar(frm_aux2, orient="vertical", command=self.trv_summary_cg.yview)
-        vsb_trv_sumcg.grid(row=1, column=2, rowspan=5, pady=25, sticky=NS)
+        vsb_trv_sumcg.grid(row=1, column=2, rowspan=5, pady=10, sticky=NS)
         self.trv_summary_cg.configure(yscrollcommand=vsb_trv_sumcg.set)
         lbl_details_cg = Label(frm_aux2, text='Details', anchor=W)
         lbl_details_cg.config(font=LABEL_FONT, fg=TEXT_COLOR)
-        lbl_details_cg.grid(row=6, column=1, pady=25, columnspan=2)
-        self.trv_details_cg = Treeview(frm_aux2, height=8, columns=('Designer', 'M1', 'M2', 'M3', 'M4'))
+        lbl_details_cg.grid(row=6, column=1, pady=10, columnspan=2, sticky=W)
+        self.trv_details_cg = Treeview(frm_aux2, height=5, columns=('Designer', 'M1', 'M2', 'M3', 'M4'))
         self.trv_details_cg.heading('#0', text='ID', anchor=CENTER)
         self.trv_details_cg.heading('#1', text='Designer', anchor=CENTER)
         self.trv_details_cg.heading('#2', text='M1', anchor=CENTER)
@@ -156,25 +159,25 @@ class FormChildReport:
         self.trv_details_cg.heading('#4', text='M3', anchor=CENTER)
         self.trv_details_cg.heading('#5', text='M4', anchor=CENTER)
         self.trv_details_cg.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_details_cg.column('#1', width=30, minwidth=30, stretch=NO)
+        self.trv_details_cg.column('#1', width=130, minwidth=130, stretch=NO)
         self.trv_details_cg.column('#2', width=30, minwidth=30, stretch=NO)
         self.trv_details_cg.column('#3', width=30, minwidth=30, stretch=NO)
         self.trv_details_cg.column('#4', width=30, minwidth=30, stretch=NO)
         self.trv_details_cg.column('#5', width=30, minwidth=30, stretch=NO)
-        self.trv_details_cg.grid(row=7, column=1, rowspan=8, sticky=W, pady=25)
+        self.trv_details_cg.grid(row=7, column=1, rowspan=5, sticky=W, pady=10)
         vsb_trv_detcg = Scrollbar(frm_aux2, orient="vertical", command=self.trv_details_cg.yview)
-        vsb_trv_detcg.grid(row=7, column=2, rowspan=8, pady=25, sticky=NS)
+        vsb_trv_detcg.grid(row=7, column=2, rowspan=5, pady=10, sticky=NS)
         self.trv_details_cg.configure(yscrollcommand=vsb_trv_detcg.set)
         lbl_sep5 = Label(frm_aux2)
-        lbl_sep5.grid(row=0, column=3, padx=25, pady=25, rowspan=15)
+        lbl_sep5.grid(row=0, column=3, padx=25, pady=10, rowspan=12)
 
         frm_aux3 = LabelFrame(self.frm_child_component, text='Experimental group')
         frm_aux3.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_sep4 = Label(frm_aux3)
-        lbl_sep4.grid(row=0, column=0, padx=25, pady=25, rowspan=15)
+        lbl_sep4.grid(row=0, column=0, padx=25, pady=10, rowspan=12)
         lbl_summary_eg = Label(frm_aux3, text='Summary', anchor=W)
         lbl_summary_eg.config(font=LABEL_FONT, fg=TEXT_COLOR)
-        lbl_summary_eg.grid(row=0, column=1, pady=25, columnspan=2)
+        lbl_summary_eg.grid(row=0, column=1, pady=10, columnspan=2, sticky=W)
         self.trv_summary_eg = Treeview(frm_aux3, height=5, columns=('Variable', 'M1', 'M2', 'M3', 'M4'))
         self.trv_summary_eg.heading('#0', text='ID', anchor=CENTER)
         self.trv_summary_eg.heading('#1', text='Variable', anchor=CENTER)
@@ -183,19 +186,19 @@ class FormChildReport:
         self.trv_summary_eg.heading('#4', text='M3', anchor=CENTER)
         self.trv_summary_eg.heading('#5', text='M4', anchor=CENTER)
         self.trv_summary_eg.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_summary_eg.column('#1', width=30, minwidth=30, stretch=NO)
+        self.trv_summary_eg.column('#1', width=130, minwidth=130, stretch=NO)
         self.trv_summary_eg.column('#2', width=30, minwidth=30, stretch=NO)
         self.trv_summary_eg.column('#3', width=30, minwidth=30, stretch=NO)
         self.trv_summary_eg.column('#4', width=30, minwidth=30, stretch=NO)
         self.trv_summary_eg.column('#5', width=30, minwidth=30, stretch=NO)
-        self.trv_summary_eg.grid(row=1, column=1, rowspan=5, sticky=W, pady=25)
+        self.trv_summary_eg.grid(row=1, column=1, rowspan=5, sticky=W, pady=10)
         vsb_trv_sumeg = Scrollbar(frm_aux3, orient="vertical", command=self.trv_summary_eg.yview)
-        vsb_trv_sumeg.grid(row=1, column=2, rowspan=5, pady=25, sticky=NS)
+        vsb_trv_sumeg.grid(row=1, column=2, rowspan=5, pady=10, sticky=NS)
         self.trv_summary_eg.configure(yscrollcommand=vsb_trv_sumeg.set)
         lbl_details_eg = Label(frm_aux3, text='Details', anchor=W)
         lbl_details_eg.config(font=LABEL_FONT, fg=TEXT_COLOR)
-        lbl_details_eg.grid(row=6, column=1, pady=25, columnspan=2)
-        self.trv_details_eg = Treeview(frm_aux3, height=8, columns=('Designer', 'M1', 'M2', 'M3', 'M4'))
+        lbl_details_eg.grid(row=6, column=1, pady=10, columnspan=2, sticky=W)
+        self.trv_details_eg = Treeview(frm_aux3, height=5, columns=('Designer', 'M1', 'M2', 'M3', 'M4'))
         self.trv_details_eg.heading('#0', text='ID', anchor=CENTER)
         self.trv_details_eg.heading('#1', text='Designer', anchor=CENTER)
         self.trv_details_eg.heading('#2', text='M1', anchor=CENTER)
@@ -203,29 +206,34 @@ class FormChildReport:
         self.trv_details_eg.heading('#4', text='M3', anchor=CENTER)
         self.trv_details_eg.heading('#5', text='M4', anchor=CENTER)
         self.trv_details_eg.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_details_eg.column('#1', width=30, minwidth=30, stretch=NO)
+        self.trv_details_eg.column('#1', width=130, minwidth=130, stretch=NO)
         self.trv_details_eg.column('#2', width=30, minwidth=30, stretch=NO)
         self.trv_details_eg.column('#3', width=30, minwidth=30, stretch=NO)
         self.trv_details_eg.column('#4', width=30, minwidth=30, stretch=NO)
         self.trv_details_eg.column('#5', width=30, minwidth=30, stretch=NO)
-        self.trv_details_eg.grid(row=7, column=1, rowspan=8, sticky=W, pady=25)
+        self.trv_details_eg.grid(row=7, column=1, rowspan=5, sticky=W, pady=10)
         vsb_trv_deteg = Scrollbar(frm_aux3, orient="vertical", command=self.trv_details_eg.yview)
-        vsb_trv_deteg.grid(row=7, column=2, rowspan=8, pady=25, sticky=NS)
+        vsb_trv_deteg.grid(row=7, column=2, rowspan=5, pady=10, sticky=NS)
         self.trv_details_eg.configure(yscrollcommand=vsb_trv_deteg.set)
         lbl_sep5 = Label(frm_aux3)
-        lbl_sep5.grid(row=0, column=3, padx=25, pady=25, rowspan=15)
-        frm_aux1.grid(rowspan=7, columnspan=4)
-        frm_aux2.grid(row=7, column=0, rowspan=15, columnspan=2)
-        frm_aux3.grid(row=7, column=2, rowspan=15, columnspan=2)
-
+        lbl_sep5.grid(row=0, column=3, padx=25, pady=10, rowspan=12)
+        frm_aux1.grid(rowspan=6, columnspan=4)
+        frm_aux2.grid(row=6, column=0, rowspan=12, columnspan=2, padx=10, pady=10, sticky=W)
+        frm_aux3.grid(row=6, column=2, rowspan=12, columnspan=2, padx=10, pady=10, sticky=E)
+        lbl_notes = Label(self.frm_child_component, text='NOTE: To see details of measurements and solution of a '
+                                                         'designer, double click a designer (details)\n')
+        lbl_notes.config(fg=TEXT_COLOR, font=NOTE_FONT)
+        lbl_notes.grid(row=18, column=0, padx=25, sticky=W, columnspan=4)
         sep_component = Separator(self.frm_child_component, orient=VERTICAL)
-        sep_component.grid(row=0, column=4, sticky=NS, rowspan=22, padx=25)
+        sep_component.grid(row=0, column=4, sticky=NS, rowspan=19)
         btn_back_component = Button(self.frm_child_component, image=self.back_icon, command=self.click_back_component)
         btn_back_component.grid(row=0, column=5, padx=30, pady=25)
         btn_back_component_ttp = CreateToolTip(btn_back_component, 'Generate .csv file')
         btn_csv = Button(self.frm_child_component, image=self.csv_icon, command=self.click_csv)
-        btn_csv.grid(row=1, column=5, padx=30, pady=25)
+        btn_csv.grid(row=1, column=5, padx=30, pady=5)
         btn_csv_ttp = CreateToolTip(btn_csv, 'Generate .csv file')
+
+        # Components for Designer detail TopLevel window
 
     def show_frm(self):
         """
@@ -234,7 +242,7 @@ class FormChildReport:
         self.retrieve_experiments()
         if len(self.trv_available_exp.get_children()) != 0:
             self.trv_available_exp.selection_set(self.trv_available_exp.get_children()[0])
-        self.frm_child_exp_list.grid(row=0, column=0, pady=10, padx=10)
+        self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
         """
@@ -283,7 +291,7 @@ class FormChildReport:
         has been selected
         """
         self.frm_child_exp_list.grid_forget()
-        self.frm_child_sc_list.grid(padx=10, pady=10)
+        self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         '''if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
             self.id_selected_exp = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
             # Retrieve selected experiment and its 'Experimental scenarios'
@@ -303,21 +311,21 @@ class FormChildReport:
         It returns to Experiments list home form
         """
         self.frm_child_sc_list.grid_forget()
-        self.frm_child_exp_list.grid(pady=10, padx=10)
+        self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_select_component(self):
         """
         Function activated when a scenario component is selected
         """
         self.frm_child_sc_list.grid_forget()
-        self.frm_child_component.grid(padx=10, pady=10)
+        self.frm_child_component.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_csv(self):
         pass
 
     def click_back_component(self):
         self.frm_child_component.grid_forget()
-        self.frm_child_sc_list.grid(padx=10, pady=10)
+        self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_exit_designer(self):
         pass

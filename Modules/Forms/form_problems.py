@@ -100,7 +100,7 @@ class FormChildProblem:
         vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=8, pady=10, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
-        self.btn_view_diagram = Button(self.frm_child_list, text='View >>\ndiagram', command=self.click_expand_diagram)
+        self.btn_view_diagram = Button(self.frm_child_list, text='View >>\nimage', command=self.click_expand_diagram)
         self.btn_view_diagram.grid(row=1, column=9, padx=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_list)
         lbl_sep4.grid(row=0, column=10, padx=15, pady=25)
@@ -130,15 +130,15 @@ class FormChildProblem:
         self.txt_annotations = Text(frm_aux2, height=5, width=60)
         self.txt_annotations.config(font=TEXT_FONT)
         self.txt_annotations.grid(row=0, column=1, pady=10, padx=20, columnspan=5)
-        lbl_diagram = Label(frm_aux2, text='File')
+        lbl_diagram = Label(frm_aux2, text='Image')
         lbl_diagram.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_diagram.grid(row=1, column=0, pady=10, padx=20, sticky=NW)
         btn_open = Button(frm_aux2, image=self.open_icon, command=self.click_upload_file)
         btn_open.grid(row=1, column=2, padx=20, pady=10, sticky=W)
-        btn_open_ttp = CreateToolTip(btn_open, 'Open file')
+        btn_open_ttp = CreateToolTip(btn_open, 'Open image')
         btn_quit = Button(frm_aux2, image=self.remove_icon, command=self.click_remove_file)
         btn_quit.grid(row=2, column=2, padx=20, pady=10, sticky=W)
-        btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
+        btn_quit_ttp = CreateToolTip(btn_quit, 'Remove image')
         self.canvas = Canvas(frm_aux2, width=160, height=160)
         self.canvas.config(background='white', borderwidth=1)
         self.canvas.grid(row=1, column=1, padx=20, pady=10, rowspan=5, sticky=W)
@@ -261,7 +261,7 @@ class FormChildProblem:
             self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(problem_aux.name, 55)))
             self.txt_summary.insert('end-1c', "Description:\n{}\n\nIdeal Solution:\n".format(
                 wrap_text(problem_aux.description, 55)))
-            self.txt_summary.insert('end-1c', "-Diagram:\tClick right button to see diagram >>\n\n")
+            self.txt_summary.insert('end-1c', "-Image:\tClick right button to see image >>\n\n")
             if len(problem_aux.solution.patterns_id) == 0:
                 self.txt_summary.insert('end-1c', "-The ideal solution does not have associated patterns\n")
             else:
@@ -633,7 +633,7 @@ class FormChildProblem:
         Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
         """
         if self.file is None:
-            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select JPEG file",
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
                                                   filetypes=[("jpeg", "*.jpg")])
             if not filename:
                 return  # user cancelled; stop this method

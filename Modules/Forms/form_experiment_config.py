@@ -90,9 +90,9 @@ class FormChildExConfig:
                                                                       'experiment you have selected. Each scenario '
                                                                       'contains one or more design problems and extra '
                                                                       'information such as: designers groups and a '
-                                                                      'description', 80), anchor=W)
-        lbl_scenario_desc.config(font=SUBTITLE2_FONT, fg=TEXT_COLOR)
-        lbl_scenario_desc.grid(row=0, column=1, pady=25)
+                                                                      'description', 100))
+        lbl_scenario_desc.config(font=SUBTITLE2_FONT, fg=TEXT_COLOR, justify=LEFT)
+        lbl_scenario_desc.grid(row=0, column=1, pady=25, sticky=W)
         self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Description', 'Available?',
                                                                               'Locked?'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
