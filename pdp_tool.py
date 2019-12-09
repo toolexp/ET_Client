@@ -9,20 +9,17 @@ from Modules.Config.Data import Message, Designer
 from Modules.Config.Visual import *
 
 from Modules.Forms.form_AED import FormParentAED
-from Modules.Forms.form_designers_groups import FormParentDG
-from Modules.Forms.form_experiment_config import FormParentExConfig
-from Modules.Forms.form_problems import FormParentProblem
 from Modules.Forms.form_templates import FormParentTemplate
 from Modules.Forms.form_sections import FormParentSection
 from Modules.Forms.form_patterns import FormParentPattern
 from Modules.Forms.form_classifications import FormParentClassification
-from Modules.Forms.form_experiment_admin import FormParentExAdmin
+from Modules.Forms.form_experiments import FormParentExperiment
 from Modules.Forms.form_designer_gui import FormParentDesigner
 from Modules.Forms.frm_reports import FormParentReport
 
 json_config = json.load(open('config.json', 'r'))
-HOST = json_config["server"]["address"]     # The server's hostname or IP address
-PORT = json_config["server"]["port"]        # The port used by the server
+HOST = json_config["server"]["address"]  # The server's hostname or IP address
+PORT = json_config["server"]["port"]  # The port used by the server
 
 
 class WindowHome:
@@ -33,10 +30,10 @@ class WindowHome:
         self.role = 1
         self.window = Tk()
         self.window.protocol("WM_DELETE_WINDOW", self.click_log_out)
-        #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
+        # w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
         # self.window.geometry('%dx%d+0+0' % (1024, 778))
-        #self.window.geometry('%dx%d+0+0' % (1500, 778))
-        #self.window.geometry('%dx%d+0+0' % (w, h))
+        # self.window.geometry('%dx%d+0+0' % (1500, 778))
+        # self.window.geometry('%dx%d+0+0' % (w, h))
         # Place window on top left corner
         self.window.geometry('+%d+%d' % (0, 0))
         self.window.resizable(0, 0)
@@ -133,10 +130,7 @@ class WindowHome:
         self.window.config(menu=menu_bar)
         if self.role == 1:  # logged as experimenter
             administration_menu = Menu(menu_bar, tearoff=0)
-            designers_menu = Menu(administration_menu, tearoff=0)
-            designers_menu.add_command(label='Designers', command=self.click_designers)
-            designers_menu.add_command(label='Designers groups', command=self.click_designers_groups)
-            administration_menu.add_cascade(label='Designers', menu=designers_menu)
+            administration_menu.add_command(label='Designers', command=self.click_designers)
             patterns_menu = Menu(administration_menu, tearoff=0)
             patt_structure_menu = Menu(patterns_menu, tearoff=0)
             patt_structure_menu.add_command(label='Classifications', command=self.click_class)
@@ -145,24 +139,17 @@ class WindowHome:
             patterns_menu.add_cascade(label='Pattern structure', menu=patt_structure_menu)
             patterns_menu.add_command(label='Patterns', command=self.click_patterns)
             administration_menu.add_cascade(label='Patterns', menu=patterns_menu)
-            administration_menu.add_command(label='Problems', command=self.click_problems)
-            experiment_menu = Menu(administration_menu, tearoff=0)
-            experiment_menu.add_command(label='Experiment administration', command=self.click_exp_admin)
-            experiment_menu.add_command(label='Experiment configuration', command=self.click_config_ex_sc)
             menu_bar.add_cascade(label='Administration', menu=administration_menu)
-            menu_bar.add_cascade(label='Experiment', menu=experiment_menu)
+            menu_bar.add_command(label='Experiments', command=self.click_experiments)
             menu_bar.add_command(label='Reports', command=self.click_reports)
 
             # Configuration of the existing frames, one for each command in the menu bar
             self.frm_parent_designer = FormParentAED(self.window, 'Designer', connection)
-            self.frm_parent_designers_group = FormParentDG(self.window, connection)
             self.frm_parent_template = FormParentTemplate(self.window, connection)
             self.frm_parent_class = FormParentClassification(self.window, connection)
             self.frm_parent_section = FormParentSection(self.window, connection)
-            self.frm_parent_problem = FormParentProblem(self.window, connection)
             self.frm_parent_pattern = FormParentPattern(self.window, connection)
-            self.frm_parent_exp_config = FormParentExConfig(self.window, connection)
-            self.frm_parent_exp_admin = FormParentExAdmin(self.window, connection)
+            self.frm_parent_experiment = FormParentExperiment(self.window, connection)
             self.frm_parent_report = FormParentReport(self.window, connection)
         elif self.role == 2:  # logged as designer
             self.frm_parent_designer_gui = FormParentDesigner(self.window, connection, self.current_designer)
@@ -172,10 +159,7 @@ class WindowHome:
             users_menu = Menu(administration_menu, tearoff=0)
             users_menu.add_command(label='Administrators', command=self.click_administrators)
             users_menu.add_command(label='Experimenters', command=self.click_experimenters)
-            designers_menu = Menu(users_menu, tearoff=0)
-            designers_menu.add_command(label='Designers', command=self.click_designers)
-            designers_menu.add_command(label='Designers groups', command=self.click_designers_groups)
-            users_menu.add_cascade(label='Designers', menu=designers_menu)
+            users_menu.add_command(label='Designers', command=self.click_designers)
             administration_menu.add_cascade(label='Users', menu=users_menu)
             patterns_menu = Menu(administration_menu, tearoff=0)
             patt_structure_menu = Menu(patterns_menu, tearoff=0)
@@ -185,26 +169,19 @@ class WindowHome:
             patterns_menu.add_cascade(label='Pattern structure', menu=patt_structure_menu)
             patterns_menu.add_command(label='Patterns', command=self.click_patterns)
             administration_menu.add_cascade(label='Patterns', menu=patterns_menu)
-            administration_menu.add_command(label='Problems', command=self.click_problems)
-            experiment_menu = Menu(administration_menu, tearoff=0)
-            experiment_menu.add_command(label='Experiment administration', command=self.click_exp_admin)
-            experiment_menu.add_command(label='Experiment configuration', command=self.click_config_ex_sc)
             menu_bar.add_cascade(label='Administration', menu=administration_menu)
-            menu_bar.add_cascade(label='Experiment', menu=experiment_menu)
+            menu_bar.add_command(label='Experiments', command=self.click_experiments)
             menu_bar.add_command(label='Reports', command=self.click_reports)
 
             # Configuration of the existing frames, one for each command in the menu bar
             self.frm_parent_administrator = FormParentAED(self.window, 'Administrator', connection)
             self.frm_parent_experimenter = FormParentAED(self.window, 'Experimenter', connection)
             self.frm_parent_designer = FormParentAED(self.window, 'Designer', connection)
-            self.frm_parent_designers_group = FormParentDG(self.window, connection)
             self.frm_parent_template = FormParentTemplate(self.window, connection)
             self.frm_parent_class = FormParentClassification(self.window, connection)
             self.frm_parent_section = FormParentSection(self.window, connection)
-            self.frm_parent_problem = FormParentProblem(self.window, connection)
             self.frm_parent_pattern = FormParentPattern(self.window, connection)
-            self.frm_parent_exp_config = FormParentExConfig(self.window, connection)
-            self.frm_parent_exp_admin = FormParentExAdmin(self.window, connection)
+            self.frm_parent_experiment = FormParentExperiment(self.window, connection)
             self.frm_parent_report = FormParentReport(self.window, connection)
         else:
             raise Exception('Error while trying login the system')
@@ -216,14 +193,11 @@ class WindowHome:
     def click_experimenters(self):
         self.frm_parent_designer.hide_frm()
         self.frm_parent_administrator.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_experimenter.hide_frm()
         self.frm_parent_experimenter.show_frm()
@@ -232,14 +206,11 @@ class WindowHome:
         if self.role == 3:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_designer.hide_frm()
         self.frm_parent_designer.show_frm()
@@ -247,46 +218,24 @@ class WindowHome:
     def click_administrators(self):
         self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_administrator.hide_frm()
         self.frm_parent_administrator.show_frm()
-
-    def click_designers_groups(self):
-        if self.role == 3:
-            self.frm_parent_administrator.hide_frm()
-            self.frm_parent_experimenter.hide_frm()
-        self.frm_parent_designer.hide_frm()
-        self.frm_parent_problem.hide_frm()
-        self.frm_parent_template.hide_frm()
-        self.frm_parent_section.hide_frm()
-        self.frm_parent_pattern.hide_frm()
-        self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
-        self.frm_parent_report.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_designers_group.show_frm()
 
     def click_templates(self):
         if self.role == 3:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_template.show_frm()
@@ -296,13 +245,10 @@ class WindowHome:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_section.show_frm()
@@ -312,13 +258,10 @@ class WindowHome:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_section.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_class.hide_frm()
         self.frm_parent_class.show_frm()
@@ -328,78 +271,37 @@ class WindowHome:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_problem.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_pattern.show_frm()
 
-    def click_problems(self):
+    def click_experiments(self):
         if self.role == 3:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
         self.frm_parent_report.hide_frm()
-        self.frm_parent_problem.hide_frm()
-        self.frm_parent_problem.show_frm()
-
-    def click_config_ex_sc(self):
-        if self.role == 3:
-            self.frm_parent_administrator.hide_frm()
-            self.frm_parent_experimenter.hide_frm()
-        self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_template.hide_frm()
-        self.frm_parent_section.hide_frm()
-        self.frm_parent_pattern.hide_frm()
-        self.frm_parent_class.hide_frm()
-        self.frm_parent_problem.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
-        self.frm_parent_report.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_config.show_frm()
-
-    def click_exp_admin(self):
-        if self.role == 3:
-            self.frm_parent_administrator.hide_frm()
-            self.frm_parent_experimenter.hide_frm()
-        self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
-        self.frm_parent_template.hide_frm()
-        self.frm_parent_section.hide_frm()
-        self.frm_parent_pattern.hide_frm()
-        self.frm_parent_class.hide_frm()
-        self.frm_parent_problem.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_report.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
-        self.frm_parent_exp_admin.show_frm()
+        self.frm_parent_experiment.hide_frm()
+        self.frm_parent_experiment.show_frm()
 
     def click_reports(self):
         if self.role == 3:
             self.frm_parent_administrator.hide_frm()
             self.frm_parent_experimenter.hide_frm()
         self.frm_parent_designer.hide_frm()
-        self.frm_parent_designers_group.hide_frm()
         self.frm_parent_template.hide_frm()
         self.frm_parent_section.hide_frm()
         self.frm_parent_pattern.hide_frm()
         self.frm_parent_class.hide_frm()
-        self.frm_parent_problem.hide_frm()
-        self.frm_parent_exp_config.hide_frm()
-        self.frm_parent_exp_admin.hide_frm()
+        self.frm_parent_experiment.hide_frm()
         self.frm_parent_report.hide_frm()
         self.frm_parent_report.show_frm()
 
@@ -443,7 +345,13 @@ class WindowHome:
 if __name__ == '__main__':
     connection = Connection()
     try:
-        connection.create_connection(HOST, PORT)
+        try:
+            connection.create_connection(HOST, PORT)
+        except: # Issue when connection with server can not be established
+            messagebox.showerror(title='Failed connection',
+                                 message='Can not conect with the server. Please check that your device is connected to'
+                                         'the same network as the server and that it is accessible from your device')
+            exit(0)
         app = WindowHome(connection)
         app.window.mainloop()
     except Exception as e:
