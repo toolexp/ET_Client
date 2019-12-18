@@ -103,11 +103,12 @@ class DesignersGroup:
 
 
 class Experiment:
-    def __init__(self, id=0, name='', description=''):
+    def __init__(self, id=0, name='', description='', design_type='', state=''):
         self.id = id
         self.name = name
         self.description = description
-
+        self.design_type = design_type
+        self.state = state
 
 class ExperimentalSC:
     def __init__(self, id=0, name='', description='', access_code='', scenario_availability=True, scenario_lock=False,

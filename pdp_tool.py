@@ -349,8 +349,9 @@ if __name__ == '__main__':
             connection.create_connection(HOST, PORT)
         except: # Issue when connection with server can not be established
             messagebox.showerror(title='Failed connection',
-                                 message='Can not conect with the server. Please check that your device is connected to'
-                                         'the same network as the server and that it is accessible from your device')
+                                 message='Can not connect with the server. Please check that your device and the '
+                                         'server are connected to the same network, and that the server is accessible '
+                                         'from your device')
             exit(0)
         app = WindowHome(connection)
         app.window.mainloop()

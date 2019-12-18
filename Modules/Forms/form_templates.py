@@ -340,13 +340,13 @@ class FormChildTemplate:
             name_aux = self.txt_name.get('1.0', 'end-1c')
             description_aux = self.txt_description.get('1.0', 'end-1c')
             if self.decide_template:
-                self.directive = Message(action=36, information=[name_aux, description_aux, [], []])
+                self.directive = Message(action=36, information=[name_aux, description_aux, visual_section_id, [], []])
                 for item in self.trv_selected_sections.get_children():
                     self.directive.information[2].append(int(self.trv_selected_sections.item(item)['text']))
                     self.directive.information[3].append(self.trv_selected_sections.item(item)['values'][2])
             else:
-                self.directive = Message(action=38,
-                                         information=[self.id_selected, name_aux, description_aux, [], []])
+                self.directive = Message(action=38, information=[self.id_selected, name_aux, description_aux,
+                                                                 visual_section_id, [], []])
                 for item in self.trv_selected_sections.get_children():
                     self.directive.information[3].append(int(self.trv_selected_sections.item(item)['text']))
                     self.directive.information[4].append(self.trv_selected_sections.item(item)['values'][2])
