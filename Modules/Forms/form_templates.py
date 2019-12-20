@@ -1,6 +1,6 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar
+from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar, Toplevel
 from tkinter.constants import *
-from tkinter.ttk import Treeview, Separator
+from tkinter.ttk import Treeview, Separator, Combobox
 from Modules.Config.Data import Message, CreateToolTip, wrap_text
 from Modules.Config.Visual import *
 
@@ -34,8 +34,6 @@ class FormChildTemplate:
         self.frm_child_list = LabelFrame(frm_parent)
         self.frm_child_crud = LabelFrame(frm_parent)
         self.frm_child_crud.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        self.frm_child_section = LabelFrame(frm_parent)
-        self.frm_child_section.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.initialize_components()
 
     def initialize_components(self):
@@ -52,6 +50,7 @@ class FormChildTemplate:
         self.delete_icon = PhotoImage(file=r"./Resources/left.png")
         self.up_arrow = PhotoImage(file=r"./Resources/up_arrow.png")
         self.down_arrow = PhotoImage(file=r"./Resources/down_arrow.png")
+        self.star_icon = PhotoImage(file=r"./Resources/star.png")
         defaultbg = self.frm_child_list.cget('bg')
 
         # Components for List FRM
@@ -131,24 +130,26 @@ class FormChildTemplate:
         lbl_sep3.grid(row=1, column=2, padx=10, pady=10)
         lbl_sep4 = Label(frm_aux2)
         lbl_sep4.grid(row=1, column=4, padx=10, pady=10)
-        self.trv_selected_sections = Treeview(frm_aux2, height=10, columns=('Name', 'Data type', 'Mandatory'))
+        self.trv_selected_sections = Treeview(frm_aux2, height=10, columns=('Name', 'Data type', 'Mandatory', 'Main'))
         self.trv_selected_sections.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_sections.heading('#1', text='Name', anchor=CENTER)
         self.trv_selected_sections.heading('#2', text='Data type', anchor=CENTER)
         self.trv_selected_sections.heading('#3', text='Mandatory', anchor=CENTER)
+        self.trv_selected_sections.heading('#4', text='Main', anchor=CENTER)
         self.trv_selected_sections.column('#0', width=0, minwidth=20, stretch=NO)
         self.trv_selected_sections.column('#1', width=150, minwidth=150, stretch=NO)
         self.trv_selected_sections.column('#2', width=120, minwidth=120, stretch=NO)
         self.trv_selected_sections.column('#3', width=80, minwidth=80, stretch=NO)
+        self.trv_selected_sections.column('#4', width=80, minwidth=80, stretch=NO)
         self.trv_selected_sections.bind("<Button-1>", self.click_trv_ssections)
         self.trv_selected_sections.bind("<Double-1>", self.click_switch_mandatory)
         self.trv_selected_sections.grid(row=1, column=5, rowspan=10, sticky=W, pady=10)
         vsb_trv_ses = Scrollbar(frm_aux2, orient="vertical", command=self.trv_selected_sections.yview)
         vsb_trv_ses.grid(row=1, column=6, rowspan=10, pady=10, sticky=NS)
         self.trv_selected_sections.configure(yscrollcommand=vsb_trv_ses.set)
-        lbl_note_optional = Label(frm_aux2, text='NOTE: To switch between optional and mandatory, double click on '
-                                                 'selected section\n')
-        lbl_note_optional.config(fg=TEXT_COLOR, font=NOTE_FONT)
+        lbl_note_optional = Label(frm_aux2, text='NOTES:\tTo switch between optional and mandatory, double click on '
+                                                 'selected section.\n\tChose one section as main pressing star button.\n')
+        lbl_note_optional.config(fg=TEXT_COLOR, font=NOTE_FONT, justify=LEFT)
         lbl_note_optional.grid(row=11, column=5, columnspan=3, sticky=W)
         btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
         btn_add.grid(row=4, column=3)
@@ -156,6 +157,9 @@ class FormChildTemplate:
         btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
         btn_remove.grid(row=5, column=3)
         btn_remove_ttp = CreateToolTip(btn_remove, 'Remove section')
+        btn_main_section = Button(frm_aux2, image=self.star_icon, command=self.click_main_section)
+        btn_main_section.grid(row=1, column=7)
+        btn_main_section_ttp = CreateToolTip(btn_main_section, 'Main section')
         btn_up = Button(frm_aux2, image=self.up_arrow, command=self.click_up)
         btn_up.grid(row=4, column=7)
         btn_up_ttp = CreateToolTip(btn_up, 'Move up')
@@ -206,7 +210,8 @@ class FormChildTemplate:
             index = 0
             for item in self.connection.message.information:
                 elements = item.split('¥')
-                self.txt_summary.insert('end-1c', "{}) {}\t\t{}\n".format(index + 1, elements[3], 'optional' if elements[7] == '' else 'mandatory'))
+                self.txt_summary.insert('end-1c', "{}) {}\t\t{}\t\t{}\n".format(index + 1, elements[3], 'optional' \
+                    if elements[7] == '' else 'mandatory', '' if elements[8] == '' else '(MAIN)'))
                 index += 1
             self.txt_summary['state'] = DISABLED
 
@@ -281,9 +286,9 @@ class FormChildTemplate:
             item = item.split('¥')
             item.remove(item[0])
             item.remove(item[0])
-            item.remove(item[-1])
-            item.remove(item[-1])
-            item.remove(item[-1])
+            item.remove(item[-2])
+            item.remove(item[-2])
+            item.remove(item[-2])
             item = '¥'.join(item)
             if item in a_sections:
                 a_sections.remove(item)
@@ -293,7 +298,7 @@ class FormChildTemplate:
         for item in s_sections:
             elements = item.split('¥')
             self.trv_selected_sections.insert('', 'end', text=elements[2], values=(elements[3], elements[5],
-                                                                                   elements[7]))
+                                                                                   elements[7], elements[8]))
 
     def click_add(self):
         if self.trv_available_sections.item(self.trv_available_sections.selection())['text'] != '' and \
@@ -302,7 +307,7 @@ class FormChildTemplate:
                 self.trv_available_sections.focus())['values']
             text = self.trv_available_sections.item(
                 self.trv_available_sections.focus())['text']
-            self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], '✓'))
+            self.trv_selected_sections.insert('', 'end', text=text, values=(values[0], values[1], '✓', ''))
             self.trv_available_sections.delete(self.trv_available_sections.selection())
 
     def click_remove(self):
@@ -329,6 +334,19 @@ class FormChildTemplate:
             index = self.trv_selected_sections.index(item)
             self.trv_selected_sections.move(item, '', index + 1)
 
+    def click_main_section(self):
+        if self.trv_selected_sections.item(self.trv_selected_sections.selection())['text'] != '' and \
+                self.trv_available_sections.item(self.trv_available_sections.selection())['text'] == '':
+            for item in self.trv_selected_sections.get_children():
+                if self.trv_selected_sections.item(item)['values'][3] != '':
+                    values = self.trv_selected_sections.item(item)['values']
+                    self.trv_selected_sections.item(item, values=(values[0], values[1], values[2], ''))
+                    break
+            item = self.trv_selected_sections.focus()
+            values = self.trv_selected_sections.item(self.trv_selected_sections.focus())['values']
+            self.trv_selected_sections.item(item, values=(values[0], values[1], values[2], '✓'))
+            self.id_main_section = int(self.trv_selected_sections.item(item)['text'])
+
     def click_trv_asections(self, event):
         self.trv_selected_sections.selection_remove(self.trv_selected_sections.selection())
 
@@ -336,27 +354,49 @@ class FormChildTemplate:
         self.trv_available_sections.selection_remove(self.trv_available_sections.selection())
 
     def click_save(self):
-        if self.validate_fields():
+        validation_option = self.validate_fields()
+        if validation_option == 0:
             name_aux = self.txt_name.get('1.0', 'end-1c')
             description_aux = self.txt_description.get('1.0', 'end-1c')
             if self.decide_template:
-                self.directive = Message(action=36, information=[name_aux, description_aux, visual_section_id, [], []])
-                for item in self.trv_selected_sections.get_children():
-                    self.directive.information[2].append(int(self.trv_selected_sections.item(item)['text']))
-                    self.directive.information[3].append(self.trv_selected_sections.item(item)['values'][2])
-            else:
-                self.directive = Message(action=38, information=[self.id_selected, name_aux, description_aux,
-                                                                 visual_section_id, [], []])
+                self.directive = Message(action=36, information=[name_aux, description_aux, self.id_main_section, [], []])
                 for item in self.trv_selected_sections.get_children():
                     self.directive.information[3].append(int(self.trv_selected_sections.item(item)['text']))
-                    self.directive.information[4].append(self.trv_selected_sections.item(item)['values'][2])
+                    if int(self.trv_selected_sections.item(item)['text']) == self.id_main_section:
+                        self.directive.information[4].append('✓')
+                    else:
+                        self.directive.information[4].append(self.trv_selected_sections.item(item)['values'][2])
+            else:
+                self.directive = Message(action=38, information=[self.id_selected, name_aux, description_aux,
+                                                                 self.id_main_section, [], []])
+                for item in self.trv_selected_sections.get_children():
+                    self.directive.information[4].append(int(self.trv_selected_sections.item(item)['text']))
+                    if int(self.trv_selected_sections.item(item)['text']) == self.id_main_section:
+                        self.directive.information[5].append('✓')
+                    else:
+                        self.directive.information[5].append(self.trv_selected_sections.item(item)['values'][2])
             self.connection = self.directive.send_directive(self.connection)
             self.clear_fields()
             self.frm_child_crud.grid_forget()
             self.show_frm()
-        else:
+        elif validation_option == 1:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
-                                   message='There are mandatory fields that need to be filled!')
+                                   message='You must provide a name')
+        elif validation_option == 2:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must provide a description')
+        elif validation_option == 3:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must select at least one section')
+        elif validation_option == 4:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='At least one section has to be of text type')
+        elif validation_option == 5:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
+                                   message='You mus set one of the selected section as main')
+        else:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
+                                   message='The main section has to be of text type')
 
     def click_cancel(self):
         decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
@@ -367,13 +407,26 @@ class FormChildTemplate:
             self.show_frm()
 
     def validate_fields(self):
-        if len(self.txt_name.get('1.0', 'end-1c')) != 0 and len(self.txt_description.get('1.0', 'end-1c')) != 0:
-            if len(self.trv_selected_sections.get_children()) != 0:
-                return True
-            else:
-                return False
-        else:
-            return False
+        text_section = False
+        if len(self.txt_name.get('1.0', 'end-1c')) == 0:
+            return 1
+        if len(self.txt_description.get('1.0', 'end-1c')) == 0:
+            return 2
+        if len(self.trv_selected_sections.get_children()) == 0:
+            return 3
+        for item in self.trv_selected_sections.get_children():
+            if self.trv_selected_sections.item(item)['values'][1] == 'Text':
+                text_section = True
+                break
+        if not text_section:
+            return 4
+        for item in self.trv_selected_sections.get_children():
+            if self.trv_selected_sections.item(item)['values'][3] == '✓':
+                if self.trv_selected_sections.item(item)['values'][1] == 'Text':
+                    return 0
+                else:
+                    return 6
+        return 5
 
     def clear_fields(self):
         self.txt_name.delete('1.0', 'end-1c')
@@ -384,8 +437,8 @@ class FormChildTemplate:
             values = self.trv_selected_sections.item(
                 self.trv_selected_sections.focus())['values']
             if values[2] == '':
-                self.trv_selected_sections.item(self.trv_selected_sections.focus(), values=(values[0], values[1], '✓'))
+                self.trv_selected_sections.item(self.trv_selected_sections.focus(), values=(values[0], values[1], '✓', values[3]))
             else:
-                self.trv_selected_sections.item(self.trv_selected_sections.focus(), values=(values[0], values[1], ''))
+                self.trv_selected_sections.item(self.trv_selected_sections.focus(), values=(values[0], values[1], '', values[3]))
 
 
