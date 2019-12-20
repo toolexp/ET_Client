@@ -2,7 +2,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoIma
     Canvas, StringVar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator, Combobox
-from Modules.Config.Data import Message, CreateToolTip, Experiment, wrap_text
+from Modules.Config.Data import Message, CreateToolTip, Experiment, Pattern, wrap_text
 from Modules.Config.Visual import *
 
 
@@ -511,6 +511,25 @@ class FormChildExperiment:
         self.directive = Message()
         self.experiment = None'''
 
+    def initialize_expsc_variables(self):
+        """
+        Method that set the local variables to its initial state (empty) and retrieve info from the database
+        """
+        # Retrieve available patterns from the server
+        self.patterns = Pattern.get_available_patterns(self.connection)
+        # Retrieve available designers groups from the server
+        self.designers_group = []
+        self.directive = Message(action=27)
+        self.connection = self.directive.send_directive(self.connection)
+        for item in self.connection.message.information:
+            elements = item.split('¥')
+            self.designers_group.append(DesignersGroup(id=int(elements[0]), name=elements[1], description=elements[2]))
+        # Other important variables for internal use
+        self.directive = Message()
+        self.current_sc_comp = None
+        self.scenario_components = []
+        self.experimental_scenario = None
+
     def retrieve_list_exp(self):
         """
         Function that shows the existing 'Experiments' in the home list (TreeView)
@@ -691,6 +710,8 @@ class FormChildExperiment:
                     self.experiment.design_type = design_type_aux
                     self.directive = Message(action=93, information=[self.experiment.id, self.experiment.name,
                                                                      self.experiment.description, self.experiment.design_type])
+                    ###### Borrar informacion de control group
+
                     self.connection = self.directive.send_directive(self.connection)
                     self.click_back_exp()
                 else:
@@ -799,6 +820,8 @@ class FormChildExperiment:
         if self.experiment.design_type == 2:
             self.frm_aux9.grid(row=0, column=2, padx=50, pady=10, sticky=E)
             self.frm_aux11.grid(row=0, column=1, padx=10, pady=10, sticky=E)
+        self.load_designers()
+        self.load_patterns()
         self.show_cu_buttons()
 
     def click_view_sc(self):
@@ -1067,6 +1090,64 @@ class FormChildExperiment:
         self.btn_quit_isol.grid_forget()
         self.btn_view_isol.grid_forget()
 
+    def load_designers(self):
+        # Clear designers groups listboxes
+        self.lbx_egroup.delete(0, END)
+        self.lbx_cgroup.delete(0, END)
+        # Load listboxes with designers' names
+        for item in self.designers_group:
+            self.cbx_cgroup['values'] += (item.name,)
+            self.cbx_egroup['values'] += (item.name,)
+
+    def load_patterns(self):
+        # Remove existing elements (available patterns)
+        for item in self.trv_available_patters_egroup.get_children():
+            self.trv_available_patters_egroup.delete(item)
+        for item in self.trv_available_patters_cgroup.get_children():
+            self.trv_available_patters_cgroup.delete(item)
+        # Remove existing elements (selected patterns)
+        for item in self.trv_selected_patterns_egroup.get_children():
+            self.trv_selected_patterns_egroup.delete(item)
+        for item in self.trv_selected_patterns_cgroup.get_children():
+            self.trv_selected_patterns_cgroup.delete(item)
+        # Adding elements in the list depending if the component is new or being modified
+        if not self.decide_component:   # This is executed when an scenario component is being edited
+            a_patterns_cgroup = self.patterns[:]
+            a_patterns_egroup = self.patterns[:]
+            s_patterns_cgroup = self.current_sc_comp.id_patterns_cgroup
+            selected_patterns_cg = []
+            s_patterns_egroup = self.current_sc_comp.id_patterns_egroup
+            selected_patterns_eg = []
+            # Compare and distribute patterns correctly in control group
+            for identity in s_patterns_cgroup:
+                for item in a_patterns_cgroup:
+                    if identity == item.id:
+                        selected_patterns_cg.append(item)
+                        a_patterns_cgroup.remove(item)
+            # Compare and distribute patterns correctly in experimental group
+            for identity in s_patterns_egroup:
+                for item in a_patterns_egroup:
+                    if identity == item.id:
+                        selected_patterns_eg.append(item)
+                        a_patterns_egroup.remove(item)
+            # Fill TVs with the results from the comparation
+            for item in a_patterns_cgroup:
+                content = item.get_content_name()
+                self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
+            for item in selected_patterns_cg:
+                content = item.get_content_name()
+                self.trv_selected_patterns_cgroup.insert('', 'end', text=item.id, values=(content,))
+            for item in a_patterns_egroup:
+                content = item.get_content_name()
+                self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
+            for item in selected_patterns_eg:
+                content = item.get_content_name()
+                self.trv_selected_patterns_egroup.insert('', 'end', text=item.id, values=(content,))
+        else:
+            for item in self.patterns:
+                content = item.get_content_name()
+                self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
+                self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
 
     def clear_exp_fields(self):
         """

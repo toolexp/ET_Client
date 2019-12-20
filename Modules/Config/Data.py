@@ -110,6 +110,7 @@ class Experiment:
         self.design_type = design_type
         self.state = state
 
+
 class ExperimentalSC:
     def __init__(self, id=0, name='', description='', access_code='', scenario_availability=True, scenario_lock=False,
                  id_experiment=None, id_control_group=None, id_experimental_group=None, experiment=None,
@@ -226,15 +227,16 @@ class Message:
 
 
 class Pattern:
-    def __init__(self, id=0, template=None, sections=None):
+    def __init__(self, id=0, template=None, sections=None, main_section=None):
         if sections is None:
             sections = []
         self.id = id
         self.template = template
         self.sections = sections
+        self.main_section = main_section
 
-    def get_content_name(self):
-        return self.sections[0].content
+    def get_main_section(self):
+        return self.main_section.content
 
     @staticmethod
     def get_available_patterns(connection):
@@ -251,10 +253,9 @@ class Pattern:
             connection = directive.send_directive(connection)
             template_aux = Template(int(id_template), connection.message.information[0],
                                     connection.message.information[1])
-            directive = Message(action=77, information=[template_aux.id])
-            connection = directive.send_directive(connection)
-            sections = connection.message.information
+            sections = connection.message.information[2]
             current_sections = []
+            current_m_section = None
             for item2 in sections:
                 elements = item2.split('¥')
                 directive = Message(action=47, information=[int(id_pattern), int(elements[0])])
@@ -263,11 +264,14 @@ class Pattern:
                 section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]),
                                       section_id=int(elements[2]), name=elements[3], description=elements[4],
                                       data_type=elements[5], position=int(elements[6]), mandatory=elements[7],
-                                      classification_id=elements[8], pattern_section_id=int(elements_content[0]),
-                                      diagram_id=elements_content[4], category_id=elements_content[5],
-                                      content=elements_content[1])
+                                      main=elements[8], classification_id=elements[9],
+                                      pattern_section_id=int(elements_content[0]), diagram_id=elements_content[4],
+                                      category_id=elements_content[5], content=elements_content[1])
+                if section_aux.main == '✓':
+                    current_m_section = section_aux
                 current_sections.append(section_aux)
-            pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections)
+            pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections,
+                                  main_section=current_m_section)
             patterns.append(pattern_aux)
         return patterns
 
@@ -282,10 +286,9 @@ class Pattern:
             connection = directive.send_directive(connection)
             template_aux = Template(int(id_template), connection.message.information[0],
                                     connection.message.information[1])
-            directive = Message(action=77, information=[template_aux.id])
-            connection = directive.send_directive(connection)
-            sections = connection.message.information
+            sections = connection.message.information[2]
             current_sections = []
+            current_m_section = None
             for item2 in sections:
                 elements = item2.split('¥')
                 directive = Message(action=47, information=[int(id_pattern), int(elements[0])])
@@ -294,11 +297,14 @@ class Pattern:
                 section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]),
                                       section_id=int(elements[2]), name=elements[3], description=elements[4],
                                       data_type=elements[5], position=int(elements[6]), mandatory=elements[7],
-                                      classification_id=elements[8], pattern_section_id=int(elements_content[0]),
-                                      diagram_id=elements_content[4], category_id=elements_content[5],
-                                      content=elements_content[1])
+                                      main=elements[8], classification_id=elements[9],
+                                      pattern_section_id=int(elements_content[0]), diagram_id=elements_content[4],
+                                      category_id=elements_content[5], content=elements_content[1])
+                if section_aux.main == '✓':
+                    current_m_section = section_aux
                 current_sections.append(section_aux)
-            pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections)
+            pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections,
+                                  main_section=current_m_section)
             patterns.append(pattern_aux)
         return patterns
 
@@ -371,9 +377,8 @@ class ScenarioComponent:
 
 class Section:
     def __init__(self, temp_section_id=0, template_id=0, section_id=0, name='', description='', data_type='',
-                 position=0,
-                 mandatory='✓', classification_id=0, pattern_section_id=0, diagram_id=0, category_id=0, content='',
-                 file=None, category=None):
+                 position=0, mandatory='✓', main='', classification_id=0, pattern_section_id=0, diagram_id=0,
+                 category_id=0, content='', file=None, category=None):
         self.temp_section_id = temp_section_id
         self.template_id = template_id
         self.section_id = section_id
@@ -382,6 +387,7 @@ class Section:
         self.data_type = data_type
         self.position = position
         self.mandatory = mandatory
+        self.main = main
         if classification_id != 'None':
             self.classification_id = int(classification_id)
         else:

@@ -634,7 +634,7 @@ class FormChildProblem:
         """
         if self.file is None:
             filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
-                                                  filetypes=[("jpeg", "*.jpg")])
+                                                  filetypes=[("Diagrams", ".jpg .png .tiff")])
             if not filename:
                 return  # user cancelled; stop this method
             self.file = File()

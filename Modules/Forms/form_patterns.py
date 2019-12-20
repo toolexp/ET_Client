@@ -107,7 +107,7 @@ class FormChildPattern:
 
         # Components for CRUD FRM
         frm_aux1 = Frame(self.frm_child_crud)
-        lbl_template = Label(frm_aux1, text='Select a template')
+        lbl_template = Label(frm_aux1, text='1)Select a template')
         lbl_template.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_template.grid(pady=10, padx=20, sticky=W)
         self.cbx_template = Combobox(frm_aux1, state="readonly", width=60)
@@ -121,7 +121,7 @@ class FormChildPattern:
         sep_aux2.grid(row=0, column=1, sticky=NS, rowspan=3)
 
         self.frm_aux2 = Frame(self.frm_child_crud)
-        lbl_section = Label(self.frm_aux2, text='Select a section')
+        lbl_section = Label(self.frm_aux2, text='2)Select a section')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(row=0, column=1, pady=10, sticky=NW)
         lbl_sep5 = Label(self.frm_aux2)
@@ -156,7 +156,7 @@ class FormChildPattern:
         lbl_sep7 = Label(self.frm_aux2)
         lbl_sep7.grid(row=1, column=6, padx=20, pady=10)
 
-        lbl_section = Label(self.frm_aux2, text='Content')
+        lbl_section = Label(self.frm_aux2, text='3)Content')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(row=2, column=4, pady=10, sticky=NW)
 
@@ -247,8 +247,7 @@ class FormChildPattern:
             self.trv_available.delete(item)
         # Adding elements in the list
         for item in self.patterns:
-            content = item.get_content_name()
-            self.trv_available.insert('', 'end', text=item.id, values=(content,))
+            self.trv_available.insert('', 'end', text=item.id, values=(item.get_main_section(),))
 
     def show_frm(self):
         """
@@ -283,12 +282,16 @@ class FormChildPattern:
             # Adding elements in the list
             for item in current_pattern.sections:
                 if item.data_type == 'File': # If pattern has an associated diagram
-                    self.btn_view_diagram['state'] = NORMAL
-                    self.txt_summary.insert('end-1c', "{}:\nClick right button to see diagram >>\n\n".format(item.name))
-                    self.directive = Message(action=65, information=[item.diagram_id])  # Ask for the diagram of this section
-                    self.connection = self.directive.send_directive(self.connection)
-                    self.file_summary = File()
-                    self.file_summary.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                    if item.diagram_id != 0:
+                        self.btn_view_diagram['state'] = NORMAL
+                        self.txt_summary.insert('end-1c', "{}:\nClick right button to see diagram >>\n\n".format(item.name))
+                        self.directive = Message(action=65, information=[item.diagram_id])  # Ask for the diagram of this section
+                        self.connection = self.directive.send_directive(self.connection)
+                        self.file_summary = File()
+                        self.file_summary.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                    else:
+                        self.txt_summary.insert('end-1c',
+                                                "{}:\nNo configured diagram\n\n".format(item.name))
                 else:
                     self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 65)))
             self.txt_summary['state'] = DISABLED
@@ -496,7 +499,7 @@ class FormChildPattern:
         """
         if self.file is None:
             filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
-                                                  filetypes=[("jpeg", "*.jpg")])
+                                                  filetypes=[("Diagrams", ".jpg .png .tiff")])
             if not filename:
                 return  # user cancelled; stop this method
             self.file = File()
@@ -545,9 +548,9 @@ class FormChildPattern:
         for item in self.connection.message.information[2]:
             elements = item.split('¥')
             section_aux = Section(temp_section_id=int(elements[0]), template_id=int(elements[1]),
-                                  section_id=int(elements[2]),
-                                  name=elements[3], description=elements[4], data_type=elements[5],
-                                  position=int(elements[6]), mandatory=elements[7], classification_id=elements[8])
+                                  section_id=int(elements[2]), name=elements[3], description=elements[4],
+                                  data_type=elements[5], position=int(elements[6]), mandatory=elements[7],
+                                  main=elements[8], classification_id=elements[9])
             self.new_pattern.sections.append(section_aux)
         self.set_trv_summary(self.new_pattern.sections)
 

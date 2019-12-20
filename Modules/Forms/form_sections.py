@@ -78,13 +78,13 @@ class FormChildSection:
 
         # Components for CRUD FRM
         self.frm_aux1 = Frame(self.frm_child_crud)
-        lbl_type = Label(self.frm_aux1, text='Data type')
+        lbl_type = Label(self.frm_aux1, text='Data type*')
         lbl_type.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_type.grid(row=0, column=0, pady=10, padx=50, sticky=W)
-        lbl_name = Label(self.frm_aux1, text='Name')
+        lbl_name = Label(self.frm_aux1, text='Name*')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(row=1, column=0, pady=10, padx=50, sticky=W)
-        lbl_description = Label(self.frm_aux1, text='Description\t')
+        lbl_description = Label(self.frm_aux1, text='Description*\t')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description.grid(row=2, column=0, pady=10, padx=50, sticky=NW)
         self.cbx_data = Combobox(self.frm_aux1, state="readonly")
