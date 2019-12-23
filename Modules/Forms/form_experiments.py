@@ -1,9 +1,12 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar, Toplevel, Listbox, \
-    Canvas, StringVar
+    Canvas, StringVar, filedialog
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator, Combobox
-from Modules.Config.Data import Message, CreateToolTip, Experiment, Pattern, wrap_text
+from Modules.Config.Data import Message, CreateToolTip, Experiment, Pattern, wrap_text, Designer, ExperimentalSC, Problem, File
 from Modules.Config.Visual import *
+from PIL import ImageTk, Image
+import os
+
 
 
 class FormParentExperiment:
@@ -34,6 +37,8 @@ class FormChildExperiment:
         self.connection = connection
         self.id_exp_selected = 0
         self.decide_exp = True
+        self.file_dd = None
+        self.file_esol = None
 
         self.frm_child_exp_list = LabelFrame(frm_parent)
         self.frm_child_sc_list = LabelFrame(frm_parent)
@@ -429,38 +434,38 @@ class FormChildExperiment:
         lbl_sep16.grid(row=0, column=8, padx=10, pady=10, rowspan=6)
         lbl_sep17 = Label(frm_aux2)
         lbl_sep17.grid(row=0, column=12, padx=10, pady=10, rowspan=6)
-        lbl_annotations_isol = Label(frm_aux2, text='Notes')
-        lbl_annotations_isol.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_annotations_isol.grid(row=0, column=1, pady=10, sticky=NW)
-        self.txt_annotations_isol = Text(frm_aux2, height=4, width=50)
-        self.txt_annotations_isol.config(font=TEXT_FONT)
-        self.txt_annotations_isol.grid(row=0, column=3, pady=10, columnspan=2)
-        vsb_txt_annot_iso = Scrollbar(frm_aux2, orient="vertical", command=self.txt_annotations_isol.yview)
+        lbl_annotations_esol = Label(frm_aux2, text='Notes')
+        lbl_annotations_esol.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_annotations_esol.grid(row=0, column=1, pady=10, sticky=NW)
+        self.txt_annotations_esol = Text(frm_aux2, height=4, width=50)
+        self.txt_annotations_esol.config(font=TEXT_FONT)
+        self.txt_annotations_esol.grid(row=0, column=3, pady=10, columnspan=2)
+        vsb_txt_annot_iso = Scrollbar(frm_aux2, orient="vertical", command=self.txt_annotations_esol.yview)
         vsb_txt_annot_iso.grid(row=0, column=5, pady=10, sticky=NS)
-        self.txt_annotations_isol.configure(yscrollcommand=vsb_txt_annot_iso.set)
-        lbl_diagram_isol = Label(frm_aux2, text='Diagram*')
-        lbl_diagram_isol.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_diagram_isol.grid(row=1, column=1, pady=10, rowspan=5, sticky=NW)
-        self.canvas_isol = Canvas(frm_aux2, width=110, height=110)
-        self.canvas_isol.config(background='white', borderwidth=1)
-        self.canvas_isol.grid(row=1, column=3, pady=10, rowspan=5, sticky=E)
-        self.btn_open_isol = Button(frm_aux2, image=self.open_icon, command=self.click_upload_isol)
-        btn_open_isol_ttp = CreateToolTip(self.btn_open_isol, 'Open image')
-        self.btn_quit_isol = Button(frm_aux2, image=self.remove_icon, command=self.click_remove_isol)
-        btn_quit_isol_ttp = CreateToolTip(self.btn_quit_isol, 'Remove image')
-        self.btn_view_isol = Button(frm_aux2, image=self.view_icon, command=self.click_view_isol)
-        #self.btn_view_isol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
-        btn_view_isol_ttp = CreateToolTip(self.btn_view_isol, 'View image')
+        self.txt_annotations_esol.configure(yscrollcommand=vsb_txt_annot_iso.set)
+        lbl_diagram_esol = Label(frm_aux2, text='Diagram*')
+        lbl_diagram_esol.config(fg=TEXT_COLOR, font=LABEL_FONT)
+        lbl_diagram_esol.grid(row=1, column=1, pady=10, rowspan=5, sticky=NW)
+        self.canvas_esol = Canvas(frm_aux2, width=110, height=110)
+        self.canvas_esol.config(background='white', borderwidth=1)
+        self.canvas_esol.grid(row=1, column=3, pady=10, rowspan=5, sticky=E)
+        self.btn_open_esol = Button(frm_aux2, image=self.open_icon, command=self.click_upload_esol)
+        btn_open_esol_ttp = CreateToolTip(self.btn_open_esol, 'Open image')
+        self.btn_quit_esol = Button(frm_aux2, image=self.remove_icon, command=self.click_remove_esol)
+        btn_quit_esol_ttp = CreateToolTip(self.btn_quit_esol, 'Remove image')
+        self.btn_view_esol = Button(frm_aux2, image=self.view_icon, command=self.click_view_esol)
+        #self.btn_view_esol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
+        btn_view_esol_ttp = CreateToolTip(self.btn_view_esol, 'View image')
         lbl_patterns = Label(frm_aux2, text='Patterns')
         lbl_patterns.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_patterns.grid(row=0, column=7, pady=10, sticky=NW)
-        self.lbx_patterns_isol = Listbox(frm_aux2, height=13, width=50, exportselection=0)
-        self.lbx_patterns_isol.grid(row=0, column=9, pady=10, sticky=W, rowspan=6)
-        vsb_lbx_pat_isol = Scrollbar(frm_aux2, orient="vertical", command=self.lbx_patterns_isol.yview)
-        vsb_lbx_pat_isol.grid(row=0, column=10, pady=10, rowspan=6, sticky=NS)
-        self.lbx_patterns_isol.configure(yscrollcommand=vsb_lbx_pat_isol.set)
-        self.btn_pat_isol = Button(frm_aux2, image=self.patterns_icon, command=self.click_pat_isol)
-        btn_pat_isol_ttp = CreateToolTip(self.btn_pat_isol, 'Configure patterns')
+        self.lbx_patterns_esol = Listbox(frm_aux2, height=13, width=50, exportselection=0)
+        self.lbx_patterns_esol.grid(row=0, column=9, pady=10, sticky=W, rowspan=6)
+        vsb_lbx_pat_esol = Scrollbar(frm_aux2, orient="vertical", command=self.lbx_patterns_esol.yview)
+        vsb_lbx_pat_esol.grid(row=0, column=10, pady=10, rowspan=6, sticky=NS)
+        self.lbx_patterns_esol.configure(yscrollcommand=vsb_lbx_pat_esol.set)
+        self.btn_pat_esol = Button(frm_aux2, image=self.patterns_icon, command=self.click_pat_esol)
+        btn_pat_esol_ttp = CreateToolTip(self.btn_pat_esol, 'Configure patterns')
         frm_aux2.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
 
         #sep_aux2 = Separator(self.tlevel_problem, orient=VERTICAL)
@@ -503,32 +508,6 @@ class FormChildExperiment:
         btn_cancel_pats = Button(self.tlevel_patterns, image=self.cancel_icon, command=self.click_cancel_patterns)
         btn_cancel_pats.grid(row=1, column=7, padx=10, sticky=E)
         btn_cancel_pats_ttp = CreateToolTip(btn_cancel_pats, 'Cancel')
-
-    '''def initialize_exp_variables(self):
-        """
-        Method that set the local variables to its initial state (empty)
-        """
-        self.directive = Message()
-        self.experiment = None'''
-
-    def initialize_expsc_variables(self):
-        """
-        Method that set the local variables to its initial state (empty) and retrieve info from the database
-        """
-        # Retrieve available patterns from the server
-        self.patterns = Pattern.get_available_patterns(self.connection)
-        # Retrieve available designers groups from the server
-        self.designers_group = []
-        self.directive = Message(action=27)
-        self.connection = self.directive.send_directive(self.connection)
-        for item in self.connection.message.information:
-            elements = item.split('¥')
-            self.designers_group.append(DesignersGroup(id=int(elements[0]), name=elements[1], description=elements[2]))
-        # Other important variables for internal use
-        self.directive = Message()
-        self.current_sc_comp = None
-        self.scenario_components = []
-        self.experimental_scenario = None
 
     def retrieve_list_exp(self):
         """
@@ -591,14 +570,14 @@ class FormChildExperiment:
             #self.initialize_exp_variables()
             self.experiment = Experiment(id=self.id_exp_selected, name=self.connection.message.information[0],
                                          description=self.connection.message.information[1],
-                                         design_type=self.connection.message.information[2],
+                                         design_type=int(self.connection.message.information[2]),
                                          state=self.connection.message.information[3])
             # Fill visual components with retrieved information
             self.txt_name_exp.insert('1.0', self.experiment.name)
             self.txt_name_exp['bg'] = self.disabled_color
             self.txt_description_exp['bg'] = self.disabled_color
             self.txt_description_exp.insert('1.0', wrap_text(self.experiment.description, 85))
-            self.cbx_dt_exp.set('One experimental group' if self.connection.message.information[3] == 1 else
+            self.cbx_dt_exp.set('One experimental group' if self.experiment.design_type == 1 else
                                 'Two groups(control and exp.)')
             self.frm_child_exp_list.grid_forget()
             self.frm_child_general_exp['text'] = 'View experiment'
@@ -760,8 +739,10 @@ class FormChildExperiment:
             self.connection = self.directive.send_directive(self.connection)
             self.experiment = Experiment(id=self.id_exp_selected, name=self.connection.message.information[0],
                                          description=self.connection.message.information[1],
-                                         design_type=self.connection.message.information[2],
+                                         design_type=int(self.connection.message.information[2]),
                                          state=self.connection.message.information[3])
+            self.load_designers()
+            self.load_patterns()
             self.main_title.set('Experiment: ' + self.experiment.name)
             self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
@@ -813,6 +794,8 @@ class FormChildExperiment:
         pass
 
     def click_new_sc(self):
+        self.experimental_scenario = ExperimentalSC()
+        self.visual_problems = []
         self.txt_title_sc.focus_set()
         self.frm_child_general_sc['text'] = 'New experimental scenario'
         self.frm_child_sc_list.grid_forget()
@@ -820,8 +803,6 @@ class FormChildExperiment:
         if self.experiment.design_type == 2:
             self.frm_aux9.grid(row=0, column=2, padx=50, pady=10, sticky=E)
             self.frm_aux11.grid(row=0, column=1, padx=10, pady=10, sticky=E)
-        self.load_designers()
-        self.load_patterns()
         self.show_cu_buttons()
 
     def click_view_sc(self):
@@ -862,42 +843,191 @@ class FormChildExperiment:
     def click_cancel_designers(self):
         self.tlevel_designers.grab_release()
         self.tlevel_designers.withdraw()
+        self.tlevel_designers_type = 0
 
     def click_cancel_patterns(self):
         self.tlevel_patterns.grab_release()
         self.tlevel_patterns.withdraw()
+        self.tlevel_patterns_type = 0
 
     def click_cgroup_sc(self):
+        # Clear treeviews
+        for item in self.trv_available_designers.get_children():
+            self.trv_available_designers.delete(item)
+        for item in self.trv_selected_designers.get_children():
+            self.trv_selected_designers.delete(item)
+        # Fill available designers treeview
+        for item in self.av_designers_cgroup:
+            self.trv_available_designers.insert('', 'end', text=item.id,
+                                                values=('{} {}'.format(item.name, item.surname),))
+        # Fill selected designers treeview
+        for item in self.experimental_scenario.control_group:
+            self.trv_selected_designers.insert('', 'end', text=item.id,
+                                               values=('{} {}'.format(item.name, item.surname),))
         self.tlevel_designers.deiconify()
         self.tlevel_designers.grab_set()
+        self.tlevel_designers_type = 2
 
     def click_egroup_sc(self):
+        # Clear treeviews
+        for item in self.trv_available_designers.get_children():
+            self.trv_available_designers.delete(item)
+        for item in self.trv_selected_designers.get_children():
+            self.trv_selected_designers.delete(item)
+        # Fill available designers treeview
+        for item in self.av_designers_egroup:
+            self.trv_available_designers.insert('', 'end', text=item.id,
+                                                values=('{} {}'.format(item.name, item.surname),))
+        # Fill selected designers treeview
+        for item in self.experimental_scenario.experimental_group:
+            self.trv_selected_designers.insert('', 'end', text=item.id,
+                                               values=('{} {}'.format(item.name, item.surname),))
         self.tlevel_designers.deiconify()
         self.tlevel_designers.grab_set()
+        self.tlevel_designers_type = 1
 
     def click_upload_dd(self):
-        pass
+        """
+        Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
+        """
+        if self.file_dd is None:
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
+                                                  filetypes=[("Diagrams", ".jpg .png .tiff")])
+            if not filename:
+                return  # user cancelled; stop this method
+            self.file_dd = File()
+            self.file_dd.read_file(filename)
+            self.show_file(self.file_dd, self.canvas_dd)
 
     def click_remove_dd(self):
-        pass
+        """
+        Remove an uploaded file from the system validating it is already uploaded. This method also delete
+        any image in the canvas that may be fulfilled with an image.
+        """
+        if self.file_dd is not None:  # if an image was already loaded
+            self.canvas_dd.delete(self.file_dd.image)  # clear canvas
+            self.file_dd = None
 
     def click_view_dd(self):
         pass
 
     def click_new_problem(self):
+        self.problem = Problem()
+        self.av_patterns_esol = self.av_patterns[:]
         self.txt_title_sc.focus_set()
         self.tlevel_problem.title('New problem')
         self.tlevel_problem.deiconify()
         self.tlevel_problem.grab_set()
 
     def click_delete_problem(self):
-        pass
+        element = self.lbx_problems.curselection()
+        if element is not None:  # Check if listbox is selected
+            index = element[0]
+            id_selected = self.visual_problems[index]
+            self.lbx_problems.delete(element)  # Remove from listbox
+            for item in reversed(self.experimental_scenario.problems):  # Remove from object
+                if item.id_visual == id_selected:
+                    self.experimental_scenario.problems.remove(item)
+                    break
+        else:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='No selection',
+                                   message='You must select an item')
 
     def click_view_problem(self):
         pass
 
     def click_save_sc(self):
-        pass
+        """
+        Function that saves all inserted information of a new scenario component into the database
+        """
+        validation_option = self.validate_sc_fields()
+        if validation_option == 0:
+            patterns_decision = True
+            if self.lbx_egroup_pat.size() == 0:
+                # MessageBox asking confirmation not saving patterns for exp. group
+                decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
+                                               message='Are you sure you don\'t want to configure patterns for '
+                                                       'experimental group?')
+                if not decision: #  Cancel
+                    patterns_decision = False
+            if self.experiment.design_type == 2:
+                if self.lbx_cgroup_pat.size() == 0:
+                    # MessageBox asking confirmation not saving patterns for ctrl. group
+                    decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
+                                                   message='Are you sure you don\'t want to configure patterns for '
+                                                           'control group?')
+                    if decision:  # Cancel
+                        patterns_decision = False
+            if patterns_decision:
+                self.experimental_scenario.title = self.txt_title_sc.get('1.0', 'end-1c')
+                self.experimental_scenario.description = self.txt_description_sc.get('1.0', 'end-1c')
+                self.experimental_scenario.access_code = self.txt_access_sc.get('1.0', 'end-1c')
+                if self.experimental_scenario.id == 0:  # New experimental scenario
+                    # Create context diagram in DB (if exist)
+                    id_diagram = None
+                    if self.file_dd is not None:
+                        self.directive = Message(action=61,
+                                                 information=[self.file_dd.file_bytes, self.file_dd.name, 'scen context'])
+                        self.connection = self.directive.send_directive(self.connection)
+                        id_diagram = self.connection.message.information[0]
+                    # Create scenario in DB
+                    self.directive = Message(action=81,
+                                             information=[self.experimental_scenario.title,
+                                                          self.experimental_scenario.description,
+                                                          self.experimental_scenario.access_code, id_diagram,
+                                                          self.experiment.id, [], [], [], []])
+                    for item in self.experimental_scenario.experimental_group:
+                        self.directive.information[5].append(item.id)
+                    for item in self.experimental_scenario.egroup_patterns:
+                        self.directive.information[7].append(item.id)
+                    if self.experiment.design_type == 2:
+                        for item in self.experimental_scenario.control_group:
+                            self.directive.information[6].append(item.id)
+                        for item in self.experimental_scenario.cgroup_patterns:
+                            self.directive.information[8].append(item.id)
+                    self.connection = self.directive.send_directive(self.connection)
+                    id_exp_scenario = self.connection.message.information[0]
+                    # Create problems and its associated objects
+                    for item in self.experimental_scenario.problems:
+                        # Create expected solution diagram in DB
+                        self.directive = Message(action=61,
+                                                 information=[item.solution.file.file_bytes, item.solution.file.name,
+                                                              'exp sol'])
+                        self.connection = self.directive.send_directive(self.connection)
+                        id_diagram = self.connection.message.information[0]
+                        # Create the expected solution in DB
+                        self.directive = Message(action=56, information=[item.solution.annotations, id_diagram])
+                        if item.solution.patterns:
+                            self.directive.information.append(item.solution.patterns)
+                        self.connection = self.directive.send_directive(self.connection)
+                        id_solution = self.connection.message.information[0]
+                        # Create the problem in DB
+                        self.directive = Message(action=51,
+                                                 information=[item.brief_description, item.description, id_solution,
+                                                              id_exp_scenario])
+                        self.connection = self.directive.send_directive(self.connection)
+                else:   # Updating experimental scenario
+                    pass
+                self.clear_sc_fields()
+                self.frm_child_general_sc.grid_forget()
+                self.retrieve_list_sc()
+                self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+
+        elif validation_option == 1:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='Check mandatory text fields, some of them are empty')
+        elif validation_option == 2:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Duplicated designers',
+                                   message='At least one designer is in both, experimental and control group')
+        elif validation_option == 3:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='Experimental group can not be empty')
+        elif validation_option == 4:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='Control group can not be empty')
+        else:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='You must configure at least one problem')
 
     def click_cancel_sc(self):
         """
@@ -929,13 +1059,34 @@ class FormChildExperiment:
         self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_save_problem(self):
-        pass
+        """
+        Function that saves all inserted information of a new problem
+        """
+        validation_option = self.validate_problem_fields()
+        if validation_option == 0:
+            self.problem.brief_description = self.txt_short_desc_prob.get('1.0', 'end-1c')
+            self.problem.description = self.txt_description_prob.get('1.0', 'end-1c')
+            self.problem.solution.annotations = self.txt_description_prob.get('1.0', 'end-1c')
+            self.problem.solution.file = self.file_esol
+            self.experimental_scenario.problems.append(self.problem)
+            self.visual_problems.append(self.problem.id_visual)
+            self.lbx_problems.insert(END, self.problem.brief_description)
+            self.clear_problem_fields()
+            self.tlevel_problem.grab_release()
+            self.tlevel_problem.withdraw()
+        elif validation_option == 1:
+            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
+                                   message='Check mandatory text fields, some of them are empty')
+        else:
+            messagebox.showwarning(parent=self.tlevel_problem, title='Diagram',
+                                   message='The expected solution must have a file')
 
     def click_back_problem(self):
         """
         Function activated when 'Back' button is presed in 'Problem configuration tlevel'. It returns the
         user to the 'Experimental scenario configuration form'.
         """
+        self.clear_problem_fields()
         self.tlevel_problem.grab_release()
         self.tlevel_problem.withdraw()
 
@@ -974,7 +1125,77 @@ class FormChildExperiment:
         self.trv_available_designers.selection_remove(self.trv_available_designers.selection())
 
     def click_save_designers(self):
-        pass
+        aux_designers_av = []
+        aux_designers_sel = []
+        if self.tlevel_designers_type == 1: # Current view is for experimental group
+            # Compare current available designers in treeview with available designers in object
+            for item1 in reversed(self.av_designers_egroup):
+                found = False
+                for item2 in self.trv_available_designers.get_children():
+                    if self.trv_available_designers.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:   # Append designer to aux (added to selected ones) variable if designer not found and delete
+                    # from current list
+                    aux_designers_sel.append(item1)
+                    self.av_designers_egroup.remove(item1)
+            # Compare current selected designers in treeview with selected designers in object
+            for item1 in reversed(self.experimental_scenario.experimental_group):
+                found = False
+                for item2 in self.trv_selected_designers.get_children():
+                    if self.trv_selected_designers.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append designer to aux (added to available ones) variable if designer not found and delete
+                    # from current list
+                    aux_designers_av.append(item1)
+                    self.experimental_scenario.experimental_group.remove(item1)
+            # Add object to respective objects
+            for item in reversed(aux_designers_sel):
+                self.experimental_scenario.experimental_group.append(item)
+            for item in reversed(aux_designers_av):
+                self.av_designers_egroup.append(item)
+            # Clear patterns from listbox and insert new ones
+            self.lbx_egroup.delete(0, END)
+            for item in self.experimental_scenario.experimental_group:
+                self.lbx_egroup.insert(END, '{} {}'.format(item.name, item.surname))
+        elif self.tlevel_designers_type == 2:   # Current view is for control group
+            # Compare current available designers in treeview with available designers in object
+            for item1 in reversed(self.av_designers_cgroup):
+                found = False
+                for item2 in self.trv_available_designers.get_children():
+                    if self.trv_available_designers.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append designer to aux (added to selected ones) variable if designer not found and delete
+                    # from current list
+                    aux_designers_sel.append(item1)
+                    self.av_designers_cgroup.remove(item1)
+            # Compare current selected designers in treeview with selected designers in object
+            for item1 in reversed(self.experimental_scenario.control_group):
+                found = False
+                for item2 in self.trv_selected_designers.get_children():
+                    if self.trv_selected_designers.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append designer to aux (added to available ones) variable if designer not found and delete
+                    # from current list
+                    aux_designers_av.append(item1)
+                    self.experimental_scenario.control_group.remove(item1)
+            # Add object to respective objects
+            for item in reversed(aux_designers_sel):
+                self.experimental_scenario.control_group.append(item)
+            for item in reversed(aux_designers_av):
+                self.av_designers_cgroup.append(item)
+            # Clear patterns from listbox and insert new ones
+            self.lbx_cgroup.delete(0, END)
+            for item in self.experimental_scenario.control_group:
+                self.lbx_cgroup.insert(END, '{} {}'.format(item.name, item.surname))
+        else:
+            raise Exception('Tipo de grupo de disenadores es incongruente')
+        self.tlevel_designers.grab_release()
+        self.tlevel_designers.withdraw()
+        self.tlevel_designers_type = 0
 
     def click_trv_apatterns(self, event):
         """
@@ -1011,28 +1232,179 @@ class FormChildExperiment:
         self.trv_available_patterns.selection_remove(self.trv_available_patterns.selection())
 
     def click_save_patterns(self):
+        aux_patterns_av = []
+        aux_patterns_sel = []
+        if self.tlevel_patterns_type == 1:  # Current view is for patterns of experimental group
+            for item1 in reversed(self.av_patterns_egroup):
+                found = False
+                for item2 in self.trv_available_patterns.get_children():
+                    if self.trv_available_patterns.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append pattern to aux (added to selected ones) variable if designer not found and delete
+                    # from current list
+                    aux_patterns_sel.append(item1)
+                    self.av_patterns_egroup.remove(item1)
+            # Compare current selected patterns in treeview with selected patterns in object
+            for item1 in reversed(self.experimental_scenario.egroup_patterns):
+                found = False
+                for item2 in self.trv_selected_patterns.get_children():
+                    if self.trv_selected_patterns.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append pattern to aux (added to available ones) variable if designer not found and delete
+                    # from current list
+                    aux_patterns_av.append(item1)
+                    self.experimental_scenario.experimental_group.remove(item1)
+            # Add object to respective objects
+            for item in reversed(aux_patterns_sel):
+                self.experimental_scenario.egroup_patterns.append(item)
+            for item in reversed(aux_patterns_av):
+                self.av_patterns_egroup.append(item)
+            # Clear patterns from listbox and insert new ones
+            self.lbx_egroup_pat.delete(0, END)
+            for item in self.experimental_scenario.egroup_patterns:
+                self.lbx_egroup_pat.insert(END, item.get_main_section())
+        elif self.tlevel_patterns_type == 2:     # Current view is for patterns of control group
+            for item1 in reversed(self.av_patterns_cgroup):
+                found = False
+                for item2 in self.trv_available_patterns.get_children():
+                    if self.trv_available_patterns.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append pattern to aux (added to selected ones) variable if designer not found and delete
+                    # from current list
+                    aux_patterns_sel.append(item1)
+                    self.av_patterns_cgroup.remove(item1)
+            # Compare current selected patterns in treeview with selected patterns in object
+            for item1 in reversed(self.experimental_scenario.cgroup_patterns):
+                found = False
+                for item2 in self.trv_selected_patterns.get_children():
+                    if self.trv_selected_patterns.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append pattern to aux (added to available ones) variable if designer not found and delete
+                    # from current list
+                    aux_patterns_av.append(item1)
+                    self.experimental_scenario.experimental_group.remove(item1)
+            # Add object to respective objects
+            for item in reversed(aux_patterns_sel):
+                self.experimental_scenario.cgroup_patterns.append(item)
+            for item in reversed(aux_patterns_av):
+                self.av_patterns_cgroup.append(item)
+            # Clear patterns from listbox and insert new ones
+            self.lbx_cgroup_pat.delete(0, END)
+            for item in self.experimental_scenario.cgroup_patterns:
+                self.lbx_cgroup_pat.insert(END, item.get_main_section())
+        elif self.tlevel_patterns_type == 3:     # Current view is for patterns of expected solution
+            for item1 in reversed(self.av_patterns_esol):
+                found = False
+                for item2 in self.trv_available_patterns.get_children():
+                    if self.trv_available_patterns.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append pattern to aux (added to selected ones) variable if designer not found and delete
+                    # from current list
+                    aux_patterns_sel.append(item1)
+                    self.av_patterns_esol.remove(item1)
+            # Compare current selected patterns in treeview with selected patterns in object
+            for item1 in reversed(self.problem.solution.patterns):
+                found = False
+                for item2 in self.trv_selected_patterns.get_children():
+                    if self.trv_selected_patterns.item(item2)['text'] == item1.id:
+                        found = True
+                        break
+                if not found:  # Append pattern to aux (added to available ones) variable if designer not found and delete
+                    # from current list
+                    aux_patterns_av.append(item1)
+                    self.experimental_scenario.experimental_group.remove(item1)
+            # Add object to respective objects
+            for item in reversed(aux_patterns_sel):
+                self.problem.solution.patterns.append(item)
+            for item in reversed(aux_patterns_av):
+                self.av_patterns_esol.append(item)
+            # Clear patterns from listbox and insert new ones
+            self.lbx_patterns_esol.delete(0, END)
+            for item in self.problem.solution.patterns:
+                self.lbx_patterns_esol.insert(END, item.get_main_section())
+        else:
+            raise Exception('Tipo de grupo de patrones es incongruente')
+        self.tlevel_patterns.grab_release()
+        self.tlevel_patterns.withdraw()
+        self.tlevel_patterns_type = 0
+
+    def click_upload_esol(self):
+        """
+        Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
+        """
+        if self.file_esol is None:
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
+                                                  filetypes=[("Diagrams", ".jpg .png .tiff")])
+            if not filename:
+                return  # user cancelled; stop this method
+            self.file_esol = File()
+            self.file_esol.read_file(filename)
+            self.show_file(self.file_esol, self.canvas_esol)
+
+    def click_remove_esol(self):
+        """
+        Remove an uploaded file from the system validating it is already uploaded. This method also delete
+        any image in the canvas that may be fulfilled with an image.
+        """
+        if self.file_esol is not None:  # if an image was already loaded
+            self.canvas_esol.delete(self.file_esol.image)  # clear canvas
+            self.file_esol = None
+
+    def click_view_esol(self):
         pass
 
-    def click_upload_isol(self):
-        pass
-
-    def click_remove_isol(self):
-        pass
-
-    def click_view_isol(self):
-        pass
-
-    def click_pat_isol(self):
+    def click_pat_esol(self):
+        # Clear treeviews
+        for item in self.trv_available_patterns.get_children():
+            self.trv_available_patterns.delete(item)
+        for item in self.trv_selected_patterns.get_children():
+            self.trv_selected_patterns.delete(item)
+        # Fill available patterns treeview
+        for item in self.av_patterns_esol:
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(item.get_main_section(),))
+        # Fill selected patterns treeview
+        for item in self.problem.solution.patterns:
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(item.get_main_section(),))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
+        self.tlevel_patterns_type = 3
 
     def click_cgroup_pat(self):
+        # Clear treeviews
+        for item in self.trv_available_patterns.get_children():
+            self.trv_available_patterns.delete(item)
+        for item in self.trv_selected_patterns.get_children():
+            self.trv_selected_patterns.delete(item)
+        # Fill available patterns treeview
+        for item in self.av_patterns_cgroup:
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(item.get_main_section(),))
+        # Fill selected patterns treeview
+        for item in self.experimental_scenario.cgroup_patterns:
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(item.get_main_section(),))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
+        self.tlevel_patterns_type = 2
 
     def click_egroup_pat(self):
+        # Clear treeviews
+        for item in self.trv_available_patterns.get_children():
+            self.trv_available_patterns.delete(item)
+        for item in self.trv_selected_patterns.get_children():
+            self.trv_selected_patterns.delete(item)
+        # Fill available patterns treeview
+        for item in self.av_patterns_egroup:
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(item.get_main_section(),))
+        # Fill selected patterns treeview
+        for item in self.experimental_scenario.egroup_patterns:
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(item.get_main_section(),))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
+        self.tlevel_patterns_type = 1
 
     def click_copy_pats(self):
         pass
@@ -1051,9 +1423,9 @@ class FormChildExperiment:
         self.btn_egroup_pat.grid(row=0, column=4, padx=10, sticky=E)
         self.btn_cgroup_pat.grid(row=0, column=5, padx=10, sticky=E)
         self.btn_copy_pat.grid(row=2, column=0, padx=20, sticky=NSEW)
-        self.btn_pat_isol.grid(row=0, column=11, pady=10, padx=10, sticky=E)
-        self.btn_open_isol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
-        self.btn_quit_isol.grid(row=4, column=4, padx=10, pady=10, sticky=E)
+        self.btn_pat_esol.grid(row=0, column=11, pady=10, padx=10, sticky=E)
+        self.btn_open_esol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
+        self.btn_quit_esol.grid(row=4, column=4, padx=10, pady=10, sticky=E)
 
     def hide_exp_buttons(self):
         """
@@ -1085,69 +1457,29 @@ class FormChildExperiment:
         self.btn_egroup_pat.grid_forget()
         self.btn_cgroup_pat.grid_forget()
         self.btn_copy_pat.grid_forget()
-        self.btn_pat_isol.grid_forget()
-        self.btn_open_isol.grid_forget()
-        self.btn_quit_isol.grid_forget()
-        self.btn_view_isol.grid_forget()
+        self.btn_pat_esol.grid_forget()
+        self.btn_open_esol.grid_forget()
+        self.btn_quit_esol.grid_forget()
+        self.btn_view_esol.grid_forget()
 
     def load_designers(self):
-        # Clear designers groups listboxes
-        self.lbx_egroup.delete(0, END)
-        self.lbx_cgroup.delete(0, END)
-        # Load listboxes with designers' names
-        for item in self.designers_group:
-            self.cbx_cgroup['values'] += (item.name,)
-            self.cbx_egroup['values'] += (item.name,)
+        # Get designers from database
+        self.directive = Message(action=22)
+        self.connection = self.directive.send_directive(self.connection)
+        self.av_designers_egroup = []
+        self.av_designers_cgroup = []
+        # Create designers list as objects
+        for item in self.connection.message.information:
+            elements = item.split('¥')
+            designer_aux = Designer(id=int(elements[0]), name=elements[1], surname=elements[2], user=elements[3])
+            self.av_designers_egroup.append(designer_aux)
+            self.av_designers_cgroup.append(designer_aux)
 
     def load_patterns(self):
-        # Remove existing elements (available patterns)
-        for item in self.trv_available_patters_egroup.get_children():
-            self.trv_available_patters_egroup.delete(item)
-        for item in self.trv_available_patters_cgroup.get_children():
-            self.trv_available_patters_cgroup.delete(item)
-        # Remove existing elements (selected patterns)
-        for item in self.trv_selected_patterns_egroup.get_children():
-            self.trv_selected_patterns_egroup.delete(item)
-        for item in self.trv_selected_patterns_cgroup.get_children():
-            self.trv_selected_patterns_cgroup.delete(item)
-        # Adding elements in the list depending if the component is new or being modified
-        if not self.decide_component:   # This is executed when an scenario component is being edited
-            a_patterns_cgroup = self.patterns[:]
-            a_patterns_egroup = self.patterns[:]
-            s_patterns_cgroup = self.current_sc_comp.id_patterns_cgroup
-            selected_patterns_cg = []
-            s_patterns_egroup = self.current_sc_comp.id_patterns_egroup
-            selected_patterns_eg = []
-            # Compare and distribute patterns correctly in control group
-            for identity in s_patterns_cgroup:
-                for item in a_patterns_cgroup:
-                    if identity == item.id:
-                        selected_patterns_cg.append(item)
-                        a_patterns_cgroup.remove(item)
-            # Compare and distribute patterns correctly in experimental group
-            for identity in s_patterns_egroup:
-                for item in a_patterns_egroup:
-                    if identity == item.id:
-                        selected_patterns_eg.append(item)
-                        a_patterns_egroup.remove(item)
-            # Fill TVs with the results from the comparation
-            for item in a_patterns_cgroup:
-                content = item.get_content_name()
-                self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
-            for item in selected_patterns_cg:
-                content = item.get_content_name()
-                self.trv_selected_patterns_cgroup.insert('', 'end', text=item.id, values=(content,))
-            for item in a_patterns_egroup:
-                content = item.get_content_name()
-                self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
-            for item in selected_patterns_eg:
-                content = item.get_content_name()
-                self.trv_selected_patterns_egroup.insert('', 'end', text=item.id, values=(content,))
-        else:
-            for item in self.patterns:
-                content = item.get_content_name()
-                self.trv_available_patters_cgroup.insert('', 'end', text=item.id, values=(content,))
-                self.trv_available_patters_egroup.insert('', 'end', text=item.id, values=(content,))
+        # Retrieve available patterns from the server
+        self.av_patterns = Pattern.get_available_patterns(self.connection)
+        self.av_patterns_egroup = self.av_patterns[:]
+        self.av_patterns_cgroup = self.av_patterns[:]
 
     def clear_exp_fields(self):
         """
@@ -1175,9 +1507,72 @@ class FormChildExperiment:
         self.txt_access_sc['state'] = NORMAL
         self.lbx_egroup['state'] = NORMAL
         self.lbx_cgroup['state'] = NORMAL
+        self.lbx_egroup_pat['state'] = NORMAL
+        self.lbx_cgroup_pat['state'] = NORMAL
+        self.lbx_problems['state'] = NORMAL
         self.txt_title_sc.delete('1.0', 'end-1c')
         self.txt_description_sc.delete('1.0', 'end-1c')
         self.txt_access_sc.delete('1.0', 'end-1c')
+        self.lbx_problems.delete(0, END)
         self.lbx_egroup.delete(0, END)
         self.lbx_cgroup.delete(0, END)
-        self.lbx_problems.delete(0, END)
+        self.lbx_egroup_pat.delete(0, END)
+        self.lbx_cgroup_pat.delete(0, END)
+        if self.file_dd is not None:  # if an image was already loaded
+            self.canvas_dd.delete(self.file_dd.image)  # clear canvas
+            self.file_dd = None  # set file NULL
+        self.experimental_scenario = None
+
+    def clear_problem_fields(self):
+        """
+        Function that clear visual components tat may be fulfilled by the user when adding/editing information in
+        'Problem administration' (tlevel_problem)
+        """
+        self.txt_short_desc_prob['state'] = NORMAL
+        self.txt_description_prob['state'] = NORMAL
+        self.txt_annotations_esol['state'] = NORMAL
+        self.lbx_patterns_esol['state'] = NORMAL
+        self.txt_short_desc_prob.delete('1.0', 'end-1c')
+        self.txt_description_prob.delete('1.0', 'end-1c')
+        self.txt_annotations_esol.delete('1.0', 'end-1c')
+        self.lbx_patterns_esol.delete(0, END)
+        if self.file_esol is not None:  # if an image was already loaded
+            self.canvas_esol.delete(self.file_esol.image)  # clear canvas
+            self.file_esol = None  # set file NULL
+        self.problem = None
+
+    def validate_problem_fields(self):
+        if len(self.txt_short_desc_prob.get('1.0', 'end-1c')) == 0 or len(self.txt_description_prob.get('1.0', 'end-1c')) == 0:
+            return 1
+        if self.file_esol is None:
+            return 2
+        return 0
+
+    def validate_sc_fields(self):
+        if len(self.txt_title_sc.get('1.0', 'end-1c')) == 0 or len(self.txt_description_sc.get('1.0', 'end-1c')) == 0\
+                or len(self.txt_access_sc.get('1.0', 'end-1c')) == 0:
+            return 1
+        if self.experiment.design_type == 2:
+            for item1 in self.experimental_scenario.experimental_group:
+                for item2 in self.experimental_scenario.control_group:
+                    if item1.id == item2.id:
+                        return 2
+        if self.lbx_egroup.size() == 0:
+            return 3
+        if self.experiment.design_type == 2 and self.lbx_cgroup.size() == 0:
+            return 4
+        if self.lbx_problems.size() == 0:
+            return 5
+        return 0
+
+    def show_file(self, file=None, canvas=None):
+        """
+        Show the image in the visual canvas of a form only if it is empty, this function is called after uploading
+        a diagram and depends of the file and the canvas where it has to be displayed, both given as parameters
+        """
+        load = Image.open(file.filename)
+        load = load.resize((110, 110), Image.ANTIALIAS)
+        self.render = ImageTk.PhotoImage(load)
+        if file.image is not None:  # if an image was already loaded
+            canvas.delete(file.image)  # remove the previous image
+        file.image = canvas.create_image(0, 0, anchor='nw', image=self.render)  # and display new image

@@ -570,7 +570,7 @@ class FormParentDesigner:
         self.sel_patterns_ids = []
         for item in self.available_patterns:
             self.av_patterns_ids.append(item.id)
-            self.lbx_av_patterns.insert(END, item.get_content_name())
+            self.lbx_av_patterns.insert(END, item.get_main_section())
         self.current_ideal_patterns = self.scenario_components[index].problem.solution.patterns_id  # Get the patterns of the ideal solution for current problem
         self.time_thread = TimerClass()
         self.time_thread.begin()

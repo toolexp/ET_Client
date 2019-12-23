@@ -80,7 +80,7 @@ class Designer:
             self.retrieve_components()
 
     def retrieve_components(self):
-        if self.id == 0:
+        if self.id != 0:
             self.directive = Message(action=25, information=[self.id])
             self.connection = self.directive.send_directive(self.connection)
             self.name = self.connection.message.information[0]
@@ -95,38 +95,44 @@ class Designer:
         self.current_group = self.connection.message.information[0]
 
 
-class DesignersGroup:
-    def __init__(self, id=0, name='', description=''):
-        self.id = id
-        self.name = name
-        self.description = description
-
-
 class Experiment:
-    def __init__(self, id=0, name='', description='', design_type='', state=''):
+    def __init__(self, id=0, name='', description='', design_type=0, state='', creation_date='', execution_date='',
+                 finished_date=''):
         self.id = id
         self.name = name
         self.description = description
         self.design_type = design_type
         self.state = state
+        self.creation_date = creation_date
+        self.execution_date = execution_date
+        self.finished_date = finished_date
 
 
 class ExperimentalSC:
-    def __init__(self, id=0, name='', description='', access_code='', scenario_availability=True, scenario_lock=False,
-                 id_experiment=None, id_control_group=None, id_experimental_group=None, experiment=None,
-                 control_group=None, experimental_group=None, connection=None):
+    def __init__(self, id=0, title='', description='', access_code='', state='', availability=True,
+                 id_experiment=None, experiment=None, id_description_diagram=None, description_diagram=None,
+                 control_group=None, experimental_group=None, cgroup_patterns=None, egroup_patterns=None,
+                 problems=None, connection=None):
         self.id = id
-        self.name = name
+        self.title = title
         self.description = description
         self.access_code = access_code
-        self.scenario_availability = scenario_availability
-        self.scenario_lock = scenario_lock
+        self.state = state
+        self.availability = availability
         self.id_experiment = id_experiment
-        self.id_control_group = id_control_group
-        self.id_experimental_group = id_experimental_group
+        self.id_description_diagram = id_description_diagram
         self.experiment = experiment
-        self.control_group = control_group
-        self.experimental_group = experimental_group
+        self.description_diagram = description_diagram
+        if experimental_group is None:
+            self.experimental_group = []
+        if control_group is None:
+            self.control_group = []
+        if egroup_patterns is None:
+            self.egroup_patterns = []
+        if cgroup_patterns is None:
+            self.cgroup_patterns = []
+        if problems is None:
+            self.problems = []
         self.connection = connection
         if self.connection is not None:
             self.retrieve_components()
@@ -136,22 +142,12 @@ class ExperimentalSC:
             self.directive = Message(action=95, information=[self.id_experiment])
             self.connection = self.directive.send_directive(self.connection)
             self.control_group = Experiment(id=self.id_experiment, name=self.connection.message.information[0],
-                                                description=self.connection.message.information[1])
-        if self.id_control_group is not None:
-            self.directive = Message(action=30, information=[self.id_control_group])
-            self.connection = self.directive.send_directive(self.connection)
-            self.control_group = DesignersGroup(id=self.id_control_group, name=self.connection.message.information[0],
-                                                description=self.connection.message.information[1])
-        if self.id_experimental_group is not None:
-            self.directive = Message(action=30, information=[self.id_experimental_group])
-            self.connection = self.directive.send_directive(self.connection)
-            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
-                                                     name=self.connection.message.information[0],
-                                                     description=self.connection.message.information[1])
+                                            description=self.connection.message.information[1],
+                                            design_type=int(self.connection.message.information[2]),
+                                            state=self.connection.message.information[3])
 
 
 class File:
-
     def __init__(self, name='', file=None, file_bytes=None, filename=None, image=None):
         self.name = name
         self.file = file
@@ -310,12 +306,18 @@ class Pattern:
 
 
 class Problem:
-    def __init__(self, id=0, name='', description='', id_solution=None, solution=None, connection=None):
+    id_visual = 0
+
+    def __init__(self, id=0, brief_description='', description='', id_solution=None, solution=None,
+                 connection=None):
         self.id = id
-        self.name = name
+        Problem.id_visual += 1
+        self.id_visual = Problem.id_visual
+        self.name = brief_description
         self.description = description
         self.id_solution = id_solution
-        self.solution = solution
+        if solution is None:
+            self.solution = Solution()
         self.connection = connection
         if self.connection is not None:
             self.retrieve_components()
@@ -413,12 +415,13 @@ class Section:
 
 
 class Solution:
-    def __init__(self, id=0, annotations='', patterns_id=None, diagram_id=0):
-        if patterns_id is None:
-            patterns_id = []
+    def __init__(self, id=0, annotations='', patterns=None, file=None, diagram_id=0):
+        if patterns is None:
+            patterns = []
         self.id = id
         self.annotations = annotations
-        self.patterns_id = patterns_id
+        self.patterns = patterns
+        self.file = file
         self.diagram_id = diagram_id
 
 

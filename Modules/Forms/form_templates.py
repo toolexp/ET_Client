@@ -393,7 +393,7 @@ class FormChildTemplate:
                                    message='At least one section has to be of text type')
         elif validation_option == 5:
             messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
-                                   message='You mus set one of the selected section as main')
+                                   message='You must set one of the selected section as main')
         else:
             messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
                                    message='The main section has to be of text type')
