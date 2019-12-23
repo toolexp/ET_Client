@@ -806,6 +806,26 @@ class FormChildExperiment:
         self.show_cu_buttons()
 
     def click_view_sc(self):
+        '''if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
+            self.id_sc_selected = int(self.trv_available_sc.item(self.trv_available_sc.selection())['text'])
+            # Retrieve selected Experimental scenario
+            if len(self.trv_available_sc.get_children()) != 0:
+                self.trv_available_sc.selection_set(self.trv_available_sc.get_children()[0])
+            self.directive = Message(action=95, information=[self.id_exp_selected])
+            self.connection = self.directive.send_directive(self.connection)
+            self.experiment = Experiment(id=self.id_exp_selected, name=self.connection.message.information[0],
+                                         description=self.connection.message.information[1],
+                                         design_type=int(self.connection.message.information[2]),
+                                         state=self.connection.message.information[3])
+            self.experimental_scenario = ExperimentalSC()
+            self.visual_problems = []
+            self.frm_child_general_sc['text'] = 'View experimental scenario'
+            self.frm_child_sc_list.grid_forget()
+            self.frm_child_general_sc.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+            if self.experiment.design_type == 2:
+                self.frm_aux9.grid(row=0, column=2, padx=50, pady=10, sticky=E)
+                self.frm_aux11.grid(row=0, column=1, padx=10, pady=10, sticky=E)
+            self.show_cu_buttons()'''
         pass
 
     def click_update_sc(self):
@@ -897,7 +917,7 @@ class FormChildExperiment:
                 return  # user cancelled; stop this method
             self.file_dd = File()
             self.file_dd.read_file(filename)
-            self.show_file(self.file_dd, self.canvas_dd)
+            self.show_dd_file()
 
     def click_remove_dd(self):
         """
@@ -944,20 +964,22 @@ class FormChildExperiment:
         if validation_option == 0:
             patterns_decision = True
             if self.lbx_egroup_pat.size() == 0:
+                patterns_decision = False
                 # MessageBox asking confirmation not saving patterns for exp. group
                 decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
                                                message='Are you sure you don\'t want to configure patterns for '
                                                        'experimental group?')
-                if not decision: #  Cancel
-                    patterns_decision = False
+                if decision: #  Confirm saving withouth patterns for experimental group
+                    patterns_decision = True
             if self.experiment.design_type == 2:
                 if self.lbx_cgroup_pat.size() == 0:
+                    patterns_decision = False
                     # MessageBox asking confirmation not saving patterns for ctrl. group
                     decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
                                                    message='Are you sure you don\'t want to configure patterns for '
                                                            'control group?')
                     if decision:  # Cancel
-                        patterns_decision = False
+                        patterns_decision = True
             if patterns_decision:
                 self.experimental_scenario.title = self.txt_title_sc.get('1.0', 'end-1c')
                 self.experimental_scenario.description = self.txt_description_sc.get('1.0', 'end-1c')
@@ -998,7 +1020,9 @@ class FormChildExperiment:
                         # Create the expected solution in DB
                         self.directive = Message(action=56, information=[item.solution.annotations, id_diagram])
                         if item.solution.patterns:
-                            self.directive.information.append(item.solution.patterns)
+                            self.directive.information.append([])
+                            for item2 in item.solution.patterns:
+                                self.directive.information[2].append(item2.id)
                         self.connection = self.directive.send_directive(self.connection)
                         id_solution = self.connection.message.information[0]
                         # Create the problem in DB
@@ -1064,16 +1088,26 @@ class FormChildExperiment:
         """
         validation_option = self.validate_problem_fields()
         if validation_option == 0:
-            self.problem.brief_description = self.txt_short_desc_prob.get('1.0', 'end-1c')
-            self.problem.description = self.txt_description_prob.get('1.0', 'end-1c')
-            self.problem.solution.annotations = self.txt_description_prob.get('1.0', 'end-1c')
-            self.problem.solution.file = self.file_esol
-            self.experimental_scenario.problems.append(self.problem)
-            self.visual_problems.append(self.problem.id_visual)
-            self.lbx_problems.insert(END, self.problem.brief_description)
-            self.clear_problem_fields()
-            self.tlevel_problem.grab_release()
-            self.tlevel_problem.withdraw()
+            patterns_decision = True
+            if self.lbx_patterns_esol.size() == 0:
+                patterns_decision = False
+                # MessageBox asking confirmation not saving patterns for exp. group
+                decision = messagebox.askyesno(parent=self.tlevel_problem, title='Confirmation',
+                                               message='Are you sure you don\'t want to configure patterns for '
+                                                       'the expected solution?')
+                if decision:
+                    patterns_decision = True
+            if patterns_decision:
+                self.problem.brief_description = self.txt_short_desc_prob.get('1.0', 'end-1c')
+                self.problem.description = self.txt_description_prob.get('1.0', 'end-1c')
+                self.problem.solution.annotations = self.txt_description_prob.get('1.0', 'end-1c')
+                self.problem.solution.file = self.file_esol
+                self.experimental_scenario.problems.append(self.problem)
+                self.visual_problems.append(self.problem.id_visual)
+                self.lbx_problems.insert(END, self.problem.brief_description)
+                self.clear_problem_fields()
+                self.tlevel_problem.grab_release()
+                self.tlevel_problem.withdraw()
         elif validation_option == 1:
             messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
                                    message='Check mandatory text fields, some of them are empty')
@@ -1255,7 +1289,7 @@ class FormChildExperiment:
                 if not found:  # Append pattern to aux (added to available ones) variable if designer not found and delete
                     # from current list
                     aux_patterns_av.append(item1)
-                    self.experimental_scenario.experimental_group.remove(item1)
+                    self.experimental_scenario.egroup_patterns.remove(item1)
             # Add object to respective objects
             for item in reversed(aux_patterns_sel):
                 self.experimental_scenario.egroup_patterns.append(item)
@@ -1286,7 +1320,7 @@ class FormChildExperiment:
                 if not found:  # Append pattern to aux (added to available ones) variable if designer not found and delete
                     # from current list
                     aux_patterns_av.append(item1)
-                    self.experimental_scenario.experimental_group.remove(item1)
+                    self.experimental_scenario.cgroup_patterns.remove(item1)
             # Add object to respective objects
             for item in reversed(aux_patterns_sel):
                 self.experimental_scenario.cgroup_patterns.append(item)
@@ -1317,7 +1351,7 @@ class FormChildExperiment:
                 if not found:  # Append pattern to aux (added to available ones) variable if designer not found and delete
                     # from current list
                     aux_patterns_av.append(item1)
-                    self.experimental_scenario.experimental_group.remove(item1)
+                    self.problem.solution.patterns.remove(item1)
             # Add object to respective objects
             for item in reversed(aux_patterns_sel):
                 self.problem.solution.patterns.append(item)
@@ -1344,7 +1378,7 @@ class FormChildExperiment:
                 return  # user cancelled; stop this method
             self.file_esol = File()
             self.file_esol.read_file(filename)
-            self.show_file(self.file_esol, self.canvas_esol)
+            self.show_esol_file()
 
     def click_remove_esol(self):
         """
@@ -1522,6 +1556,8 @@ class FormChildExperiment:
             self.canvas_dd.delete(self.file_dd.image)  # clear canvas
             self.file_dd = None  # set file NULL
         self.experimental_scenario = None
+        self.frm_aux9.grid_forget()
+        self.frm_aux11.grid_forget()
 
     def clear_problem_fields(self):
         """
@@ -1565,14 +1601,26 @@ class FormChildExperiment:
             return 5
         return 0
 
-    def show_file(self, file=None, canvas=None):
+    def show_dd_file(self):
         """
         Show the image in the visual canvas of a form only if it is empty, this function is called after uploading
         a diagram and depends of the file and the canvas where it has to be displayed, both given as parameters
         """
-        load = Image.open(file.filename)
+        load = Image.open(self.file_dd.filename)
         load = load.resize((110, 110), Image.ANTIALIAS)
-        self.render = ImageTk.PhotoImage(load)
-        if file.image is not None:  # if an image was already loaded
-            canvas.delete(file.image)  # remove the previous image
-        file.image = canvas.create_image(0, 0, anchor='nw', image=self.render)  # and display new image
+        self.render_dd = ImageTk.PhotoImage(load)
+        if self.file_dd.image is not None:  # if an image was already loaded
+            self.canvas_dd.delete(self.file_dd.image)  # remove the previous image
+        self.file_dd.image = self.canvas_dd.create_image(0, 0, anchor='nw', image=self.render_dd)  # and display new image
+
+    def show_esol_file(self):
+        """
+        Show the image in the visual canvas of a form only if it is empty, this function is called after uploading
+        a diagram and depends of the file and the canvas where it has to be displayed, both given as parameters
+        """
+        load = Image.open(self.file_esol.filename)
+        load = load.resize((110, 110), Image.ANTIALIAS)
+        self.render_sol = ImageTk.PhotoImage(load)
+        if self.file_esol.image is not None:  # if an image was already loaded
+            self.canvas_esol.delete(self.file_esol.image)  # remove the previous image
+        self.file_esol.image = self.canvas_esol.create_image(0, 0, anchor='nw', image=self.render_sol)  # and display new image

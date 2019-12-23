@@ -313,7 +313,7 @@ class Problem:
         self.id = id
         Problem.id_visual += 1
         self.id_visual = Problem.id_visual
-        self.name = brief_description
+        self.brief_description = brief_description
         self.description = description
         self.id_solution = id_solution
         if solution is None:
