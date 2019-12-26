@@ -42,10 +42,13 @@ class FormChildClassification:
         """
         # Resources for the Forms
         self.new_icon = PhotoImage(file=r"./Resources/create.png")
+        self.view_icon = PhotoImage(file=r"./Resources/view.png")
         self.modify_icon = PhotoImage(file=r"./Resources/modify.png")
         self.remove_icon = PhotoImage(file=r"./Resources/delete.png")
         self.save_icon = PhotoImage(file=r"./Resources/save.png")
+        self.back_icon = PhotoImage(file=r"./Resources/back.png")
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
+        self.disabled_color = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
@@ -65,11 +68,14 @@ class FormChildClassification:
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
         btn_new.grid(row=0, column=0, pady=5, padx=5, sticky=E)
         btn_new_ttp = CreateToolTip(btn_new, 'New classification')
+        btn_view = Button(frm_aux4, image=self.view_icon, command=self.click_view)
+        btn_view.grid(row=1, column=0, pady=5, padx=5, sticky=E)
+        btn_view_ttp = CreateToolTip(btn_view, 'View classification')
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=1, column=0, pady=5, padx=5, sticky=E)
+        btn_edit.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit classification')
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
+        btn_delete.grid(row=3, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete classification')
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
 
@@ -96,12 +102,13 @@ class FormChildClassification:
         self.txt_categories.configure(yscrollcommand=vsb_txt_cat.set)
         sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
         sep_aux1.grid(row=0, column=4, sticky=NS, rowspan=3, padx=20)
-        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=5, padx=20)
-        btn_save_ttp = CreateToolTip(btn_save, 'Save classification')
-        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=5, padx=20)
-        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
+        self.btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        btn_save_ttp = CreateToolTip(self.btn_save, 'Save classification')
+        self.btn_back = Button(self.frm_child_crud, image=self.back_icon, command=self.click_back)
+        btn_back_ttp = CreateToolTip(self.btn_back, 'Go back')
+        self.btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel_ttp = CreateToolTip(self.btn_cancel, 'Cancel')
+        self.enabled_color = self.txt_name_class.cget('bg')
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -143,10 +150,37 @@ class FormChildClassification:
 
     def click_new(self):
         self.decide = True
-        self.frm_child_list.grid_forget()
         self.frm_child_crud['text'] = 'New Classification'
         self.txt_name_class.focus_set()
+        self.btn_save.grid(row=0, column=5, padx=20)
+        self.btn_cancel.grid(row=1, column=5, padx=20)
+        self.frm_child_list.grid_forget()
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+
+    def click_view(self):
+        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            self.directive = Message(action=70, information=[self.id_selected])
+            self.connection = self.directive.send_directive(self.connection)
+            # Insert information into visual components
+            self.txt_name_class.insert('1.0', self.connection.message.information[0])
+            # Section to insert categories in textbox
+            length_string = 0
+            for item in self.connection.message.information[1]:
+                elements = item.split('¥')
+                self.txt_categories.insert('end-1c', elements[1] + '\n')
+                length_string += len(elements[1]) + 1
+            self.txt_categories.delete('end-2c', 'end')
+            self.frm_child_crud['text'] = 'View classification'
+            self.txt_name_class['bg'] = self.disabled_color
+            self.txt_categories['bg'] = self.disabled_color
+            self.txt_name_class['state'] = DISABLED
+            self.txt_categories['state'] = DISABLED
+            self.btn_back.grid(row=0, column=5, padx=20)
+            self.frm_child_list.grid_forget()
+            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        else:
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
 
     def click_update(self):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
@@ -167,8 +201,10 @@ class FormChildClassification:
                     length_string += len(elements[1]) + 1
                 self.txt_categories.delete('end-2c', 'end')
                 self.frm_child_crud['text'] = 'Update classification'
-                self.frm_child_list.grid_forget()
                 self.txt_name_class.focus_set()
+                self.btn_save.grid(row=0, column=5, padx=20)
+                self.btn_cancel.grid(row=1, column=5, padx=20)
+                self.frm_child_list.grid_forget()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
@@ -209,6 +245,15 @@ class FormChildClassification:
             messagebox.showwarning(parent=self.frm_child_crud, title='Category problem',
                                    message='A category can not be empty!')
 
+    def click_back(self):
+        self.txt_name_class['state'] = NORMAL
+        self.txt_categories['state'] = NORMAL
+        self.txt_name_class['bg'] = self.enabled_color
+        self.txt_categories['bg'] = self.enabled_color
+        self.clear_fields()
+        self.frm_child_crud.grid_forget()
+        self.show_frm()
+
     def click_cancel(self):
         decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
                                        message='Are you sure you want to cancel?')
@@ -229,5 +274,8 @@ class FormChildClassification:
             return 1
 
     def clear_fields(self):
+        self.btn_save.grid_forget()
+        self.btn_cancel.grid_forget()
+        self.btn_back.grid_forget()
         self.txt_name_class.delete('1.0', 'end-1c')
         self.txt_categories.delete('1.0', 'end-1c')
