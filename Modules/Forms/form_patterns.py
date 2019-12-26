@@ -248,6 +248,9 @@ class FormChildPattern:
         # Adding elements in the list
         for item in self.patterns:
             self.trv_available.insert('', 'end', text=item.id, values=(item.get_main_section(),))
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
+            self.select_pattern_summary()
 
     def show_frm(self):
         """
@@ -255,9 +258,6 @@ class FormChildPattern:
         """
         self.get_patterns()
         self.retrieve_list()
-        if len(self.trv_available.get_children()) != 0:
-            self.trv_available.selection_set(self.trv_available.get_children()[0])
-            self.select_pattern_summary()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):
@@ -723,8 +723,7 @@ class FormChildPattern:
         load = load.resize((500, 500), Image.ANTIALIAS)
         self.render = ImageTk.PhotoImage(load)
         self.canvas_summary.delete()
-        self.file_summary.image = self.canvas_summary.create_image(0, 0, anchor='nw',
-                                                                image=self.render)  # and display new image
+        self.file_summary.image = self.canvas_summary.create_image(0, 0, anchor='nw', image=self.render)  # and display new image
         self.tlevel_diagram_summary.deiconify()
         self.tlevel_diagram_summary.grab_set()
 

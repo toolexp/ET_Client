@@ -113,11 +113,11 @@ class FormChildClassification:
         for item in self.connection.message.information:
             elements = item.split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
 
     def show_frm(self):
         self.retrieve_list()
-        if len(self.trv_available.get_children()) != 0:
-            self.trv_available.selection_set(self.trv_available.get_children()[0])
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def hide_frm(self):

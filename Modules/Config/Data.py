@@ -138,13 +138,58 @@ class ExperimentalSC:
             self.retrieve_components()
 
     def retrieve_components(self):
-        if self.id_experiment is not None:
+        # Retrieve experiment
+        if self.id_experiment is not None and self.experiment is None:
             self.directive = Message(action=95, information=[self.id_experiment])
             self.connection = self.directive.send_directive(self.connection)
-            self.control_group = Experiment(id=self.id_experiment, name=self.connection.message.information[0],
-                                            description=self.connection.message.information[1],
-                                            design_type=int(self.connection.message.information[2]),
-                                            state=self.connection.message.information[3])
+            self.experiment = Experiment(id=self.id_experiment, name=self.connection.message.information[0],
+                                         description=self.connection.message.information[1],
+                                         design_type=int(self.connection.message.information[2]),
+                                         state=self.connection.message.information[3])
+        # Retrieve description diagram
+        if self.id_description_diagram is not None and self.description_diagram is None:
+            self.directive = Message(action=65, information=[self.id_description_diagram])
+            self.connection = self.directive.send_directive(self.connection)
+            self.description_diagram = File()
+            self.description_diagram.write_file(name=self.connection.message.information[0],
+                                                file_bytes=self.connection.message.information[1])
+
+    def retrieve_designers_groups(self):
+        self.directive = Message(action=27, information=[self.id])
+        self.connection = self.directive.send_directive(self.connection)
+        for item in self.connection.message.information[0]:  # Here are designers of experimental group
+            elements = item.split('¥')
+            self.experimental_group.append(Designer(id=int(elements[0]), name=elements[1], surname=elements[2],
+                                                    user=elements[3]))
+        for item in self.connection.message.information[1]:  # Here are designers of control group
+            elements = item.split('¥')
+            self.control_group.append(Designer(id=int(elements[0]), name=elements[1], surname=elements[2],
+                                               user=elements[3]))
+
+    def retrieve_patterns_groups(self, av_patterns):
+        self.directive = Message(action=87, information=[self.id])
+        self.connection = self.directive.send_directive(self.connection)
+        for item in self.connection.message.information[0]:  # Here are patterns of experimental group
+            current_id = int(item.split('¥')[0])
+            for pattern in av_patterns:
+                if pattern.id == current_id:
+                    self.egroup_patterns.append(pattern)
+                    break
+
+        for item in self.connection.message.information[1]:  # Here are patterns of control group
+            current_id = int(item.split('¥')[0])
+            for pattern in av_patterns:
+                if pattern.id == current_id:
+                    self.cgroup_patterns.append(pattern)
+                    break
+
+    def retrieve_problems(self, av_patterns):
+        self.directive = Message(action=52, information=[self.id])
+        self.connection = self.directive.send_directive(self.connection)
+        for item in self.connection.message.information[0]:  # Here are problems of experimental scenario
+            elements = item.split('¥')
+            self.problems.append(Problem(id=int(elements[0]), brief_description=elements[1], description=elements[2],
+                                         id_solution=elements[3], connection=self.connection, av_patterns=av_patterns))
 
 
 class File:
@@ -309,7 +354,7 @@ class Problem:
     id_visual = 0
 
     def __init__(self, id=0, brief_description='', description='', id_solution=None, solution=None,
-                 connection=None):
+                 connection=None, av_patterns=None):
         self.id = id
         Problem.id_visual += 1
         self.id_visual = Problem.id_visual
@@ -318,19 +363,25 @@ class Problem:
         self.id_solution = id_solution
         if solution is None:
             self.solution = Solution()
+        if av_patterns is None:
+            av_patterns = []
         self.connection = connection
         if self.connection is not None:
-            self.retrieve_components()
+            self.retrieve_components(av_patterns)
 
-    def retrieve_components(self):
+    def retrieve_components(self, av_patterns):
         if self.id_solution is not None:
             self.directive = Message(action=60, information=[self.id_solution])
             self.connection = self.directive.send_directive(self.connection)
             self.solution = Solution(id=self.id_solution, annotations=self.connection.message.information[0],
-                                     diagram_id=self.connection.message.information[1],
-                                     patterns_id=[])
-            for item in self.connection.message.information[2]:
-                self.solution.patterns_id.append(int(item.split('¥')[0]))
+                                     diagram_id=int(self.connection.message.information[1]),
+                                     patterns_id=self.connection.message.information[2], connection=self.connection)
+            for item in self.solution.patterns_id:
+                current_id = int(item.split('¥')[0])
+                for pattern in av_patterns:
+                    if pattern.id == current_id:
+                        self.solution.patterns.append(pattern)
+                        break
 
 
 class ScenarioComponent:
@@ -415,14 +466,30 @@ class Section:
 
 
 class Solution:
-    def __init__(self, id=0, annotations='', patterns=None, file=None, diagram_id=0):
+    def __init__(self, id=0, annotations='', patterns=None, patterns_id=None, diagram=None, diagram_id=0,
+                 connection=None):
         if patterns is None:
             patterns = []
+        if patterns_id is None:
+            patterns_id = []
         self.id = id
         self.annotations = annotations
         self.patterns = patterns
-        self.file = file
+        self.patterns_id = patterns_id
+        self.diagram = diagram
         self.diagram_id = diagram_id
+        self.connection = connection
+        if self.connection is not None:
+            self.retrieve_components()
+
+    def retrieve_components(self):
+        # Retrieve diagram for the solution
+        if self.diagram_id != 0:
+            self.directive = Message(action=65, information=[self.diagram_id])
+            self.connection = self.directive.send_directive(self.connection)
+            self.diagram = File()
+            self.diagram.write_file(name=self.connection.message.information[0],
+                                    file_bytes=self.connection.message.information[1])
 
 
 class Template:
