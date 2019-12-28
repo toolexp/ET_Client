@@ -51,11 +51,11 @@ class FormChildExperiment:
         self.tlevel_designers.title('Configure designers')
         self.tlevel_designers.protocol("WM_DELETE_WINDOW", self.click_cancel_designers)
         self.tlevel_designers.withdraw()
-        self.tlevel_patterns = Toplevel(self.frm_child_general_sc)
+        self.tlevel_patterns = Toplevel(self.tlevel_problem)
         self.tlevel_patterns.title('Configure patterns')
         self.tlevel_patterns.protocol("WM_DELETE_WINDOW", self.click_cancel_patterns)
         self.tlevel_patterns.withdraw()
-        self.tlevel_diagram = Toplevel(self.frm_child_general_sc)
+        self.tlevel_diagram = Toplevel(self.tlevel_problem)
         self.tlevel_diagram.title('Diagram')
         self.tlevel_diagram.protocol("WM_DELETE_WINDOW", self.click_cancel_diagram)
         self.tlevel_diagram.withdraw()
@@ -132,13 +132,13 @@ class FormChildExperiment:
         frm_aux5.grid(row=1, column=4, pady=25, padx=25, sticky=SW)
 
         # Components for general experiment form, where each experiment may be administrated
-        lbl_name_exp = Label(self.frm_child_general_exp, text='Name')
+        lbl_name_exp = Label(self.frm_child_general_exp, text='Name*')
         lbl_name_exp.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name_exp.grid(pady=10, padx=50, sticky=W)
-        lbl_description_exp = Label(self.frm_child_general_exp, text='Description')
+        lbl_description_exp = Label(self.frm_child_general_exp, text='Description*')
         lbl_description_exp.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_description_exp.grid(pady=10, padx=50, sticky=NW)
-        lbl_design_type = Label(self.frm_child_general_exp, text='Design type')
+        lbl_design_type = Label(self.frm_child_general_exp, text='Design type*')
         lbl_design_type.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_design_type.grid(row=9, column=0, pady=10, padx=50, sticky=NW)
         self.txt_name_exp = Text(self.frm_child_general_exp, height=1, width=80)
@@ -673,6 +673,7 @@ class FormChildExperiment:
         else:   # Update selected experiment
             design_type_aux = 1 if self.cbx_dt_exp.get() == 'One experimental group' else 2
             decision_aux = 1
+            decision_remove_egroup = False
             # Section executed when an experiment is being updated (in warning state) and its design type is changed
             if self.update_experiment_decision == 1 and design_type_aux != self.experiment.design_type:
                 decision = messagebox.askyesno(parent=self.frm_child_general_exp, title='Warning!',
@@ -680,6 +681,7 @@ class FormChildExperiment:
                                                        'OF INFORMATION, are you sure you want to continue?')
                 if decision:
                     decision_aux = 1
+                    decision_remove_egroup = True
                 else:
                     decision_aux = 0
             if decision_aux == 1:
@@ -690,9 +692,12 @@ class FormChildExperiment:
                     self.experiment.design_type = design_type_aux
                     self.directive = Message(action=93, information=[self.experiment.id, self.experiment.name,
                                                                      self.experiment.description, self.experiment.design_type])
-                    ###### Borrar informacion de control group
-
                     self.connection = self.directive.send_directive(self.connection)
+                    if decision_remove_egroup:
+                        self.directive = Message(action=29, information=[self.experiment.id])
+                        self.connection = self.directive.send_directive(self.connection)
+                        self.directive = Message(action=89, information=[self.experiment.id])
+                        self.connection = self.directive.send_directive(self.connection)
                     self.click_back_exp()
                 else:
                     messagebox.showwarning(parent=self.frm_child_general_exp, title='Missing information',
@@ -765,26 +770,20 @@ class FormChildExperiment:
         Function activated when 'Finish experiment' button is pressed. Finishes an experiment and generates a report
         for it. After finishing it, its structure wont be able to be modified, neither its information
         """
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            values = self.trv_available.item(
-                self.trv_available.focus())['values']
-            if values[3] == '':
-                # MessageBox asking confirmation
-                decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
-                                               message='Are you sure you want to finish the experiment?')
-                if decision:
-                    id_exp_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-                    self.directive = Message(action=93, information=[id_exp_selected, 'finish'])
-                    self.connection = self.directive.send_directive(self.connection)
-                    ################
-                    # Here generate the report
-                    ################
-                    self.retrieve_list()
-            else:
-                messagebox.showwarning(parent=self.frm_child_list, title='Experiment finished',
-                                       message='The selected experiment is already finished')
+        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+            decision = messagebox.askyesno(parent=self.frm_child_exp_list, title='Confirmation',
+                                           message='Are you sure you want to finish the experiment?')
+            if decision:
+                id_exp_selected = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
+                self.directive = Message(action=93, information=[id_exp_selected, 'finished'])
+                self.connection = self.directive.send_directive(self.connection)
+                if self.connection.message.action == 5:  # An error ocurred while executing experiment
+                    messagebox.showerror(parent=self.frm_child_exp_list, title='Can not execute experiment',
+                                         message=self.connection.message.information[0])
+                self.retrieve_list_exp()
         else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
+                                   message='You must select an item')
 
     def retrieve_list_sc(self):
         """
@@ -857,11 +856,15 @@ class FormChildExperiment:
             # Retrieve selected Experimental scenario and its components
             self.directive = Message(action=85, information=[id_sc_selected])
             self.connection = self.directive.send_directive(self.connection)
+            if self.connection.message.information[3] is None:
+                id_diagram = None
+            else:
+                id_diagram = int(self.connection.message.information[3])
             self.experimental_scenario = ExperimentalSC(id=id_sc_selected, title=self.connection.message.information[0],
                                                         description=self.connection.message.information[1],
                                                         access_code=self.connection.message.information[2],
                                                         id_experiment=int(self.connection.message.information[4]),
-                                                        id_description_diagram=int(self.connection.message.information[3]),
+                                                        id_description_diagram=id_diagram,
                                                         connection=self.connection)
             self.experimental_scenario.retrieve_designers_groups()
             self.experimental_scenario.retrieve_patterns_groups(self.av_patterns)
@@ -870,7 +873,8 @@ class FormChildExperiment:
             self.txt_title_sc.insert('1.0', self.experimental_scenario.title)
             self.txt_description_sc.insert('1.0', self.experimental_scenario.description)
             self.file_dd = self.experimental_scenario.description_diagram
-            self.show_dd_file()
+            if self.file_dd is not None:
+                self.show_dd_file()
             self.txt_access_sc.insert('1.0', self.experimental_scenario.access_code)
             for item in self.experimental_scenario.experimental_group:
                 self.lbx_egroup.insert(END, '{} {}'.format(item.name, item.surname))
@@ -921,13 +925,16 @@ class FormChildExperiment:
                 # Retrieve selected Experimental scenario and its components
                 self.directive = Message(action=85, information=[id_sc_selected])
                 self.connection = self.directive.send_directive(self.connection)
+                if self.connection.message.information[3] is None:
+                    id_diagram = None
+                else:
+                    id_diagram = int(self.connection.message.information[3])
                 self.experimental_scenario = ExperimentalSC(id=id_sc_selected,
                                                             title=self.connection.message.information[0],
                                                             description=self.connection.message.information[1],
                                                             access_code=self.connection.message.information[2],
                                                             id_experiment=int(self.connection.message.information[4]),
-                                                            id_description_diagram=int(
-                                                                self.connection.message.information[3]),
+                                                            id_description_diagram=id_diagram,
                                                             connection=self.connection)
                 self.experimental_scenario.retrieve_designers_groups()
                 self.experimental_scenario.retrieve_patterns_groups(self.av_patterns)
@@ -937,7 +944,8 @@ class FormChildExperiment:
                 self.txt_title_sc.insert('1.0', self.experimental_scenario.title)
                 self.txt_description_sc.insert('1.0', self.experimental_scenario.description)
                 self.file_dd = self.experimental_scenario.description_diagram
-                self.show_dd_file()
+                if self.file_dd is not None:
+                    self.show_dd_file()
                 self.txt_access_sc.insert('1.0', self.experimental_scenario.access_code)
                 for item in self.experimental_scenario.experimental_group:
                     self.lbx_egroup.insert(END, '{} {}'.format(item.name, item.surname))
@@ -967,7 +975,28 @@ class FormChildExperiment:
                                                                                                 'item')
 
     def click_delete_sc(self):
-        pass
+        """
+        Function activated when 'Delete' experiment sc button is pressed, it removes an experimental scenario from the
+        database
+        """
+        if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
+            values = self.trv_available_sc.item(self.trv_available_sc.selection())['values']
+            if values[2] == 'created':  # Scenario can be deleted only when it is in creation process
+                decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
+                                               message='Are you sure you want to delete the item?')
+                if decision:  # Confirm decision
+                    id_sc_selected = int(self.trv_available_sc.item(self.trv_available_sc.selection())['text'])
+                    # Retrieve selected Experimental scenario and its components
+                    self.directive = Message(action=84, information=[id_sc_selected])
+                    self.connection = self.directive.send_directive(self.connection)
+                    self.retrieve_list_sc()
+            else:
+                messagebox.showerror(parent=self.frm_child_sc_list, title='Scenario locked',
+                                     message='You are not allowed to delete the selected scenario, because '
+                                             'it has finished or it is being executed')
+        else:
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select an '
+                                                                                                'item')
 
     def click_save_experiment_sc(self):
         """
@@ -1081,23 +1110,29 @@ class FormChildExperiment:
         """
         if self.file_dd is not None:  # if an image was already loaded
             self.canvas_dd.delete(self.file_dd.image)  # clear canvas
+            self.render_dd = None
             self.file_dd = None
 
     def click_view_dd(self):
         # Fill summary problem canvas with retrieved image
-        load = Image.open(self.file_dd.filename)
-        load = load.resize((500, 500), Image.ANTIALIAS)
-        self.render_dd_exp = ImageTk.PhotoImage(load)
-        self.canvas_expanded.delete()
-        self.file_dd.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_dd_exp)  # and display new image
-        self.tlevel_diagram.deiconify()
-        self.tlevel_diagram.grab_set()
+        if self.file_dd is not None:
+            load = Image.open(self.file_dd.filename)
+            load = load.resize((500, 500), Image.ANTIALIAS)
+            self.render_dd_exp = ImageTk.PhotoImage(load)
+            self.canvas_expanded.delete()
+            self.file_dd.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_dd_exp)  # and display new image
+            self.tlevel_diagram.deiconify()
+            self.tlevel_diagram.grab_set()
+        else:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='No diagram',
+                                   message='No diagram uploaded in this section')
 
     def click_new_problem(self):
         self.problem = Problem()
         self.av_patterns_esol = self.av_patterns[:]
         self.txt_title_sc.focus_set()
         self.tlevel_problem.title('New problem')
+        self.txt_short_desc_prob.focus_set()
         self.tlevel_problem.deiconify()
         self.tlevel_problem.grab_set()
 
@@ -1105,13 +1140,19 @@ class FormChildExperiment:
         element = self.lbx_problems.curselection()
         if element is not None:  # Check if listbox is selected
             if element:
-                index = element[0]
-                id_selected = self.visual_problems[index]
-                self.lbx_problems.delete(element)  # Remove from listbox
-                for item in reversed(self.experimental_scenario.problems):  # Remove from object
-                    if item.id_visual == id_selected:
-                        self.experimental_scenario.problems.remove(item)
-                        break
+                decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
+                                               message='Are you sure you want to delete the item?')
+                if decision:    # Confirm decision
+                    index = element[0]
+                    id_selected = self.visual_problems[index]
+                    self.lbx_problems.delete(element)  # Remove from listbox
+                    for item in reversed(self.experimental_scenario.problems):  # Remove from object
+                        if item.id_visual == id_selected:
+                            if self.experimental_scenario.id != 0:  # When updating an experimental scenario must remove from db
+                                self.directive = Message(action=54, information=[item.id])
+                                self.connection = self.directive.send_directive(self.connection)
+                            self.experimental_scenario.problems.remove(item)
+                            break
             else:
                 messagebox.showwarning(parent=self.frm_child_general_sc, title='No selection',
                                        message='You must select an item')
@@ -1223,7 +1264,70 @@ class FormChildExperiment:
                                                               id_exp_scenario])
                         self.connection = self.directive.send_directive(self.connection)
                 else:   # Updating experimental scenario
-                    pass
+                    # Update context diagram in DB (optional field)
+                    id_diagram = None
+                    delete_diagram = False
+                    if self.file_dd is not None:    # A diagram is uploaded
+                        if self.experimental_scenario.id_description_diagram is not None:
+                            if self.experimental_scenario.description_diagram.file_bytes != self.file_dd.file_bytes: # Update diagram
+                                self.directive = Message(action=63, information=[self.experimental_scenario.id_description_diagram,
+                                                                                 self.file_dd.file_bytes, self.file_dd.name,
+                                                                                 'scen context'])
+                                self.connection = self.directive.send_directive(self.connection)
+                            id_diagram = self.experimental_scenario.id_description_diagram
+                        else:   # Create diagram
+                            self.directive = Message(action=61,
+                                                     information=[self.file_dd.file_bytes, self.file_dd.name,
+                                                                  'scen context'])
+                            self.connection = self.directive.send_directive(self.connection)
+                            id_diagram = self.connection.message.information[0]
+                    else:   # No diagram uploaded
+                        if self.experimental_scenario.id_description_diagram is not None:   # Must delete existing diagram
+                            id_diagram = self.experimental_scenario.id_description_diagram
+                            delete_diagram = True
+                    # Update scenario in DB
+                    self.directive = Message(action=83,
+                                             information=[self.experimental_scenario.id, self.experimental_scenario.title,
+                                                          self.experimental_scenario.description,
+                                                          self.experimental_scenario.access_code, id_diagram,
+                                                          self.experiment.id, [], [], [], []])
+                    for item in self.experimental_scenario.experimental_group:
+                        self.directive.information[6].append(item.id)
+                    for item in self.experimental_scenario.egroup_patterns:
+                        self.directive.information[8].append(item.id)
+                    if self.experiment.design_type == 2:
+                        for item in self.experimental_scenario.control_group:
+                            self.directive.information[7].append(item.id)
+                        for item in self.experimental_scenario.cgroup_patterns:
+                            self.directive.information[9].append(item.id)
+                    self.connection = self.directive.send_directive(self.connection)
+                    id_exp_scenario = self.experimental_scenario.id
+                    if delete_diagram:  # Deleting diagram if necessary
+                        self.directive = Message(action=64, information=[id_diagram])
+                        self.connection = self.directive.send_directive(self.connection)
+                    # Create problems and its associated objects (if neccesary)
+                    for item in self.experimental_scenario.problems:
+                        if item.id == 0:
+                            # Create expected solution diagram in DB
+                            self.directive = Message(action=61,
+                                                     information=[item.solution.diagram.file_bytes,
+                                                                  item.solution.diagram.name,
+                                                                  'exp sol'])
+                            self.connection = self.directive.send_directive(self.connection)
+                            id_diagram = self.connection.message.information[0]
+                            # Create the expected solution in DB
+                            self.directive = Message(action=56, information=[item.solution.annotations, id_diagram])
+                            if item.solution.patterns:
+                                self.directive.information.append([])
+                                for item2 in item.solution.patterns:
+                                    self.directive.information[2].append(item2.id)
+                            self.connection = self.directive.send_directive(self.connection)
+                            id_solution = self.connection.message.information[0]
+                            # Create the problem in DB
+                            self.directive = Message(action=51,
+                                                     information=[item.brief_description, item.description, id_solution,
+                                                                  id_exp_scenario])
+                            self.connection = self.directive.send_directive(self.connection)
                 self.clear_sc_fields()
                 self.frm_child_general_sc.grid_forget()
                 self.retrieve_list_sc()
@@ -1451,7 +1555,7 @@ class FormChildExperiment:
                 self.trv_selected_patterns.focus())['values'])
             self.trv_selected_patterns.delete(self.trv_selected_patterns.selection())
 
-    def click_trv_spatterns(self):
+    def click_trv_spatterns(self, event):
         """
         Function that removes selection from 'selected' tree view when 'available' tree view is selected (in tlevel_patterns)
         """
@@ -1579,15 +1683,16 @@ class FormChildExperiment:
         """
         if self.file_esol is not None:  # if an image was already loaded
             self.canvas_esol.delete(self.file_esol.image)  # clear canvas
+            self.render_sol = None
             self.file_esol = None
 
     def click_view_esol(self):
         # Fill summary problem canvas with retrieved image
         load = Image.open(self.file_esol.filename)
         load = load.resize((500, 500), Image.ANTIALIAS)
-        self.render_sol_exp = ImageTk.PhotoImage(load)
+        self.render_sol = ImageTk.PhotoImage(load)
         self.canvas_expanded.delete()
-        self.file_esol.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_sol_exp)  # and display new image
+        self.file_esol.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_sol)  # and display new image
         self.tlevel_diagram.deiconify()
         self.tlevel_diagram.grab_set()
 
@@ -1687,11 +1792,11 @@ class FormChildExperiment:
         Shows buttons that are used when viewing an experimental scenario
         :return:
         """
-        self.btn_view_prob.grid(row=8, column=6, padx=20, pady=10, sticky=W)
-        self.btn_back_sc.grid(row=0, column=0, padx=25, pady=10, sticky=W)
-        self.btn_back_prob.grid(row=0, column=9, padx=25, pady=5, sticky=W)
-        self.btn_view_dd.grid(row=2, column=10, padx=10, pady=10, sticky=W)
-        self.btn_view_esol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
+        self.btn_view_prob.grid(row=7, column=6, padx=20, pady=10, sticky=NW)
+        self.btn_back_sc.grid(row=0, column=0, padx=25, pady=5, sticky=NW)
+        self.btn_back_prob.grid(row=0, column=9, padx=25, pady=5, sticky=NW)
+        self.btn_view_dd.grid(row=1, column=10, padx=10, pady=10, sticky=NW)
+        self.btn_view_esol.grid(row=1, column=4, padx=10, pady=10, sticky=NE)
 
     def hide_exp_buttons(self):
         """
@@ -1810,6 +1915,7 @@ class FormChildExperiment:
         self.lbx_cgroup_pat.delete(0, END)
         if self.file_dd is not None:  # if an image was already loaded
             self.canvas_dd.delete(self.file_dd.image)  # clear canvas
+            self.render_dd = None
             self.file_dd = None  # set file NULL
         self.experimental_scenario = None
         self.frm_aux9.grid_forget()
@@ -1835,6 +1941,7 @@ class FormChildExperiment:
         if self.file_esol is not None:  # if an image was already loaded
             self.canvas_esol.delete(self.file_esol.image)  # clear canvas
             self.file_esol = None  # set file NULL
+            self.render_sol = None
         self.problem = None
 
     def validate_problem_fields(self):
