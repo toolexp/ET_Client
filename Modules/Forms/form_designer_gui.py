@@ -2,21 +2,11 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, 
     Listbox, Entry, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Notebook, Separator
-from Modules.Config.Data import CreateToolTip, Message, Pattern, File, wrap_text, ExperimentalSC, ScenarioComponent, \
+from Modules.Config.Data import CreateToolTip, Message, Pattern, File, wrap_text, ExperimentalSC, \
     Measurement, Solution, TimerClass
 from PIL import Image, ImageTk
 import os
 from Modules.Config.Visual import *
-
-
-INDICATIONS = {
-    "PATTERNS": "This component shows you a design problem with its respective description. You must design a solution "
-                "that best matches the problem using the tools provided. For the present case you have the following "
-                "resolution tools: privacy design patterns, file attachments and extra annotations.",
-    "NO PATTERNS": "This component shows you a design problem with its respective description. You must design a "
-                   "solution that best matches the problem using the tools provided. For the present case you have "
-                   "the following resolution tools: attachment of a file and extra annotations."
-}
 
 
 class FormParentDesigner:
@@ -52,35 +42,41 @@ class FormParentDesigner:
         defaultbg = self.frm_parent.cget('bg')
 
         # Initialize visual components for displaying available experiment scenarios
-        lbl_title = Label(self.frm_parent, text='Experimental scenarios')
+        lbl_title = Label(self.frm_parent, text='Experiments')
         lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_title.grid(row=0, column=1, columnspan=5, pady=20, sticky=EW)
-
-        lbl_experimental_trv = Label(self.frm_parent, text='Select a scenario')
-        lbl_experimental_trv.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_experimental_trv.grid(row=1, column=1, pady=5, sticky=NW)
-        lbl_problem_desc = Label(self.frm_parent, text='Indications')
-        lbl_problem_desc.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_problem_desc.grid(row=3, column=1, pady=5, sticky=NW)
+        lbl_title.grid(row=0, column=0, columnspan=7, pady=20, sticky=EW)
         lbl_sep1 = Label(self.frm_parent)
-        lbl_sep1.grid(row=2, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_parent, height=4, columns=('Scenario', 'Description'))
+        lbl_sep1.grid(row=1, column=0, padx=10, pady=20, rowspan=2)
+        lbl_experimental_trv = Label(self.frm_parent, text='Select an experiment')
+        lbl_experimental_trv.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        lbl_experimental_trv.grid(row=1, column=1, pady=20, sticky=W)
+        lbl_sep2 = Label(self.frm_parent)
+        lbl_sep2.grid(row=1, column=3, padx=10, pady=20, rowspan=2)
+        lbl_problem_desc = Label(self.frm_parent, text='Information')
+        lbl_problem_desc.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
+        lbl_problem_desc.grid(row=1, column=4, pady=20, sticky=W)
+        lbl_sep3 = Label(self.frm_parent)
+        lbl_sep3.grid(row=1, column=6, padx=10, pady=20, rowspan=2)
+        self.trv_available = Treeview(self.frm_parent, height=11, columns='Title')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available.heading('#1', text='Scenario', anchor=CENTER)
-        self.trv_available.heading('#2', text='Description', anchor=CENTER)
+        self.trv_available.heading('#1', text='Title', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_available.column('#1', width=300, minwidth=300, stretch=NO)
-        self.trv_available.column('#2', width=500, minwidth=500, stretch=NO)
+        self.trv_available.column('#1', width=400, minwidth=400, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_experimental_scenario)
-        self.trv_available.grid(row=2, column=1, sticky=W, pady=25)
+        self.trv_available.grid(row=2, column=1, sticky=W, pady=20)
         vsb_trv_av = Scrollbar(self.frm_parent, orient="vertical", command=self.trv_available.yview)
-        vsb_trv_av.grid(row=2, column=2, pady=25, sticky=NS)
+        vsb_trv_av.grid(row=2, column=2, pady=20, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
-        self.txt_scenario_desc = Text(self.frm_parent, height=4, width=90)
-        self.txt_scenario_desc.config(font=SUBTITLE2_FONT, bg=defaultbg)
-        self.txt_scenario_desc.grid(row=4, column=1, pady=25, sticky=NW, columnspan=3)
+        self.txt_scenario_desc = Text(self.frm_parent, height=15, width=40)
+        self.txt_scenario_desc.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_scenario_desc.grid(row=2, column=4, pady=20, sticky=W)
+        vsb_txt_sc = Scrollbar(self.frm_parent, orient="vertical", command=self.txt_scenario_desc.yview)
+        vsb_txt_sc.grid(row=2, column=5, pady=20, sticky=NS)
+        self.txt_scenario_desc.configure(yscrollcommand=vsb_txt_sc.set)
+        sep_aux1 = Separator(self.frm_parent, orient=VERTICAL)
+        sep_aux1.grid(row=1, column=7, sticky=NS, rowspan=2)
         btn_access = Button(self.frm_parent, image=self.next_icon, command=self.click_enter_scenario)
-        btn_access.grid(row=2, column=4, padx=50, pady=25, sticky=N)
+        btn_access.grid(row=1, column=8, padx=30, pady=20, sticky=N)
         btn_access_ttp = CreateToolTip(btn_access, 'Go')
 
         # Window dialog to authenticate the selected experimental scenario
@@ -98,40 +94,51 @@ class FormParentDesigner:
         btn_cancel_auth_ttp = CreateToolTip(btn_cancel_auth, 'Cancel')
 
         # Experiment form
-        frm_aux1 = Frame(self.frm_general)
-        self.lbl_component_title = Label(frm_aux1, text='Problem {} of {}')
-        self.lbl_component_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        self.lbl_component_title.grid(row=0, column=0, columnspan=6, pady=15, sticky=EW)
-        sep_aux1 = Separator(frm_aux1, orient=HORIZONTAL)
-        sep_aux1.grid(row=1, column=0, sticky=EW, columnspan=6)
-        self.txt_hints = Text(frm_aux1, height=8, width=50)
-        self.txt_hints.config(fg=TEXT_COLOR, font=LABEL_GUI_FONT, bg=defaultbg)
-        self.txt_hints.grid(row=2, column=0, padx=25, pady=10, rowspan=2, sticky=NW)
-        sep_aux2 = Separator(frm_aux1, orient=VERTICAL)
-        sep_aux2.grid(row=2, column=1, sticky=NS, rowspan=2)
-        lbl_problem = Label(frm_aux1, text='Design problem:')
-        lbl_problem.config(fg=TEXT_COLOR, font=LABEL_GUI_FONT)
-        lbl_problem.grid(row=2, column=2, pady=10, padx=25, sticky=NW)
-        self.lbl_problem_title = Label(frm_aux1)
-        self.lbl_problem_title.config(font=LABEL_GUI_FONT)
-        self.lbl_problem_title.grid(row=2, column=3, pady=10, padx=25, sticky=NW)
-        self.txt_problem_desc = Text(frm_aux1, height=4, width=100)
-        self.txt_problem_desc.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_problem_desc.grid(row=3, column=2, padx=25, pady=10, columnspan=2, sticky=NW)
-        sep_aux3 = Separator(frm_aux1, orient=HORIZONTAL)
-        sep_aux3.grid(row=4, column=0, sticky=EW, columnspan=4)
-        sep_aux4 = Separator(frm_aux1, orient=VERTICAL)
-        sep_aux4.grid(row=2, column=4, sticky=NS, rowspan=5)
+        lbl_sep4 = Label(self.frm_general)
+        lbl_sep4.grid(row=0, column=0, padx=10, pady=10, rowspan=2)
+        self.lbl_exp_title = Label(self.frm_general, text='Experiment: {}')
+        self.lbl_exp_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
+        self.lbl_exp_title.grid(row=0, column=1, columnspan=5, pady=10, sticky=EW)
+        self.txt_exp_desc = Text(self.frm_general, height=4, width=157)
+        self.txt_exp_desc.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_exp_desc.grid(row=1, column=1, pady=10, sticky=W)
+        vsb_txt_expd = Scrollbar(self.frm_general, orient="vertical", command=self.txt_exp_desc.yview)
+        vsb_txt_expd.grid(row=1, column=2, pady=10, sticky=NS)
+        self.txt_exp_desc.configure(yscrollcommand=vsb_txt_expd.set)
+        lbl_sep11 = Label(self.frm_general)
+        lbl_sep11.grid(row=1, column=3, padx=10, pady=10)
+        self.btn_view_dd = Button(self.frm_general, text='View >>\ndiagram', command=self.click_expand_dd)
+        btn_view_dd_ttp = CreateToolTip(self.btn_view_dd, 'Experiment description diagram')
+        sep_aux3 = Separator(self.frm_general, orient=HORIZONTAL)
+        sep_aux3.grid(row=2, column=0, sticky=EW, columnspan=6)
 
-        self.btn_next_scenario = Button(frm_aux1, image=self.next_icon, command=self.click_next_scenario)
-        self.btn_next_scenario.grid(row=2, column=5, padx=25, pady=10, sticky=W)
+        lbl_sep5 = Label(self.frm_general)
+        lbl_sep5.grid(row=3, column=0, padx=10, pady=10, rowspan=2)
+        self.lbl_prob_title = Label(self.frm_general, text='Problem {} of {}: {}')
+        self.lbl_prob_title.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        self.lbl_prob_title.grid(row=3, column=1, columnspan=2, pady=10, sticky=W)
+        self.txt_prob_desc = Text(self.frm_general, height=4, width=157)
+        self.txt_prob_desc.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_prob_desc.grid(row=4, column=1, pady=10, sticky=W)
+        vsb_txt_probd = Scrollbar(self.frm_general, orient="vertical", command=self.txt_prob_desc.yview)
+        vsb_txt_probd.grid(row=4, column=2, pady=10, sticky=NS)
+        self.txt_prob_desc.configure(yscrollcommand=vsb_txt_probd.set)
+        lbl_sep12 = Label(self.frm_general)
+        lbl_sep12.grid(row=3, column=3, padx=10, pady=10, rowspan=2)
+        sep_aux2 = Separator(self.frm_general, orient=HORIZONTAL)
+        sep_aux2.grid(row=5, column=0, sticky=EW, columnspan=4)
+        lbl_sep6 = Label(self.frm_general)
+        lbl_sep6.grid(row=6, column=0, padx=10, pady=10, rowspan=2)
+        lbl_solution_title = Label(self.frm_general, text='Your solution')
+        lbl_solution_title.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
+        lbl_solution_title.grid(row=6, column=1, pady=10, columnspan=2, sticky=W)
+        self.btn_next_scenario = Button(self.frm_general, image=self.next_icon, command=self.click_next_scenario)
+        self.btn_next_scenario.grid(row=3, column=5, padx=30, pady=10, sticky=W)
         btn_next_scenario_ttp = CreateToolTip(self.btn_next_scenario, 'Next component')
+        sep_aux4 = Separator(self.frm_general, orient=VERTICAL)
+        sep_aux4.grid(row=3, column=4, sticky=NS, rowspan=5)
 
-        lbl_solution = Label(frm_aux1, text='Design a solution')
-        lbl_solution.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_solution.grid(row=5, column=0, padx=25, pady=10, sticky=W)
-        self.tab_control = Notebook(frm_aux1)
-
+        self.tab_control = Notebook(self.frm_general)
         self.tab_patterns = Frame(self.tab_control)
         self.tab_control.add(self.tab_patterns, text="Design patterns", padding=10, image=self.incomplete_icon, compound=RIGHT)
         lbl_av_patterns = Label(self.tab_patterns, text='Patterns browser')
@@ -144,37 +151,37 @@ class FormParentDesigner:
         lbl_sel_patterns.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
         lbl_sel_patterns.grid(row=0, column=8, pady=10, sticky=W)
 
-        lbl_sep3 = Label(self.tab_patterns)
-        lbl_sep3.grid(row=0, column=0, padx=10, pady=10)
-        self.lbx_av_patterns = Listbox(self.tab_patterns, height=16, width=40, exportselection=0)
+        lbl_sep7 = Label(self.tab_patterns)
+        lbl_sep7.grid(row=0, column=0, padx=10, pady=10)
+        self.lbx_av_patterns = Listbox(self.tab_patterns, height=14, width=30, exportselection=0)
         self.lbx_av_patterns.grid(row=1, column=1, pady=10, sticky=W, rowspan=7)
         self.lbx_av_patterns.bind('<<ListboxSelect>>', self.select_available_pattern)
         vsb_trv_avpat = Scrollbar(self.tab_patterns, orient="vertical", command=self.lbx_av_patterns.yview)
         vsb_trv_avpat.grid(row=1, column=2, rowspan=7, pady=10, sticky=NS)
         self.lbx_av_patterns.configure(yscrollcommand=vsb_trv_avpat.set)
-        lbl_sep4 = Label(self.tab_patterns)
-        lbl_sep4.grid(row=0, column=3, padx=10, pady=10)
-        self.txt_pattern_content = Text(self.tab_patterns, height=16, width=70)
+        lbl_sep8 = Label(self.tab_patterns)
+        lbl_sep8.grid(row=0, column=3, padx=10, pady=10)
+        self.txt_pattern_content = Text(self.tab_patterns, height=14, width=60)
         self.txt_pattern_content.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_pattern_content.grid(row=1, column=4, pady=10, sticky=W, rowspan=7)
         vsb_txt_content = Scrollbar(self.tab_patterns, orient="vertical", command=self.txt_pattern_content.yview)
         vsb_txt_content.grid(row=1, column=5, rowspan=7, pady=10, sticky=NS)
         self.txt_pattern_content.configure(yscrollcommand=vsb_txt_content.set)
-        self.btn_view_diagram = Button(self.tab_patterns, text='View >>\ndiagram', command=self.click_expand_diagram)
-        self.btn_view_diagram.grid(row=1, column=6, padx=20, pady=10, sticky=W)
+        self.btn_view_pd = Button(self.tab_patterns, text='View >>\ndiagram', command=self.click_expand_pd)
+        self.btn_view_pd.grid(row=1, column=6, padx=20, pady=10, sticky=W)
         btn_add = Button(self.tab_patterns, image=self.add_icon, command=self.click_add_patt)
         btn_add.grid(row=2, column=7, padx=20)
         btn_add_ttp = CreateToolTip(btn_add, 'Add pattern')
         btn_remove = Button(self.tab_patterns, image=self.delete_icon, command=self.click_remove_patt)
         btn_remove.grid(row=4, column=7, padx=20)
         btn_remove_ttp = CreateToolTip(btn_remove, 'Remove pattern')
-        self.lbx_sel_patterns = Listbox(self.tab_patterns, height=16, width=40, exportselection=0)
+        self.lbx_sel_patterns = Listbox(self.tab_patterns, height=14, width=30, exportselection=0)
         self.lbx_sel_patterns.grid(row=1, column=8, pady=10, sticky=W, rowspan=7)
         vsb_trv_selpat = Scrollbar(self.tab_patterns, orient="vertical", command=self.lbx_sel_patterns.yview)
         vsb_trv_selpat.grid(row=1, column=9, rowspan=7, pady=10, sticky=NS)
         self.lbx_sel_patterns.configure(yscrollcommand=vsb_trv_selpat.set)
-        lbl_sep4 = Label(self.tab_patterns)
-        lbl_sep4.grid(row=0, column=10, padx=10, pady=10)
+        lbl_sep9 = Label(self.tab_patterns)
+        lbl_sep9.grid(row=0, column=10, padx=10, pady=10)
 
         self.tab_file = Frame(self.tab_control)
         self.tab_control.add(self.tab_file, text="File", padding=1, image=self.incomplete_icon, compound=RIGHT)
@@ -187,24 +194,24 @@ class FormParentDesigner:
         btn_quit = Button(self.tab_file, image=self.remove_icon, command=self.click_remove_file)
         btn_quit.grid(row=2, column=0, padx=20, pady=10, sticky=E)
         btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
-        self.canvas_solution = Canvas(self.tab_file, width=300, height=300)
+        self.canvas_solution = Canvas(self.tab_file, width=270, height=270)
         self.canvas_solution.config(background='white', borderwidth=1)
         self.canvas_solution.grid(row=0, column=1, padx=10, pady=10, rowspan=10, sticky=NS)
 
         self.tab_desc = Frame(self.tab_control)
         self.tab_control.add(self.tab_desc, text="Notes", padding=10, image=self.incomplete_icon, compound=RIGHT)
-        lbl_sep5 = Label(self.tab_desc)
-        lbl_sep5.grid(row=0, column=0, padx=10, pady=20)
-        self.txt_solution_desc = Text(self.tab_desc, height=10, width=175)
+        lbl_sep10 = Label(self.tab_desc)
+        lbl_sep10.grid(row=0, column=0, padx=10, pady=20)
+        self.txt_solution_desc = Text(self.tab_desc, height=15, width=145)
         self.txt_solution_desc.config(font=TEXT_FONT)
         self.txt_solution_desc.bind("<Key>", self.txt_notes_modified)
         self.txt_solution_desc.grid(row=0, column=1, pady=20, sticky=W)
         vsb_txt_solution_desc = Scrollbar(self.tab_desc, orient="vertical", command=self.txt_solution_desc.yview)
         vsb_txt_solution_desc.grid(row=0, column=2, pady=20, sticky=NS)
         self.lbx_av_patterns.configure(yscrollcommand=vsb_txt_solution_desc.set)
-
-        self.tab_control.grid(row=6, column=0, padx=25, pady=10, sticky=W, columnspan=4)
-        frm_aux1.grid(row=0, column=0, pady=20, padx=10, sticky=NSEW)
+        self.tab_control.grid(row=7, column=1, pady=10, sticky=W, columnspan=2)
+        lbl_sep13 = Label(self.frm_general)
+        lbl_sep13.grid(row=6, column=3, padx=10, pady=10, rowspan=2)
 
         self.canvas_expanded = Canvas(self.tlevel_image_exp, width=500, height=500)
         self.canvas_expanded.config(background='white', borderwidth=1)
@@ -212,9 +219,6 @@ class FormParentDesigner:
 
     def show_frm(self):
         self.retrieve_list()
-        if len(self.trv_available.get_children()) != 0:
-            self.trv_available.selection_set(self.trv_available.get_children()[0])
-            self.select_experimental_scenario()
         self.frm_parent.grid(row=0, column=0, columnspan=9, rowspan=9, pady=10, padx=10)
 
     def hide_frm(self):
@@ -231,12 +235,18 @@ class FormParentDesigner:
         # Remove text from annotation
         self.txt_scenario_desc['state'] = NORMAL
         self.txt_scenario_desc.delete('1.0', 'end-1c')
-        self.txt_scenario_desc['state'] = DISABLED
         self.directive = Message(action=82, information=['my scenarios', self.current_designer.id])
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], wrap_text(elements[2], 72)))
+            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1],))
+        if len(self.trv_available.get_children()) != 0:
+            self.trv_available.selection_set(self.trv_available.get_children()[0])
+            self.select_experimental_scenario()
+        else:
+            self.txt_scenario_desc.insert('1.0', wrap_text('No experiments available for you', 40))
+        self.txt_scenario_desc['state'] = DISABLED
+
 
     def select_experimental_scenario(self, event=None):
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
@@ -244,38 +254,17 @@ class FormParentDesigner:
             self.directive = Message(action=85, information=[id_selected_ex_scenario])
             self.connection = self.directive.send_directive(self.connection)
             self.experimental_scenario = ExperimentalSC(id=id_selected_ex_scenario,
-                                                        name=self.connection.message.information[0],
+                                                        title=self.connection.message.information[0],
                                                         description=self.connection.message.information[1],
                                                         access_code=self.connection.message.information[2],
-                                                        scenario_availability=self.connection.message.information[3],
-                                                        scenario_lock=self.connection.message.information[4],
-                                                        id_experiment=self.connection.message.information[5],
-                                                        id_control_group=self.connection.message.information[6],
-                                                        id_experimental_group=self.connection.message.information[7],
+                                                        state=self.connection.message.information[3],
+                                                        availability=self.connection.message.information[4],
+                                                        id_experiment=self.connection.message.information[6],
+                                                        id_description_diagram=self.connection.message.information[5],
                                                         connection=self.connection)
-            # Retrieve scenario components
-            self.scenario_components = []
-            self.directive = Message(action=87, information=[id_selected_ex_scenario, 1])
-            self.connection = self.directive.send_directive(self.connection)
-            for item in self.connection.message.information:
-                elements = item.split('¥')
-                self.scenario_components.append(
-                    ScenarioComponent(id_DB=int(elements[0]), id_exp_scenario=int(elements[1]),
-                                      id_problem=int(elements[2]), connection=self.connection))
-
+            self.experimental_scenario.retrieve_problems(Pattern.get_available_patterns(self.connection))
             # Insert description of the current scenario into visual component
-            self.txt_scenario_desc['state'] = NORMAL
-            self.txt_scenario_desc.delete('1.0', 'end-1c')
-            if len(self.scenario_components) == 1:
-                text = 'The selected scenario has one design problem that you can solve with supporting ' \
-                       'tools, such as: design patterns, digrams and descriptions. Take the necessary time to solve it ' \
-                       'in the most efficient way.'
-            else:
-                text = 'The selected scenario has {} design problems that you can solve with supporting ' \
-                       'tools, such as: design patterns, digrams and descriptions. Take the necessary time to solve it ' \
-                       'in the most efficient way.'.format(len(self.scenario_components))
-            self.txt_scenario_desc.insert('1.0', wrap_text(text, 108))
-            self.txt_scenario_desc['state'] = DISABLED
+            self.txt_scenario_desc.insert('1.0', wrap_text(self.experimental_scenario.description, 40))
 
     def click_enter_scenario(self):
         """
@@ -297,14 +286,9 @@ class FormParentDesigner:
             self.txt_auth_scenario.delete(0, END)
             self.tlevel_auth_scenario.grab_release()
             self.tlevel_auth_scenario.withdraw()
+            self.load_experiment()
             self.frm_parent.grid_forget()
             self.frm_general.grid(row=0, column=0, columnspan=9, rowspan=9, pady=10, padx=10)
-            self.initialize_component_variables()
-            self.current_scenarios_counter = 0
-            self.clear_visual_components()
-            self.current_designer.get_current_role(self.experimental_scenario.id)    #Get role for current experimental scenario
-            self.lock_experiment()
-            self.load_scenario_component(self.current_scenarios_counter)
         else:
             messagebox.showerror(parent=self.tlevel_auth_scenario, title='Wrong access code',
                                  message='The access code you provided is wrong, retry')
@@ -343,8 +327,8 @@ class FormParentDesigner:
                                        message="Are you sure you want to continue? Yo won't be able to make any change later")
         if decision: # Confirmation of action
             if self.save_changes():
-                self.current_scenarios_counter += 1
-                if self.current_scenarios_counter == len(self.scenario_components): # If no more scenario components available
+                self.problems_counter += 1
+                if self.problems_counter == len(self.experimental_scenario.problems): # If no more problems available
                     messagebox.showinfo(parent=self.frm_general, title='Experimental scenario finished',
                                            message="This concludes the execution of the experimental scenario. Thank you!")
                     self.clear_visual_components()
@@ -355,7 +339,7 @@ class FormParentDesigner:
                                         message="You are about to start a new component, press Ok when you are ready.")
                     self.clear_visual_components()
                     self.initialize_component_variables()
-                    self.load_scenario_component(self.current_scenarios_counter)
+                    self.load_problem()
 
     def save_changes(self):
         validation_option = self.validate_component_frm()  # Validate any problem with info inserted into visual components
@@ -363,27 +347,27 @@ class FormParentDesigner:
             self.solution_time += self.time_thread.seconds
             self.time_thread.stop() # Stop thread timer
             # Get measurements of important metrics for the current component
-            scenario_comp_id = self.scenario_components[self.current_scenarios_counter].id_DB
+            problem_id = self.experimental_scenario.problems[self.problems_counter].id
             current_measurements = []
             # Solution time
             measurement_1 = Measurement(value=str(self.solution_time), id_metric=1, id_designer=self.current_designer.id,
-                                        id_scenario_comp=scenario_comp_id)
+                                        id_problem=problem_id)
             current_measurements.append(measurement_1)
             # Selection time
             measurement_2 = Measurement(value=str(self.selection_time), id_metric=2, id_designer=self.current_designer.id,
-                                        id_scenario_comp=scenario_comp_id)
+                                        id_problem=problem_id)
             current_measurements.append(measurement_2)
             # Viewed patterns
             measurement_3 = Measurement(value=str(len(self.av_patterns_seen)), id_metric=3,
-                                        id_designer=self.current_designer.id, id_scenario_comp=scenario_comp_id)
+                                        id_designer=self.current_designer.id, id_problem=problem_id)
             current_measurements.append(measurement_3)
             # Chosen patterns
             measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()), id_metric=4,
-                                        id_designer=self.current_designer.id, id_scenario_comp=scenario_comp_id)
+                                        id_designer=self.current_designer.id, id_problem=problem_id)
             current_measurements.append(measurement_4)
             for item in current_measurements:
                 self.directive = Message(action=96, information=[item.value, item.date, item.id_metric, item.id_designer,
-                                                                 item.id_scenario_comp])
+                                                                 item.id_problem])
                 self.connection = self.directive.send_directive(self.connection)
             # Get info and build the solution to send to the server
             # Create diagram in DB
@@ -395,7 +379,7 @@ class FormParentDesigner:
                                     patterns_id=self.sel_patterns_ids)
             # Create the solution in DB
             self.directive = Message(action=101, information=[solution_aux.annotations, solution_aux.diagram_id,
-                                                              self.current_designer.id, scenario_comp_id,
+                                                              self.current_designer.id, problem_id,
                                                               solution_aux.patterns_id])
             self.connection = self.directive.send_directive(self.connection)
             return True
@@ -410,14 +394,14 @@ class FormParentDesigner:
                                    message='You must add annotations to your solution')
         return False
 
-    def lock_experiment(self):
+    '''def lock_experiment(self):
         """
         This section locks the scenario before starting its resolution, so the experimenter can not make any changes to
         it later (this section is only executed if the scenario is not locked)
         """
         if not self.experimental_scenario.scenario_lock:
             self.directive = Message(action=83, information=['lock_scenario', self.experimental_scenario.id])
-            self.connection = self.directive.send_directive(self.connection)
+            self.connection = self.directive.send_directive(self.connection)'''
 
     def validate_component_frm(self):
         if self.pattern_decision:
@@ -448,7 +432,7 @@ class FormParentDesigner:
             self.attached_file.read_file(filename)
             # Display image into canvas
             load = Image.open(self.attached_file.filename)
-            load = load.resize((300, 300), Image.ANTIALIAS)
+            load = load.resize((270, 270), Image.ANTIALIAS)
             self.render = ImageTk.PhotoImage(load)
             if self.attached_file.image is not None:  # if an image was already loaded
                 self.canvas_solution.delete(self.attached_file.image)  # remove the previous image
@@ -484,7 +468,7 @@ class FormParentDesigner:
                         self.selected_pattern = item
                         break
                 self.sel_patterns_ids.append(id_selected)   # Append pattern_id to selected patterns ids
-                self.lbx_sel_patterns.insert(END, self.selected_pattern.get_content_name())  # Insert pattern name into selected listbox patters
+                self.lbx_sel_patterns.insert(END, self.selected_pattern.get_main_section())  # Insert pattern name into selected listbox patters
                 self.check_selected_patterns()
 
     def click_remove_patt(self):
@@ -506,14 +490,23 @@ class FormParentDesigner:
                         break
                 self.check_selected_patterns()
 
-    def click_expand_diagram(self):
+    def click_expand_pd(self):
         # Fill canvas with retrieved image
-        load = Image.open(self.file_aux.filename)
+        load = Image.open(self.file_pd.filename)
         load = load.resize((500, 500), Image.ANTIALIAS)
-        self.render = ImageTk.PhotoImage(load)
+        self.render_pd = ImageTk.PhotoImage(load)
         self.canvas_expanded.delete()
-        self.file_aux.image = self.canvas_expanded.create_image(0, 0, anchor='nw',
-                                                                image=self.render)  # and display new image
+        self.file_pd.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_pd)  # and display new image
+        self.tlevel_image_exp.deiconify()
+        self.tlevel_image_exp.grab_set()
+
+    def click_expand_dd(self):
+        # Fill canvas with retrieved image
+        load = Image.open(self.file_dd.filename)
+        load = load.resize((500, 500), Image.ANTIALIAS)
+        self.render_dd = ImageTk.PhotoImage(load)
+        self.canvas_expanded.delete()
+        self.file_dd.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_dd)  # and display new image
         self.tlevel_image_exp.deiconify()
         self.tlevel_image_exp.grab_set()
 
@@ -522,10 +515,8 @@ class FormParentDesigner:
         self.tlevel_image_exp.withdraw()
 
     def clear_visual_components(self):
-        self.txt_hints['state'] = NORMAL
-        self.txt_hints.delete('1.0', 'end-1c')
-        self.txt_problem_desc['state'] = NORMAL
-        self.txt_problem_desc.delete('1.0', 'end-1c')
+        self.txt_prob_desc['state'] = NORMAL
+        self.txt_prob_desc.delete('1.0', 'end-1c')
         self.lbx_av_patterns.delete(0, END)
         self.lbx_sel_patterns.delete(0, END)
         self.txt_pattern_content['state'] = NORMAL
@@ -539,39 +530,51 @@ class FormParentDesigner:
         self.tab_control.tab(1, image=self.incomplete_icon)
         self.tab_control.tab(2, image=self.incomplete_icon)
 
-    def load_scenario_component(self, index):
-        # Ask for available patterns in current scenario for the current designer, depending of the role
-        self.directive = Message(action=42, information=[self.scenario_components[index].id_DB, 1 if self.current_designer.current_group == 'control' else 2])
+    def load_experiment(self):
+        self.initialize_component_variables()
+        self.problems_counter = 0
+        #self.clear_visual_components()
+        self.current_designer.get_current_role(
+            self.experimental_scenario.id)  # Get role for current experimental scenario
+        # self.lock_experiment()
+        # Retrieve patterns for designer in current experimental scenario
+        self.directive = Message(action=42, information=[self.experimental_scenario.id,
+                                                         1 if self.current_designer.current_group == 'experimental' else 2])
         self.connection = self.directive.send_directive(self.connection)
         self.available_patterns = Pattern.get_patterns(self.connection, self.connection.message.information)
-        self.lbl_component_title['text'] = 'Problem {} of {}'.format(self.current_scenarios_counter + 1,
-                                                                       len(self.scenario_components))
-        # Make patterns visible if the patterns are available for current designer in current scenario component
-        if self.current_designer.current_group == 'control' and self.scenario_components[index].id_patterns_cgroup:
-            self.txt_hints.insert('1.0', wrap_text(INDICATIONS["PATTERNS"], 60))
-            self.tab_control.tab(0, state='normal')
-            self.tab_control.select(0)
-            self.pattern_decision = True
-        elif self.current_designer.current_group == 'experimental' and self.scenario_components[index].id_patterns_egroup:
-            self.txt_hints.insert('1.0', wrap_text(INDICATIONS["PATTERNS"], 60))
+        # Make patterns visible if the patterns are available for current designer in current experimental scenario
+        if self.available_patterns:
             self.tab_control.tab(0, state='normal')
             self.tab_control.select(0)
             self.pattern_decision = True
         else:
-            self.txt_hints.insert('1.0', wrap_text(INDICATIONS["NO PATTERNS"], 60))
             self.tab_control.tab(0, state='disabled')
             self.tab_control.select(1)
             self.pattern_decision = False
-        self.txt_hints['state'] = DISABLED
-        self.lbl_problem_title['text'] = self.scenario_components[index].problem.name
-        self.txt_problem_desc.insert('1.0', wrap_text(self.scenario_components[index].problem.description, 110))
-        self.txt_problem_desc['state'] = DISABLED
+        self.btn_view_dd.grid_forget()
+        if self.experimental_scenario.description_diagram is None:
+            self.btn_view_dd.grid(row=1, column=4, padx=10, pady=10, sticky=N)
+        self.lbl_exp_title['text'] = 'Experiment: {}'.format(self.experimental_scenario.title)
+        self.txt_exp_desc['state'] = NORMAL
+        self.txt_exp_desc.delete('1.0', 'end-1c')
+        self.txt_exp_desc.insert('1.0', wrap_text(self.experimental_scenario.description, 165))
+        self.txt_exp_desc['state'] = DISABLED
+        self.load_problem()
+
+    def load_problem(self):
+        # Ask for available patterns in current problem for the current designer, depending of the role
+        self.lbl_prob_title['text'] = 'Problem {} of {}: {}'.format(self.problems_counter + 1,
+                                                                    len(self.experimental_scenario.problems),
+                                                                    self.experimental_scenario.problems[self.problems_counter].brief_description)
+        self.txt_prob_desc.insert('1.0', wrap_text(self.experimental_scenario.problems[self.problems_counter].description, 165))
+        self.txt_prob_desc['state'] = DISABLED
         self.av_patterns_ids = []
         self.sel_patterns_ids = []
         for item in self.available_patterns:
             self.av_patterns_ids.append(item.id)
             self.lbx_av_patterns.insert(END, item.get_main_section())
-        self.current_ideal_patterns = self.scenario_components[index].problem.solution.patterns_id  # Get the patterns of the ideal solution for current problem
+        self.current_ideal_patterns = self.experimental_scenario.problems[self.problems_counter].solution.patterns  # Get the patterns of the ideal solution for current problem
+        self.btn_view_pd['state'] = DISABLED
         self.time_thread = TimerClass()
         self.time_thread.begin()
 
@@ -586,7 +589,7 @@ class FormParentDesigner:
                 self.selected_pattern = item
                 break
         # Set visual components depending on the selected pattern and its info
-        self.btn_view_diagram['state'] = DISABLED
+        self.btn_view_pd['state'] = DISABLED
         self.txt_pattern_content['state'] = NORMAL
         self.txt_pattern_content.delete('1.0', 'end-1c')
         for item in self.selected_pattern.sections:
@@ -594,12 +597,12 @@ class FormParentDesigner:
             if item.data_type == 'File': # The section content is a file
                 self.directive = Message(action=65, information=[item.diagram_id])
                 self.connection = self.directive.send_directive(self.connection)
-                self.file_aux = File()
-                self.file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
-                self.btn_view_diagram['state'] = NORMAL
-                self.txt_pattern_content.insert('end-1c', "\n" + wrap_text('Click right button to see diagram >>', 80) + "\n\n")
+                self.file_pd = File()
+                self.file_pd.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                self.btn_view_pd['state'] = NORMAL
+                self.txt_pattern_content.insert('end-1c', "\n" + wrap_text('Click right button to see diagram >>', 65) + "\n\n")
             else:
-                self.txt_pattern_content.insert('end-1c', "\n" + wrap_text(item.content, 80) + "\n\n")
+                self.txt_pattern_content.insert('end-1c', "\n" + wrap_text(item.content, 65) + "\n\n")
         self.txt_pattern_content['state'] = DISABLED
 
     def txt_notes_modified(self, event):

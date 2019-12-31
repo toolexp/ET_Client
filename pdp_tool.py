@@ -15,7 +15,7 @@ from Modules.Forms.form_patterns import FormParentPattern
 from Modules.Forms.form_classifications import FormParentClassification
 from Modules.Forms.form_experiments import FormParentExperiment
 from Modules.Forms.form_designer_gui import FormParentDesigner
-from Modules.Forms.frm_reports import FormParentReport
+from Modules.Forms.form_reports import FormParentReport
 
 json_config = json.load(open('config.json', 'r'))
 HOST = json_config["server"]["address"]  # The server's hostname or IP address

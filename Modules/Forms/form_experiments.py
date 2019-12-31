@@ -859,11 +859,11 @@ class FormChildExperiment:
             if self.connection.message.information[3] is None:
                 id_diagram = None
             else:
-                id_diagram = int(self.connection.message.information[3])
+                id_diagram = int(self.connection.message.information[5])
             self.experimental_scenario = ExperimentalSC(id=id_sc_selected, title=self.connection.message.information[0],
                                                         description=self.connection.message.information[1],
                                                         access_code=self.connection.message.information[2],
-                                                        id_experiment=int(self.connection.message.information[4]),
+                                                        id_experiment=int(self.connection.message.information[6]),
                                                         id_description_diagram=id_diagram,
                                                         connection=self.connection)
             self.experimental_scenario.retrieve_designers_groups()
@@ -928,12 +928,12 @@ class FormChildExperiment:
                 if self.connection.message.information[3] is None:
                     id_diagram = None
                 else:
-                    id_diagram = int(self.connection.message.information[3])
+                    id_diagram = int(self.connection.message.information[5])
                 self.experimental_scenario = ExperimentalSC(id=id_sc_selected,
                                                             title=self.connection.message.information[0],
                                                             description=self.connection.message.information[1],
                                                             access_code=self.connection.message.information[2],
-                                                            id_experiment=int(self.connection.message.information[4]),
+                                                            id_experiment=int(self.connection.message.information[6]),
                                                             id_description_diagram=id_diagram,
                                                             connection=self.connection)
                 self.experimental_scenario.retrieve_designers_groups()

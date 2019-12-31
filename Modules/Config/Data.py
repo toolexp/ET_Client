@@ -80,7 +80,7 @@ class Designer:
             self.retrieve_components()
 
     def retrieve_components(self):
-        if self.id != 0:
+        if self.id == 0:
             self.directive = Message(action=25, information=[self.id])
             self.connection = self.directive.send_directive(self.connection)
             self.name = self.connection.message.information[0]
@@ -218,13 +218,13 @@ class File:
 
 class Measurement:
     def __init__(self, id=0, value='', date=datetime.datetime.now(), id_metric=None, id_designer=None,
-                 id_scenario_comp=None, metric=None, designer=None, scenario_comp=None, connection=None):
+                 id_problem=None, metric=None, designer=None, scenario_comp=None, connection=None):
         self.id = id
         self.value = value
         self.date = date
         self.id_metric = id_metric
         self.id_designer = id_designer
-        self.id_scenario_comp = id_scenario_comp
+        self.id_problem = id_problem
         self.metric = metric
         self.designer = designer
         self.scenario_comp = scenario_comp
@@ -382,50 +382,6 @@ class Problem:
                     if pattern.id == current_id:
                         self.solution.patterns.append(pattern)
                         break
-
-
-class ScenarioComponent:
-    id_counter = 0
-
-    def __init__(self, id=0, id_exp_scenario=0, id_problem=0, id_patterns_cgroup=None, id_patterns_egroup=None, problem=None,
-                 connection=None, id_DB=0):
-        if id_patterns_egroup is None:
-            id_patterns_egroup = []
-        if id_patterns_cgroup is None:
-            id_patterns_cgroup = []
-        if id == 0:
-            ScenarioComponent.id_counter += 1
-            self.id = ScenarioComponent.id_counter
-        else:
-            self.id = id
-        self.id_exp_scenario = id_exp_scenario
-        self.id_problem = id_problem
-        self.id_patterns_egroup = id_patterns_egroup
-        self.id_patterns_cgroup = id_patterns_cgroup
-        self.problem = problem
-        self.connection = connection
-        self.id_DB = id_DB
-        if self.connection is not None:
-            self.retrieve_components()
-
-    def retrieve_components(self):
-        if self.id_problem is not None:
-            self.directive = Message(action=55, information=[self.id_problem])
-            self.connection = self.directive.send_directive(self.connection)
-            self.problem = Problem(id=self.id_problem, name=self.connection.message.information[0],
-                                   description=self.connection.message.information[1],
-                                   id_solution=self.connection.message.information[2], connection=self.connection)
-
-        # Ask for the patterns associated with the current scenario component
-        self.directive = Message(action=87, information=[self.id_DB, 2])
-        self.connection = self.directive.send_directive(self.connection)
-        if len(self.connection.message.information) != 0:   # There may not be associated patterns to a sc components when ideal solutions doesnt have patterns
-            for item in self.connection.message.information:
-                elements = item.split('¥')
-                if int(elements[1]) == 1:
-                    self.id_patterns_cgroup.append(int(elements[3]))
-                else:
-                    self.id_patterns_egroup.append(int(elements[3]))
 
 
 class Section:
