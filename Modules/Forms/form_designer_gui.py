@@ -227,14 +227,13 @@ class FormParentDesigner:
 
     def retrieve_list(self):
         """
-        This function shows the existing 'Experimental scenarios for the specified designer' in the home TreeView
+        This function shows the existing 'Experimental scenarios for the specified designer' in the home TreeView, if
+        not 'Experimental scenario' then an information box is showed
         """
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
         # Remove text from annotation
-        self.txt_scenario_desc['state'] = NORMAL
-        self.txt_scenario_desc.delete('1.0', 'end-1c')
         self.directive = Message(action=82, information=['my scenarios', self.current_designer.id])
         self.connection = self.directive.send_directive(self.connection)
         for item in self.connection.message.information:
@@ -244,11 +243,16 @@ class FormParentDesigner:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
             self.select_experimental_scenario()
         else:
+            self.txt_scenario_desc['state'] = NORMAL
+            self.txt_scenario_desc.delete('1.0', 'end-1c')
             self.txt_scenario_desc.insert('1.0', wrap_text('No experiments available for you', 40))
-        self.txt_scenario_desc['state'] = DISABLED
-
+            self.txt_scenario_desc['state'] = DISABLED
 
     def select_experimental_scenario(self, event=None):
+        """
+        Retrieves information of the selected experimental scenario form the server and saves in a local variable for
+        future usage, also shows the description of the selected experimental scenario in a textbox
+        """
         if self.trv_available.item(self.trv_available.selection())['text'] != '':
             id_selected_ex_scenario = int(self.trv_available.item(self.trv_available.selection())['text'])  # Retrieve id of selected item from TreeView
             self.directive = Message(action=85, information=[id_selected_ex_scenario])
@@ -263,8 +267,15 @@ class FormParentDesigner:
                                                         id_description_diagram=self.connection.message.information[5],
                                                         connection=self.connection)
             self.experimental_scenario.retrieve_problems(Pattern.get_available_patterns(self.connection))
+            if self.experimental_scenario.description_diagram is not None:
+                self.file_dd = self.experimental_scenario.description_diagram
+            else:
+                self.file_dd = None
             # Insert description of the current scenario into visual component
+            self.txt_scenario_desc['state'] = NORMAL
+            self.txt_scenario_desc.delete('1.0', 'end-1c')
             self.txt_scenario_desc.insert('1.0', wrap_text(self.experimental_scenario.description, 40))
+            self.txt_scenario_desc['state'] = DISABLED
 
     def click_enter_scenario(self):
         """
@@ -279,8 +290,8 @@ class FormParentDesigner:
 
     def click_authenticate_scenario(self):
         """
-        Shows the component form with information of first component loaded. This happens if the validation process is
-        correct
+        If validation process is correct the the experimental scenario and it's problems are loaded into the visual
+        components
         """
         if self.validate_access_code():
             self.txt_auth_scenario.delete(0, END)
@@ -294,6 +305,10 @@ class FormParentDesigner:
                                  message='The access code you provided is wrong, retry')
 
     def initialize_component_variables(self):
+        """
+        Initialize to zero or empty state all variables associated with the resolution of a problem for the designers
+        (solutions and measurements)
+        """
         self.attached_file = None
         self.av_patterns_seen = []
         self.solution_time = 0
@@ -324,19 +339,21 @@ class FormParentDesigner:
         component if available, otherwise the experiment will be closed
         """
         decision = messagebox.askyesno(parent=self.frm_general, title='Confirmation',
-                                       message="Are you sure you want to continue? Yo won't be able to make any change later")
+                                       message="Are you sure you want to continue? Yo won't be able to make any change "
+                                               "later")
         if decision: # Confirmation of action
             if self.save_changes():
                 self.problems_counter += 1
                 if self.problems_counter == len(self.experimental_scenario.problems): # If no more problems available
-                    messagebox.showinfo(parent=self.frm_general, title='Experimental scenario finished',
-                                           message="This concludes the execution of the experimental scenario. Thank you!")
+                    messagebox.showinfo(parent=self.frm_general, title='Experiment',
+                                        message="This concludes the execution of the experiment. Thank you!")
+                    self.finish_experiment()
                     self.clear_visual_components()
                     self.hide_frm()
                     self.show_frm()
                 else: # If another scenario component available
-                    messagebox.showinfo(parent=self.frm_general, title='Next component',
-                                        message="You are about to start a new component, press Ok when you are ready.")
+                    messagebox.showinfo(parent=self.frm_general, title='Next problem',
+                                        message="You are about to start a new problem, press Ok when you are ready.")
                     self.clear_visual_components()
                     self.initialize_component_variables()
                     self.load_problem()
@@ -394,14 +411,13 @@ class FormParentDesigner:
                                    message='You must add annotations to your solution')
         return False
 
-    '''def lock_experiment(self):
+    def finish_experiment(self):
         """
-        This section locks the scenario before starting its resolution, so the experimenter can not make any changes to
-        it later (this section is only executed if the scenario is not locked)
+        This section checks in the server if current designer is the last of the current experimental scenario, and if
+        True changes it's state to finished, otherwise the state remains in executed
         """
-        if not self.experimental_scenario.scenario_lock:
-            self.directive = Message(action=83, information=['lock_scenario', self.experimental_scenario.id])
-            self.connection = self.directive.send_directive(self.connection)'''
+        self.directive = Message(action=83, information=['finished', self.experimental_scenario.id])
+        self.connection = self.directive.send_directive(self.connection)
 
     def validate_component_frm(self):
         if self.pattern_decision:
@@ -533,10 +549,8 @@ class FormParentDesigner:
     def load_experiment(self):
         self.initialize_component_variables()
         self.problems_counter = 0
-        #self.clear_visual_components()
         self.current_designer.get_current_role(
             self.experimental_scenario.id)  # Get role for current experimental scenario
-        # self.lock_experiment()
         # Retrieve patterns for designer in current experimental scenario
         self.directive = Message(action=42, information=[self.experimental_scenario.id,
                                                          1 if self.current_designer.current_group == 'experimental' else 2])
@@ -552,8 +566,8 @@ class FormParentDesigner:
             self.tab_control.select(1)
             self.pattern_decision = False
         self.btn_view_dd.grid_forget()
-        if self.experimental_scenario.description_diagram is None:
-            self.btn_view_dd.grid(row=1, column=4, padx=10, pady=10, sticky=N)
+        if self.experimental_scenario.description_diagram is not None:
+            self.btn_view_dd.grid(row=1, column=5, padx=10, pady=10, sticky=N)
         self.lbl_exp_title['text'] = 'Experiment: {}'.format(self.experimental_scenario.title)
         self.txt_exp_desc['state'] = NORMAL
         self.txt_exp_desc.delete('1.0', 'end-1c')
@@ -573,8 +587,13 @@ class FormParentDesigner:
         for item in self.available_patterns:
             self.av_patterns_ids.append(item.id)
             self.lbx_av_patterns.insert(END, item.get_main_section())
-        self.current_ideal_patterns = self.experimental_scenario.problems[self.problems_counter].solution.patterns  # Get the patterns of the ideal solution for current problem
+        self.current_ideal_patterns = self.experimental_scenario.problems[self.problems_counter].solution.patterns_id  # Get the patterns of the ideal solution for current problem
         self.btn_view_pd['state'] = DISABLED
+        # Make patterns visible if the patterns are available for current designer in current experimental scenario
+        if self.pattern_decision:
+            self.tab_control.select(0)
+        else:
+            self.tab_control.select(1)
         self.time_thread = TimerClass()
         self.time_thread.begin()
 

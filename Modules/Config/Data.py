@@ -376,12 +376,15 @@ class Problem:
             self.solution = Solution(id=self.id_solution, annotations=self.connection.message.information[0],
                                      diagram_id=int(self.connection.message.information[1]),
                                      patterns_id=self.connection.message.information[2], connection=self.connection)
+            current_ids = []
             for item in self.solution.patterns_id:
                 current_id = int(item.split('¥')[0])
+                current_ids.append(current_id)
                 for pattern in av_patterns:
                     if pattern.id == current_id:
                         self.solution.patterns.append(pattern)
                         break
+            self.solution.patterns_id = current_ids
 
 
 class Section:

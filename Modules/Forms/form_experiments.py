@@ -721,6 +721,7 @@ class FormChildExperiment:
         experiment option
         """
         self.hide_frm()
+        self.main_title.set('Experiments')
         self.txt_name_exp['bg'] = self.enabled_color
         self.txt_description_exp['bg'] = self.enabled_color
         self.show_frm()
