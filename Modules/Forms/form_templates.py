@@ -51,7 +51,9 @@ class FormChildTemplate:
         self.up_arrow = PhotoImage(file=r"./Resources/up_arrow.png")
         self.down_arrow = PhotoImage(file=r"./Resources/down_arrow.png")
         self.star_icon = PhotoImage(file=r"./Resources/star.png")
-        defaultbg = self.frm_child_list.cget('bg')
+        self.back_icon = PhotoImage(file=r"./Resources/back.png")
+        self.view_icon = PhotoImage(file=r"./Resources/view.png")
+        self.disabled_color = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
@@ -70,11 +72,14 @@ class FormChildTemplate:
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
         btn_new.grid(row=0, column=0, pady=5, padx=5, sticky=E)
         btn_new_ttp = CreateToolTip(btn_new, 'New template')
+        btn_view = Button(frm_aux4, image=self.view_icon, command=self.click_view)
+        btn_view.grid(row=1, column=0, pady=5, padx=5, sticky=E)
+        btn_view_ttp = CreateToolTip(btn_new, 'View template')
         btn_edit = Button(frm_aux4, image=self.modify_icon, command=self.click_update)
-        btn_edit.grid(row=1, column=0, pady=5, padx=5, sticky=E)
+        btn_edit.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_edit_ttp = CreateToolTip(btn_edit, 'Edit template')
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
-        btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
+        btn_delete.grid(row=3, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete template')
         frm_aux4.grid(row=0, column=4, pady=25, padx=25, rowspan=2, sticky=NW)
         sep_template = Separator(self.frm_child_list, orient=VERTICAL)
@@ -85,7 +90,7 @@ class FormChildTemplate:
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_details.grid(row=0, column=7, sticky=W, pady=25)
         self.txt_summary = Text(self.frm_child_list, height=18, width=50)
-        self.txt_summary.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_summary.config(font=TEXT_FONT, bg=self.disabled_color)
         self.txt_summary.grid(row=1, column=7, pady=10, sticky=NW)
         vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
@@ -147,35 +152,31 @@ class FormChildTemplate:
         vsb_trv_ses = Scrollbar(frm_aux2, orient="vertical", command=self.trv_selected_sections.yview)
         vsb_trv_ses.grid(row=1, column=6, rowspan=10, pady=10, sticky=NS)
         self.trv_selected_sections.configure(yscrollcommand=vsb_trv_ses.set)
-        lbl_note_optional = Label(frm_aux2, text='NOTES:\tTo switch between optional and mandatory, double click on '
+        self.lbl_note_optional = Label(frm_aux2, text='NOTES:\tTo switch between optional and mandatory, double click on '
                                                  'selected section.\n\tChose one section as main pressing star button.\n')
-        lbl_note_optional.config(fg=TEXT_COLOR, font=NOTE_FONT, justify=LEFT)
-        lbl_note_optional.grid(row=11, column=5, columnspan=3, sticky=W)
-        btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
-        btn_add.grid(row=4, column=3)
-        btn_add_ttp = CreateToolTip(btn_add, 'Add section')
-        btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
-        btn_remove.grid(row=5, column=3)
-        btn_remove_ttp = CreateToolTip(btn_remove, 'Remove section')
-        btn_main_section = Button(frm_aux2, image=self.star_icon, command=self.click_main_section)
-        btn_main_section.grid(row=1, column=7)
-        btn_main_section_ttp = CreateToolTip(btn_main_section, 'Main section')
-        btn_up = Button(frm_aux2, image=self.up_arrow, command=self.click_up)
-        btn_up.grid(row=4, column=7)
-        btn_up_ttp = CreateToolTip(btn_up, 'Move up')
-        btn_down = Button(frm_aux2, image=self.down_arrow, command=self.click_down)
-        btn_down.grid(row=5, column=7)
-        btn_down_ttp = CreateToolTip(btn_down, 'Move down')
+        self.lbl_note_optional.config(fg=TEXT_COLOR, font=NOTE_FONT, justify=LEFT)
+        self.btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
+        btn_add_ttp = CreateToolTip(self.btn_add, 'Add section')
+        self.btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
+        btn_remove_ttp = CreateToolTip(self.btn_remove, 'Remove section')
+        self.btn_main_section = Button(frm_aux2, image=self.star_icon, command=self.click_main_section)
+        btn_main_section_ttp = CreateToolTip(self.btn_main_section, 'Main section')
+        self.btn_up = Button(frm_aux2, image=self.up_arrow, command=self.click_up)
+        btn_up_ttp = CreateToolTip(self.btn_up, 'Move up')
+        self.btn_down = Button(frm_aux2, image=self.down_arrow, command=self.click_down)
+        btn_down_ttp = CreateToolTip(self.btn_down, 'Move down')
         frm_aux1.grid(row=0, column=0, padx=40, pady=10, rowspan=10)
         frm_aux2.grid(row=10, column=0, padx=40, pady=10)
         sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
         sep_aux1.grid(row=0, column=1, sticky=NS, rowspan=11)
-        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=0, column=2, padx=30, sticky=W)
-        btn_save_ttp = CreateToolTip(btn_save, 'Save template')
-        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=1, column=2, padx=30, sticky=W)
-        btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
+        self.enabled_color = self.txt_name.cget('bg')
+
+        self.btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        btn_save_ttp = CreateToolTip(self.btn_save, 'Save template')
+        self.btn_back = Button(self.frm_child_crud, image=self.back_icon, command=self.click_back)
+        btn_back_ttp = CreateToolTip(self.btn_back, 'Go back')
+        self.btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel_ttp = CreateToolTip(self.btn_cancel, 'Cancel')
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -245,13 +246,17 @@ class FormChildTemplate:
 
     def click_new(self):
         self.decide_template = True
-        self.frm_child_list.grid_forget()
         self.directive = Message(action=32, information=[])
         self.connection = self.directive.send_directive(self.connection)
         a_sections = self.connection.message.information
         self.retrieve_sections([], a_sections)
         self.txt_name.focus_set()
+        self.btn_save.grid(row=0, column=2, padx=30, sticky=W)
+        self.btn_cancel.grid(row=1, column=2, padx=30, sticky=W)
+        self.lbl_note_optional.grid(row=11, column=5, columnspan=3, sticky=W)
+        self.show_buttons()
         self.frm_child_crud['text'] = 'New template'
+        self.frm_child_list.grid_forget()
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
@@ -271,11 +276,54 @@ class FormChildTemplate:
                 a_sections = self.connection.message.information
                 self.retrieve_sections(s_sections, a_sections)
                 self.txt_name.focus_set()
-                self.frm_child_list.grid_forget()
+                self.btn_save.grid(row=0, column=2, padx=30, sticky=W)
+                self.btn_cancel.grid(row=1, column=2, padx=30, sticky=W)
+                self.lbl_note_optional.grid(row=11, column=5, columnspan=3, sticky=W)
+                self.show_buttons()
                 self.frm_child_crud['text'] = 'Update template'
+                self.frm_child_list.grid_forget()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+
+    def click_view(self):
+        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+            self.decide_template = False
+            self.directive = Message(action=40, information=[self.id_selected])
+            self.connection = self.directive.send_directive(self.connection)
+            self.txt_name.insert('1.0', self.connection.message.information[0])
+            self.txt_description.insert('1.0', wrap_text(self.connection.message.information[1], 65))
+            s_sections = self.connection.message.information[2]
+            self.directive = Message(action=32, information=[])
+            self.connection = self.directive.send_directive(self.connection)
+            a_sections = self.connection.message.information
+            self.retrieve_sections(s_sections, a_sections)
+            self.txt_name.focus_set()
+            self.disable_visual_components()
+            self.btn_back.grid(row=0, column=2, padx=30, sticky=W)
+            self.frm_child_list.grid_forget()
+            self.frm_child_crud['text'] = 'View template'
+            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        else:
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+
+    def show_buttons(self):
+        self.btn_add.grid(row=4, column=3)
+        self.btn_remove.grid(row=5, column=3)
+        self.btn_main_section.grid(row=1, column=7)
+        self.btn_down.grid(row=5, column=7)
+        self.btn_up.grid(row=4, column=7)
+
+    def disable_visual_components(self):
+        self.txt_name['bg'] = self.disabled_color
+        self.txt_description['bg'] = self.disabled_color
+        self.txt_name['state'] = DISABLED
+        self.txt_description['state'] = DISABLED
+        self.btn_add.grid_forget()
+        self.btn_remove.grid_forget()
+        self.btn_main_section.grid_forget()
+        self.btn_down.grid_forget()
+        self.btn_up.grid_forget()
 
     def retrieve_sections(self, s_sections, a_sections):
         for item in self.trv_available_sections.get_children():
@@ -406,6 +454,11 @@ class FormChildTemplate:
             self.frm_child_crud.grid_forget()
             self.show_frm()
 
+    def click_back(self):
+        self.clear_fields()
+        self.frm_child_crud.grid_forget()
+        self.show_frm()
+
     def validate_fields(self):
         text_section = False
         if len(self.txt_name.get('1.0', 'end-1c')) == 0:
@@ -429,8 +482,16 @@ class FormChildTemplate:
         return 5
 
     def clear_fields(self):
+        self.txt_name['state'] = NORMAL
+        self.txt_description['state'] = NORMAL
+        self.txt_name['bg'] = self.enabled_color
+        self.txt_description['bg'] = self.enabled_color
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
+        self.btn_save.grid_forget()
+        self.btn_cancel.grid_forget()
+        self.btn_back.grid_forget()
+        self.lbl_note_optional.grid_forget()
 
     def click_switch_mandatory(self, event):
         if self.trv_selected_sections.item(self.trv_selected_sections.selection())['text'] != '':

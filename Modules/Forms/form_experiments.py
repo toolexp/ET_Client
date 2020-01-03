@@ -544,6 +544,7 @@ class FormChildExperiment:
         Hides all forms that are currently active
         """
         self.clear_exp_fields()
+        self.main_title.set('Experiments')
         self.frm_child_exp_list.grid_forget()
         self.frm_child_sc_list.grid_forget()
         self.frm_child_general_exp.grid_forget()
