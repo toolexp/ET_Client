@@ -39,45 +39,51 @@ class FormParentDesigner:
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
         self.complete_icon = PhotoImage(file=r"./Resources/complete.png")
         self.incomplete_icon = PhotoImage(file=r"./Resources/incomplete.png")
+        self.refresh_icon = PhotoImage(file=r"./Resources/refresh.png")
         defaultbg = self.frm_parent.cget('bg')
 
         # Initialize visual components for displaying available experiment scenarios
         lbl_title = Label(self.frm_parent, text='Experiments')
         lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_title.grid(row=0, column=0, columnspan=7, pady=20, sticky=EW)
+        lbl_title.grid(row=0, column=0, columnspan=9, pady=20, sticky=EW)
+        sep_aux5 = Separator(self.frm_parent, orient=HORIZONTAL)
+        sep_aux5.grid(row=1, column=0, sticky=EW, columnspan=9)
         lbl_sep1 = Label(self.frm_parent)
-        lbl_sep1.grid(row=1, column=0, padx=10, pady=20, rowspan=2)
+        lbl_sep1.grid(row=2, column=0, padx=10, pady=20, rowspan=2)
         lbl_experimental_trv = Label(self.frm_parent, text='Select an experiment')
         lbl_experimental_trv.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_experimental_trv.grid(row=1, column=1, pady=20, sticky=W)
+        lbl_experimental_trv.grid(row=2, column=1, pady=20, sticky=W)
         lbl_sep2 = Label(self.frm_parent)
-        lbl_sep2.grid(row=1, column=3, padx=10, pady=20, rowspan=2)
+        lbl_sep2.grid(row=2, column=3, padx=10, pady=20, rowspan=2)
         lbl_problem_desc = Label(self.frm_parent, text='Information')
         lbl_problem_desc.config(fg=TEXT_COLOR, font=SUBTITLE2_FONT)
-        lbl_problem_desc.grid(row=1, column=4, pady=20, sticky=W)
+        lbl_problem_desc.grid(row=2, column=4, pady=20, sticky=W)
         lbl_sep3 = Label(self.frm_parent)
-        lbl_sep3.grid(row=1, column=6, padx=10, pady=20, rowspan=2)
+        lbl_sep3.grid(row=2, column=6, padx=10, pady=20, rowspan=2)
         self.trv_available = Treeview(self.frm_parent, height=11, columns='Title')
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='Title', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=400, minwidth=400, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_experimental_scenario)
-        self.trv_available.grid(row=2, column=1, sticky=W, pady=20)
+        self.trv_available.grid(row=3, column=1, sticky=W, pady=20)
         vsb_trv_av = Scrollbar(self.frm_parent, orient="vertical", command=self.trv_available.yview)
-        vsb_trv_av.grid(row=2, column=2, pady=20, sticky=NS)
+        vsb_trv_av.grid(row=3, column=2, pady=20, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
         self.txt_scenario_desc = Text(self.frm_parent, height=15, width=40)
         self.txt_scenario_desc.config(font=TEXT_FONT, bg=defaultbg)
-        self.txt_scenario_desc.grid(row=2, column=4, pady=20, sticky=W)
+        self.txt_scenario_desc.grid(row=3, column=4, pady=20, sticky=W)
         vsb_txt_sc = Scrollbar(self.frm_parent, orient="vertical", command=self.txt_scenario_desc.yview)
-        vsb_txt_sc.grid(row=2, column=5, pady=20, sticky=NS)
+        vsb_txt_sc.grid(row=3, column=5, pady=20, sticky=NS)
         self.txt_scenario_desc.configure(yscrollcommand=vsb_txt_sc.set)
         sep_aux1 = Separator(self.frm_parent, orient=VERTICAL)
-        sep_aux1.grid(row=1, column=7, sticky=NS, rowspan=2)
+        sep_aux1.grid(row=2, column=7, sticky=NS, rowspan=2)
         btn_access = Button(self.frm_parent, image=self.next_icon, command=self.click_enter_scenario)
-        btn_access.grid(row=1, column=8, padx=30, pady=20, sticky=N)
+        btn_access.grid(row=2, column=8, padx=30, pady=5)
         btn_access_ttp = CreateToolTip(btn_access, 'Go')
+        btn_refresh = Button(self.frm_parent, image=self.refresh_icon, command=self.retrieve_list)
+        btn_refresh.grid(row=3, column=8, padx=30, pady=5, sticky=N)
+        btn_refresh_ttp = CreateToolTip(btn_refresh, 'Refresh list')
 
         # Window dialog to authenticate the selected experimental scenario
         lbl_access_auth = Label(self.tlevel_auth_scenario, text='Insert access code: ')
@@ -266,7 +272,6 @@ class FormParentDesigner:
                                                         id_experiment=self.connection.message.information[6],
                                                         id_description_diagram=self.connection.message.information[5],
                                                         connection=self.connection)
-            self.experimental_scenario.retrieve_problems(Pattern.get_available_patterns(self.connection))
             if self.experimental_scenario.description_diagram is not None:
                 self.file_dd = self.experimental_scenario.description_diagram
             else:
@@ -294,10 +299,10 @@ class FormParentDesigner:
         components
         """
         if self.validate_access_code():
+            self.load_experiment()
             self.txt_auth_scenario.delete(0, END)
             self.tlevel_auth_scenario.grab_release()
             self.tlevel_auth_scenario.withdraw()
-            self.load_experiment()
             self.frm_parent.grid_forget()
             self.frm_general.grid(row=0, column=0, columnspan=9, rowspan=9, pady=10, padx=10)
         else:
@@ -374,14 +379,16 @@ class FormParentDesigner:
             measurement_2 = Measurement(value=str(self.selection_time), id_metric=2, id_designer=self.current_designer.id,
                                         id_problem=problem_id)
             current_measurements.append(measurement_2)
-            # Viewed patterns
-            measurement_3 = Measurement(value=str(len(self.av_patterns_seen)), id_metric=3,
-                                        id_designer=self.current_designer.id, id_problem=problem_id)
-            current_measurements.append(measurement_3)
-            # Chosen patterns
-            measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()), id_metric=4,
-                                        id_designer=self.current_designer.id, id_problem=problem_id)
-            current_measurements.append(measurement_4)
+            # Save measurements associated with patterns only when these are available for designer
+            if self.pattern_decision:
+                # Viewed patterns
+                measurement_3 = Measurement(value=str(len(self.av_patterns_seen)), id_metric=3,
+                                            id_designer=self.current_designer.id, id_problem=problem_id)
+                current_measurements.append(measurement_3)
+                # Chosen patterns
+                measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()), id_metric=4,
+                                            id_designer=self.current_designer.id, id_problem=problem_id)
+                current_measurements.append(measurement_4)
             for item in current_measurements:
                 self.directive = Message(action=96, information=[item.value, item.date, item.id_metric, item.id_designer,
                                                                  item.id_problem])
@@ -547,6 +554,8 @@ class FormParentDesigner:
         self.tab_control.tab(2, image=self.incomplete_icon)
 
     def load_experiment(self):
+        # Retrieve all information of problems of current scenario
+        self.experimental_scenario.retrieve_problems(Pattern.get_available_patterns(self.connection))
         self.initialize_component_variables()
         self.problems_counter = 0
         self.current_designer.get_current_role(
@@ -562,7 +571,7 @@ class FormParentDesigner:
             self.tab_control.select(0)
             self.pattern_decision = True
         else:
-            self.tab_control.tab(0, state='disabled')
+            self.tab_control.tab(0, state='hidden')
             self.tab_control.select(1)
             self.pattern_decision = False
         self.btn_view_dd.grid_forget()

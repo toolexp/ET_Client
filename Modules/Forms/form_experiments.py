@@ -858,7 +858,7 @@ class FormChildExperiment:
             # Retrieve selected Experimental scenario and its components
             self.directive = Message(action=85, information=[id_sc_selected])
             self.connection = self.directive.send_directive(self.connection)
-            if self.connection.message.information[3] is None:
+            if self.connection.message.information[5] is None:
                 id_diagram = None
             else:
                 id_diagram = int(self.connection.message.information[5])
@@ -927,7 +927,7 @@ class FormChildExperiment:
                 # Retrieve selected Experimental scenario and its components
                 self.directive = Message(action=85, information=[id_sc_selected])
                 self.connection = self.directive.send_directive(self.connection)
-                if self.connection.message.information[3] is None:
+                if self.connection.message.information[5] is None:
                     id_diagram = None
                 else:
                     id_diagram = int(self.connection.message.information[5])

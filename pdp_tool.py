@@ -2,10 +2,10 @@ import os
 import shutil
 import hashlib
 from tkinter import Tk, Menu, Toplevel, LabelFrame, Label, Entry, Button, messagebox
-from tkinter.ttk import Combobox
+from tkinter.ttk import Combobox, Style
 from tkinter.constants import *
 from Modules.Config.Connection import Connection
-from Modules.Config.Data import Message, Designer
+from Modules.Config.Data import Message, Designer, Measurement
 from Modules.Config.Visual import *
 
 from Modules.Forms.form_AED import FormParentAED
@@ -44,11 +44,14 @@ class WindowHome:
 
     def create_login(self):
         # Resources for the Forms
+        style = Style()
+        style.configure("TButton", font=SUBTITLE2_FONT)
+
         self.tlevel_login = Toplevel(self.window)
         self.tlevel_login.protocol("WM_DELETE_WINDOW", self.click_log_out)
         self.tlevel_login.withdraw()
         frm_parent = LabelFrame(self.tlevel_login)
-        lbl_title = Label(frm_parent, text='Login')
+        lbl_title = Label(frm_parent, text='Welcome')
         lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         lbl_title.grid(row=0, column=0, columnspan=3, pady=15, sticky=EW)
         lbl_role = Label(frm_parent, text='Role')
@@ -63,13 +66,13 @@ class WindowHome:
         self.cbx_role = Combobox(frm_parent, state="readonly", width=25)
         self.cbx_role['values'] = ['Administrator', 'Experimenter', 'Designer']
         self.cbx_role.grid(row=1, column=1, pady=10, padx=30, columnspan=2, sticky=NW)
-        self.txt_email = Entry(frm_parent, width=25)
+        self.txt_email = Entry(frm_parent, width=28)
         self.txt_email.grid(row=2, column=1, pady=10, padx=30, columnspan=2, sticky=NW)
-        self.txt_passwd = Entry(frm_parent, width=25, show="*")
+        self.txt_passwd = Entry(frm_parent, width=28, show="*")
         self.txt_passwd.grid(row=3, column=1, pady=10, padx=30, columnspan=2, sticky=NW)
-        btn_access = Button(frm_parent, text='Login', command=self.click_login)
+        btn_access = Button(frm_parent, text='Login', command=self.click_login, font=SUBTITLE2_FONT, fg=TEXT_COLOR)
         btn_access.grid(row=4, column=1, padx=30, pady=15)
-        btn_exit = Button(frm_parent, text='Exit', command=self.click_log_out)
+        btn_exit = Button(frm_parent, text='Exit', command=self.click_log_out, font=SUBTITLE2_FONT, fg=TEXT_COLOR)
         btn_exit.grid(row=4, column=2, padx=30, pady=15)
         frm_parent.grid(padx=10, pady=10)
 
@@ -311,36 +314,67 @@ class WindowHome:
 
     def click_log_out(self):
         if self.role != 2:
-            msg = Message(comment='close_connection')
-            self.connection.create_message(msg)
-            self.connection.send_message()
-            self.connection.close_connection()
-            shutil.rmtree('./Resources/temp/')
-            os.mkdir('./Resources/temp/')
-            self.window.destroy()
+            self.exit()
         else:
             # Cant log out if designer is running an experimental scenario
             try:
                 if not self.frm_parent_designer_gui.frm_general.grid_info():
-                    msg = Message(comment='close_connection')
-                    self.connection.create_message(msg)
-                    self.connection.send_message()
-                    self.connection.close_connection()
-                    shutil.rmtree('./Resources/temp/')
-                    os.mkdir('./Resources/temp/')
-                    self.window.destroy()
+                    self.exit()
                 else:
-                    messagebox.showerror(parent=self.window, title='Can not exit',
-                                         message='You must finish current experimental scenario to exit')
+                    decision = messagebox.askyesno(parent=self.window, title='Confirm exit',
+                                                   message='Are you sure you want to leave? Exiting may cause loss of '
+                                                           'experiment data. You won\'t be able to execute this '
+                                                           'experiment again')
+                    if decision:  # Confirm decision of exiting during an experiment execution
+                        # Measurements may be saved as null
+                        self.frm_parent_designer_gui.time_thread.stop()
+                        # Saving NULL values of measurements for designer in remaining problems
+                        while True:
+                            problem_id = self.frm_parent_designer_gui.experimental_scenario.problems[self.frm_parent_designer_gui.problems_counter].id
+                            current_measurements = []
+                            # Solution time
+                            measurement_1 = Measurement(value=None, id_metric=1, id_designer=self.current_designer.id,
+                                                        id_problem=problem_id)
+                            current_measurements.append(measurement_1)
+                            # Selection time
+                            measurement_2 = Measurement(value=None, id_metric=2, id_designer=self.current_designer.id,
+                                                        id_problem=problem_id)
+                            current_measurements.append(measurement_2)
+                            if self.frm_parent_designer_gui.pattern_decision:
+                                # Viewed patterns
+                                measurement_3 = Measurement(value=None, id_metric=3, id_designer=self.current_designer.id,
+                                                            id_problem=problem_id)
+                                current_measurements.append(measurement_3)
+                                # Chosen patterns
+                                measurement_4 = Measurement(value=None, id_metric=4, id_designer=self.current_designer.id,
+                                                            id_problem=problem_id)
+                                current_measurements.append(measurement_4)
+                            for item in current_measurements:
+                                self.directive = Message(action=96, information=[item.value, item.date, item.id_metric,
+                                                                                 item.id_designer,
+                                                                                 item.id_problem])
+                                self.connection = self.directive.send_directive(self.connection)
+                            self.frm_parent_designer_gui.problems_counter += 1
+                            if self.frm_parent_designer_gui.problems_counter == len(
+                                self.frm_parent_designer_gui.experimental_scenario.problems):  # If no more problems available
+                                # Finish experimental scenario if this was the las designer executing it
+                                self.directive = Message(action=83,
+                                                         information=['finished', self.frm_parent_designer_gui. \
+                                                         experimental_scenario.id])
+                                self.connection = self.directive.send_directive(self.connection)
+                                break
+                        self.exit()
             except:
-                msg = Message(comment='close_connection')
-                self.connection.create_message(msg)
-                self.connection.send_message()
-                self.connection.close_connection()
-                shutil.rmtree('./Resources/temp/')
-                os.mkdir('./Resources/temp/')
-                self.window.destroy()
+                self.exit()
 
+    def exit(self):
+        msg = Message(comment='close_connection')
+        self.connection.create_message(msg)
+        self.connection.send_message()
+        self.connection.close_connection()
+        shutil.rmtree('./Resources/temp/')
+        os.mkdir('./Resources/temp/')
+        self.window.destroy()
 
 if __name__ == '__main__':
     connection = Connection()

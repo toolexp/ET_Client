@@ -535,7 +535,7 @@ class FormChildPattern:
                 self.go_back_form()
             else:
                 messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
-                                       message='There are mandatory fields that need to be filled!')
+                                       message='There are mandatory sections that need to be filled!')
 
     def click_cancel(self):
         decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
