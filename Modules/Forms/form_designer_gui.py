@@ -7,6 +7,7 @@ from Modules.Config.Data import CreateToolTip, Message, Pattern, File, wrap_text
 from PIL import Image, ImageTk
 import os
 from Modules.Config.Visual import *
+from datetime import datetime
 
 
 class FormParentDesigner:
@@ -368,30 +369,38 @@ class FormParentDesigner:
         if validation_option == 0:  # No problem, proceed to save info
             self.solution_time += self.time_thread.seconds
             self.time_thread.stop() # Stop thread timer
+            acquisition_end_date = datetime.now()
             # Get measurements of important metrics for the current component
             problem_id = self.experimental_scenario.problems[self.problems_counter].id
             current_measurements = []
             # Solution time
-            measurement_1 = Measurement(value=str(self.solution_time), id_metric=1, id_designer=self.current_designer.id,
-                                        id_problem=problem_id)
+            measurement_1 = Measurement(value=str(self.solution_time), acquisition_start_date=self.acquisition_start_date,
+                                        acquisition_end_date=acquisition_end_date, id_metric=1,
+                                        id_designer=self.current_designer.id, id_problem=problem_id)
             current_measurements.append(measurement_1)
-            # Selection time
-            measurement_2 = Measurement(value=str(self.selection_time), id_metric=2, id_designer=self.current_designer.id,
-                                        id_problem=problem_id)
-            current_measurements.append(measurement_2)
             # Save measurements associated with patterns only when these are available for designer
             if self.pattern_decision:
+                # Selection time
+                measurement_2 = Measurement(value=str(self.selection_time), acquisition_start_date=self.acquisition_start_date,
+                                            acquisition_end_date=acquisition_end_date, id_metric=2,
+                                            id_designer=self.current_designer.id, id_problem=problem_id)
+                current_measurements.append(measurement_2)
                 # Viewed patterns
-                measurement_3 = Measurement(value=str(len(self.av_patterns_seen)), id_metric=3,
+                measurement_3 = Measurement(value=str(len(self.av_patterns_seen)),
+                                            acquisition_start_date=self.acquisition_start_date,
+                                            acquisition_end_date=acquisition_end_date, id_metric=3,
                                             id_designer=self.current_designer.id, id_problem=problem_id)
                 current_measurements.append(measurement_3)
                 # Chosen patterns
-                measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()), id_metric=4,
+                measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()),
+                                            acquisition_start_date=self.acquisition_start_date,
+                                            acquisition_end_date=acquisition_end_date, id_metric=4,
                                             id_designer=self.current_designer.id, id_problem=problem_id)
                 current_measurements.append(measurement_4)
             for item in current_measurements:
-                self.directive = Message(action=96, information=[item.value, item.date, item.id_metric, item.id_designer,
-                                                                 item.id_problem])
+                self.directive = Message(action=96, information=[item.value, item.acquisition_start_date,
+                                                                 item.acquisition_end_date, item.id_metric,
+                                                                 item.id_designer, item.id_problem])
                 self.connection = self.directive.send_directive(self.connection)
             # Get info and build the solution to send to the server
             # Create diagram in DB
@@ -605,6 +614,7 @@ class FormParentDesigner:
             self.tab_control.select(1)
         self.time_thread = TimerClass()
         self.time_thread.begin()
+        self.acquisition_start_date = datetime.now()
 
     def select_available_pattern(self, event):
         id_selected = self.av_patterns_ids[self.lbx_av_patterns.curselection()[0]]

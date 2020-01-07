@@ -779,9 +779,17 @@ class FormChildExperiment:
                 id_exp_selected = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
                 self.directive = Message(action=93, information=[id_exp_selected, 'finished'])
                 self.connection = self.directive.send_directive(self.connection)
-                if self.connection.message.action == 5:  # An error ocurred while executing experiment
-                    messagebox.showerror(parent=self.frm_child_exp_list, title='Can not execute experiment',
+                if self.connection.message.action == 5:  # An error ocurred while finishing experiment
+                    messagebox.showerror(parent=self.frm_child_exp_list, title='Can not finish experiment',
                                          message=self.connection.message.information[0])
+                # Get report in .zip (temporarly)
+                self.directive = Message(action=106, information=[id_exp_selected])
+                self.connection = self.directive.send_directive(self.connection)
+                report_file = File()
+                path = report_file.write_permanent_file(self.connection.message.information[0],
+                                                        self.connection.message.information[1])
+                messagebox.showinfo(parent=self.frm_child_exp_list, title='Report created',
+                                    message='Zipped report created in app main folder')
                 self.retrieve_list_exp()
         else:
             messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
@@ -823,8 +831,8 @@ class FormChildExperiment:
                                                                                       ''))
             else:
                 messagebox.showwarning(parent=self.frm_child_sc_list, title='Locked scenario',
-                                       message='The selected scenario can not be disabled because it\' state does not'
-                                               'allows it')
+                                       message='The selected scenario can not be disabled because its state does not'
+                                               ' allows it')
 
     def click_new_sc(self):
         """

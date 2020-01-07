@@ -268,9 +268,13 @@ class FormChildAED:
                 else:
                     raise Exception('Error en guardar: tipo de usuario')
             self.connection = self.directive.send_directive(self.connection)
-            self.clear_fields()
-            self.frm_child_crud.grid_forget()
-            self.show_frm()
+            if self.connection.message.action == 5:
+                messagebox.showwarning(parent=self.frm_child_crud, title='Repeated e-mail',
+                                       message=self.connection.message.comment)
+            else:
+                self.clear_fields()
+                self.frm_child_crud.grid_forget()
+                self.show_frm()
         elif validation_option == 1:
             messagebox.showwarning(parent=self.frm_child_crud, title='Password field',
                                    message='The passwords you provided are not the same')

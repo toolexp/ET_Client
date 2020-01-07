@@ -4,6 +4,7 @@ import hashlib
 from tkinter import Tk, Menu, Toplevel, LabelFrame, Label, Entry, Button, messagebox
 from tkinter.ttk import Combobox, Style
 from tkinter.constants import *
+from datetime import datetime
 from Modules.Config.Connection import Connection
 from Modules.Config.Data import Message, Designer, Measurement
 from Modules.Config.Visual import *
@@ -328,31 +329,37 @@ class WindowHome:
                     if decision:  # Confirm decision of exiting during an experiment execution
                         # Measurements may be saved as null
                         self.frm_parent_designer_gui.time_thread.stop()
+                        acquisition_end_date = datetime.now()
                         # Saving NULL values of measurements for designer in remaining problems
                         while True:
                             problem_id = self.frm_parent_designer_gui.experimental_scenario.problems[self.frm_parent_designer_gui.problems_counter].id
                             current_measurements = []
                             # Solution time
-                            measurement_1 = Measurement(value=None, id_metric=1, id_designer=self.current_designer.id,
-                                                        id_problem=problem_id)
+                            measurement_1 = Measurement(value=None, id_metric=1,
+                                                        acquisition_end_date=acquisition_end_date,
+                                                        id_designer=self.current_designer.id, id_problem=problem_id)
                             current_measurements.append(measurement_1)
-                            # Selection time
-                            measurement_2 = Measurement(value=None, id_metric=2, id_designer=self.current_designer.id,
-                                                        id_problem=problem_id)
-                            current_measurements.append(measurement_2)
                             if self.frm_parent_designer_gui.pattern_decision:
+                                # Selection time
+                                measurement_2 = Measurement(value=None, id_metric=2,
+                                                            acquisition_end_date=acquisition_end_date,
+                                                            id_designer=self.current_designer.id, id_problem=problem_id)
+                                current_measurements.append(measurement_2)
                                 # Viewed patterns
-                                measurement_3 = Measurement(value=None, id_metric=3, id_designer=self.current_designer.id,
-                                                            id_problem=problem_id)
+                                measurement_3 = Measurement(value=None, id_metric=3,
+                                                            acquisition_end_date=acquisition_end_date,
+                                                            id_designer=self.current_designer.id, id_problem=problem_id)
                                 current_measurements.append(measurement_3)
                                 # Chosen patterns
-                                measurement_4 = Measurement(value=None, id_metric=4, id_designer=self.current_designer.id,
-                                                            id_problem=problem_id)
+                                measurement_4 = Measurement(value=None, id_metric=4,
+                                                            acquisition_end_date=acquisition_end_date,
+                                                            id_designer=self.current_designer.id, id_problem=problem_id)
                                 current_measurements.append(measurement_4)
                             for item in current_measurements:
-                                self.directive = Message(action=96, information=[item.value, item.date, item.id_metric,
-                                                                                 item.id_designer,
-                                                                                 item.id_problem])
+                                self.directive = Message(action=96,
+                                                         information=[item.value, item.acquisition_start_date,
+                                                                      item.acquisition_end_date, item.id_metric,
+                                                                      item.id_designer, item.id_problem])
                                 self.connection = self.directive.send_directive(self.connection)
                             self.frm_parent_designer_gui.problems_counter += 1
                             if self.frm_parent_designer_gui.problems_counter == len(

@@ -215,19 +215,30 @@ class File:
         self.file.write(self.file_bytes)
         self.file.close()
 
+    def write_permanent_file(self, name, file_bytes):
+        self.name = name
+        self.file_bytes = file_bytes
+        path = './'
+        self.filename = path + name
+        self.file = open(self.filename, 'wb')
+        self.file.write(self.file_bytes)
+        self.file.close()
+        return path
 
 class Measurement:
-    def __init__(self, id=0, value='', date=datetime.datetime.now(), id_metric=None, id_designer=None,
-                 id_problem=None, metric=None, designer=None, scenario_comp=None, connection=None):
+    def __init__(self, id=0, value='', acquisition_start_date=None, acquisition_end_date=datetime.datetime.now(),
+                 id_metric=None, id_designer=None, id_problem=None, metric=None, designer=None, problem=None,
+                 connection=None):
         self.id = id
         self.value = value
-        self.date = date
+        self.acquisition_start_date = acquisition_start_date
+        self.acquisition_end_date = acquisition_end_date
         self.id_metric = id_metric
         self.id_designer = id_designer
         self.id_problem = id_problem
         self.metric = metric
         self.designer = designer
-        self.scenario_comp = scenario_comp
+        self.problem = problem
         self.connection = connection
         '''if self.connection is not None:
             self.retrieve_components()'''
