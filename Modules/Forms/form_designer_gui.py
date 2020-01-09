@@ -170,7 +170,7 @@ class FormParentDesigner:
         lbl_sep8.grid(row=0, column=3, padx=10, pady=10)
         self.btn_view_pd = Button(self.tab_patterns, text='View diagram', command=self.click_expand_pd)
         btn_view_pd_ttp = CreateToolTip(self.btn_view_pd, 'Pattern section diagram')
-        self.txt_pattern_content = Text(self.tab_patterns, height=20, width=80)
+        self.txt_pattern_content = Text(self.tab_patterns, height=20, width=70)
         self.txt_pattern_content.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_pattern_content.tag_configure("center", justify='center')
         self.txt_pattern_content.tag_add("center", 1.0, "end")
@@ -628,11 +628,14 @@ class FormParentDesigner:
         for item in self.selected_pattern.sections:
             self.txt_pattern_content.insert('end-1c', item.name + ": ")
             if item.data_type == 'File': # The section content is a file
-                self.directive = Message(action=65, information=[item.diagram_id])
-                self.connection = self.directive.send_directive(self.connection)
-                self.file_pd = File()
-                self.file_pd.write_file(self.connection.message.information[0], self.connection.message.information[1])
-                self.btn_view_pd.grid(row=0, column=5, pady=10, sticky=W)
+                if item.diagram_id is not None:
+                    self.directive = Message(action=65, information=[item.diagram_id])
+                    self.connection = self.directive.send_directive(self.connection)
+                    self.file_pd = File()
+                    self.file_pd.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                else:
+                    self.file_pd = None
+                self.btn_view_pd.grid(row=0, column=5, sticky=W)
                 self.txt_pattern_content.insert('end-1c', "\n" + wrap_text('Click right button to see diagram >>', 65) + "\n\n")
             else:
                 self.txt_pattern_content.insert('end-1c', "\n" + item.content + "\n\n")
