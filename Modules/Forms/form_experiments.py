@@ -413,7 +413,7 @@ class FormChildExperiment:
         self.txt_short_desc_prob = Text(frm_aux1, height=1, width=40)
         self.txt_short_desc_prob.config(font=TEXT_FONT)
         self.txt_short_desc_prob.grid(row=0, column=3, pady=10, rowspan=2, sticky=NW)
-        self.txt_description_prob = Text(frm_aux1, height=4, width=40)
+        self.txt_description_prob = Text(frm_aux1, height=8, width=40)
         self.txt_description_prob.config(font=TEXT_FONT)
         self.txt_description_prob.grid(row=0, column=7, pady=10, rowspan=2, sticky=W)
         vsb_txt_desc_prob = Scrollbar(frm_aux1, orient="vertical", command=self.txt_description_prob.yview)
@@ -445,7 +445,7 @@ class FormChildExperiment:
         vsb_txt_annot_iso = Scrollbar(frm_aux2, orient="vertical", command=self.txt_annotations_esol.yview)
         vsb_txt_annot_iso.grid(row=0, column=5, pady=10, sticky=NS)
         self.txt_annotations_esol.configure(yscrollcommand=vsb_txt_annot_iso.set)
-        lbl_diagram_esol = Label(frm_aux2, text='Diagram*')
+        lbl_diagram_esol = Label(frm_aux2, text='Diagram')
         lbl_diagram_esol.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_diagram_esol.grid(row=1, column=1, pady=10, rowspan=5, sticky=NW)
         self.canvas_esol = Canvas(frm_aux2, width=110, height=110)
@@ -1191,7 +1191,8 @@ class FormChildExperiment:
                 self.txt_annotations_esol['state'] = DISABLED
                 self.lbx_patterns_esol['state'] = DISABLED
                 self.file_esol = self.problem.solution.diagram
-                self.show_esol_file()
+                if self.file_esol is not None:
+                    self.show_esol_file()
                 self.tlevel_problem.title('View problem')
                 self.tlevel_problem.deiconify()
                 self.tlevel_problem.grab_set()
@@ -1255,11 +1256,13 @@ class FormChildExperiment:
                     # Create problems and its associated objects
                     for item in self.experimental_scenario.problems:
                         # Create expected solution diagram in DB
-                        self.directive = Message(action=61,
-                                                 information=[item.solution.diagram.file_bytes, item.solution.diagram.name,
-                                                              'exp sol'])
-                        self.connection = self.directive.send_directive(self.connection)
-                        id_diagram = self.connection.message.information[0]
+                        id_diagram = None
+                        if item.solution.diagram is not None:
+                            self.directive = Message(action=61,
+                                                     information=[item.solution.diagram.file_bytes, item.solution.diagram.name,
+                                                                  'exp sol'])
+                            self.connection = self.directive.send_directive(self.connection)
+                            id_diagram = self.connection.message.information[0]
                         # Create the expected solution in DB
                         self.directive = Message(action=56, information=[item.solution.annotations, id_diagram])
                         if item.solution.patterns:
@@ -1414,12 +1417,9 @@ class FormChildExperiment:
                 self.clear_problem_fields()
                 self.tlevel_problem.grab_release()
                 self.tlevel_problem.withdraw()
-        elif validation_option == 1:
+        else:
             messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
                                    message='Check mandatory text fields, some of them are empty')
-        else:
-            messagebox.showwarning(parent=self.tlevel_problem, title='Diagram',
-                                   message='The expected solution must have a file')
 
     def click_back_problem(self):
         """
@@ -1698,13 +1698,17 @@ class FormChildExperiment:
 
     def click_view_esol(self):
         # Fill summary problem canvas with retrieved image
-        load = Image.open(self.file_esol.filename)
-        load = load.resize((500, 500), Image.ANTIALIAS)
-        self.render_sol = ImageTk.PhotoImage(load)
-        self.canvas_expanded.delete()
-        self.file_esol.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_sol)  # and display new image
-        self.tlevel_diagram.deiconify()
-        self.tlevel_diagram.grab_set()
+        if self.file_esol is not None:
+            load = Image.open(self.file_esol.filename)
+            load = load.resize((500, 500), Image.ANTIALIAS)
+            self.render_sol = ImageTk.PhotoImage(load)
+            self.canvas_expanded.delete()
+            self.file_esol.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_sol)  # and display new image
+            self.tlevel_diagram.deiconify()
+            self.tlevel_diagram.grab_set()
+        else:
+            messagebox.showwarning(parent=self.tlevel_problem, title='No diagram',
+                                   message='No diagram uploaded for the solution')
 
     def click_pat_esol(self):
         # Clear treeviews
@@ -1961,8 +1965,6 @@ class FormChildExperiment:
         """
         if len(self.txt_short_desc_prob.get('1.0', 'end-1c')) == 0 or len(self.txt_description_prob.get('1.0', 'end-1c')) == 0:
             return 1
-        if self.file_esol is None:
-            return 2
         return 0
 
     def validate_sc_fields(self):

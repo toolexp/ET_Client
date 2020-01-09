@@ -384,8 +384,12 @@ class Problem:
         if self.id_solution is not None:
             self.directive = Message(action=60, information=[self.id_solution])
             self.connection = self.directive.send_directive(self.connection)
+            if self.connection.message.information[1] is None:
+                id_diagram = 0
+            else:
+                id_diagram = self.connection.message.information[1]
             self.solution = Solution(id=self.id_solution, annotations=self.connection.message.information[0],
-                                     diagram_id=int(self.connection.message.information[1]),
+                                     diagram_id=id_diagram,
                                      patterns_id=self.connection.message.information[2], connection=self.connection)
             current_ids = []
             for item in self.solution.patterns_id:

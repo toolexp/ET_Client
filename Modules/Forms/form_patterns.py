@@ -299,7 +299,8 @@ class FormChildPattern:
                         self.txt_summary.insert('end-1c',
                                                 "{}:\nNo configured diagram\n\n".format(item.name))
                 else:
-                    self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 65)))
+                    #self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, wrap_text(item.content, 65)))
+                    self.txt_summary.insert('end-1c', "{}:\n{}\n\n".format(item.name, item.content))
             self.txt_summary['state'] = DISABLED
 
     def restart_components(self):
@@ -712,7 +713,8 @@ class FormChildPattern:
             self.tab_control.tab(0, state='normal')
             self.tab_control.select(0)
             if self.selected_section.content != '':
-                self.txt_section.insert('1.0', wrap_text(self.selected_section.content, 65))
+                #self.txt_section.insert('1.0', wrap_text(self.selected_section.content, 65))
+                self.txt_section.insert('1.0', self.selected_section.content)
             if self.decide_view:    # With viewing option have to disable text box
                 self.txt_section['state'] = DISABLED
             else:
