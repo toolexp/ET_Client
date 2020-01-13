@@ -186,6 +186,7 @@ class ExperimentalSC:
     def retrieve_problems(self, av_patterns):
         self.directive = Message(action=52, information=[self.id])
         self.connection = self.directive.send_directive(self.connection)
+        self.problems = []
         for item in self.connection.message.information[0]:  # Here are problems of experimental scenario
             elements = item.split('¥')
             self.problems.append(Problem(id=int(elements[0]), brief_description=elements[1], description=elements[2],

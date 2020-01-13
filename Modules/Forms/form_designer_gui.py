@@ -125,7 +125,7 @@ class FormParentDesigner:
         self.lbl_prob_title = Label(self.frm_general, text='Problem {} of {}: {}')
         self.lbl_prob_title.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.lbl_prob_title.grid(row=3, column=1, columnspan=2, pady=10, sticky=W)
-        self.txt_prob_desc = Text(self.frm_general, height=4, width=157)
+        self.txt_prob_desc = Text(self.frm_general, height=6, width=157)
         self.txt_prob_desc.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_prob_desc.grid(row=4, column=1, pady=10, sticky=W)
         vsb_txt_probd = Scrollbar(self.frm_general, orient="vertical", command=self.txt_prob_desc.yview)
@@ -160,7 +160,7 @@ class FormParentDesigner:
         lbl_sel_patterns.grid(row=0, column=8, pady=10, sticky=W)
         lbl_sep7 = Label(self.tab_patterns)
         lbl_sep7.grid(row=0, column=0, padx=10, pady=10)
-        self.lbx_av_patterns = Listbox(self.tab_patterns, height=20, width=30, exportselection=0)
+        self.lbx_av_patterns = Listbox(self.tab_patterns, height=25, width=30, exportselection=0)
         self.lbx_av_patterns.grid(row=1, column=1, pady=10, sticky=W, rowspan=7)
         self.lbx_av_patterns.bind('<<ListboxSelect>>', self.select_available_pattern)
         vsb_trv_avpat = Scrollbar(self.tab_patterns, orient="vertical", command=self.lbx_av_patterns.yview)
@@ -170,7 +170,7 @@ class FormParentDesigner:
         lbl_sep8.grid(row=0, column=3, padx=10, pady=10)
         self.btn_view_pd = Button(self.tab_patterns, text='View diagram', command=self.click_expand_pd)
         btn_view_pd_ttp = CreateToolTip(self.btn_view_pd, 'Pattern section diagram')
-        self.txt_pattern_content = Text(self.tab_patterns, height=20, width=70)
+        self.txt_pattern_content = Text(self.tab_patterns, height=25, width=70)
         self.txt_pattern_content.config(font=TEXT_FONT, bg=defaultbg)
         self.txt_pattern_content.tag_configure("center", justify='center')
         self.txt_pattern_content.tag_add("center", 1.0, "end")
@@ -179,12 +179,12 @@ class FormParentDesigner:
         vsb_txt_content.grid(row=1, column=6, rowspan=7, pady=10, sticky=NS)
         self.txt_pattern_content.configure(yscrollcommand=vsb_txt_content.set)
         btn_add = Button(self.tab_patterns, image=self.add_icon, command=self.click_add_patt)
-        btn_add.grid(row=2, column=7, padx=20)
+        btn_add.grid(row=3, column=7, padx=20)
         btn_add_ttp = CreateToolTip(btn_add, 'Add pattern')
         btn_remove = Button(self.tab_patterns, image=self.delete_icon, command=self.click_remove_patt)
         btn_remove.grid(row=4, column=7, padx=20)
         btn_remove_ttp = CreateToolTip(btn_remove, 'Remove pattern')
-        self.lbx_sel_patterns = Listbox(self.tab_patterns, height=20, width=30, exportselection=0)
+        self.lbx_sel_patterns = Listbox(self.tab_patterns, height=25, width=30, exportselection=0)
         self.lbx_sel_patterns.grid(row=1, column=8, pady=10, sticky=W, rowspan=7)
         vsb_trv_selpat = Scrollbar(self.tab_patterns, orient="vertical", command=self.lbx_sel_patterns.yview)
         vsb_trv_selpat.grid(row=1, column=9, rowspan=7, pady=10, sticky=NS)
@@ -196,7 +196,7 @@ class FormParentDesigner:
         self.tab_control.add(self.tab_desc, text="Notes", padding=10, image=self.incomplete_icon, compound=RIGHT)
         lbl_sep10 = Label(self.tab_desc)
         lbl_sep10.grid(row=0, column=0, padx=10, pady=20)
-        self.txt_solution_desc = Text(self.tab_desc, height=21, width=145)
+        self.txt_solution_desc = Text(self.tab_desc, height=27, width=145)
         self.txt_solution_desc.config(font=TEXT_FONT)
         self.txt_solution_desc.bind("<Key>", self.txt_notes_modified)
         self.txt_solution_desc.grid(row=0, column=1, pady=20, sticky=W)
@@ -218,7 +218,7 @@ class FormParentDesigner:
         btn_quit = Button(self.tab_file, image=self.remove_icon, command=self.click_remove_file)
         btn_quit.grid(row=2, column=0, padx=20, pady=10, sticky=E)
         btn_quit_ttp = CreateToolTip(btn_quit, 'Remove file')
-        self.canvas_solution = Canvas(self.tab_file, width=270, height=300)
+        self.canvas_solution = Canvas(self.tab_file, width=350, height=350)
         self.canvas_solution.config(background='white', borderwidth=1)
         self.canvas_solution.grid(row=0, column=1, padx=10, pady=10, rowspan=10, sticky=NS)
 
@@ -462,7 +462,7 @@ class FormParentDesigner:
             self.attached_file.read_file(filename)
             # Display image into canvas
             load = Image.open(self.attached_file.filename)
-            load = load.resize((270, 270), Image.ANTIALIAS)
+            load = load.resize((350, 350), Image.ANTIALIAS)
             self.render = ImageTk.PhotoImage(load)
             if self.attached_file.image is not None:  # if an image was already loaded
                 self.canvas_solution.delete(self.attached_file.image)  # remove the previous image
@@ -583,7 +583,7 @@ class FormParentDesigner:
         self.txt_exp_desc['state'] = NORMAL
         self.txt_exp_desc.delete('1.0', 'end-1c')
         #self.txt_exp_desc.insert('1.0', wrap_text(self.experimental_scenario.description, 170))
-        self.txt_exp_desc.insert('1.0', wrap_text(self.experimental_scenario.description, 170))
+        self.txt_exp_desc.insert('1.0', self.experimental_scenario.description)
         self.txt_exp_desc['state'] = DISABLED
         self.load_problem()
 
@@ -628,15 +628,20 @@ class FormParentDesigner:
         for item in self.selected_pattern.sections:
             self.txt_pattern_content.insert('end-1c', item.name + ": ")
             if item.data_type == 'File': # The section content is a file
-                if item.diagram_id is not None:
+                if item.diagram_id != 0:
                     self.directive = Message(action=65, information=[item.diagram_id])
                     self.connection = self.directive.send_directive(self.connection)
                     self.file_pd = File()
                     self.file_pd.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                    self.btn_view_pd.grid(row=0, column=5, sticky=W)
+                    self.txt_pattern_content.insert('end-1c', "\n" + wrap_text('Click up button to see diagram ^',
+                                                                               65) + "\n\n")
+
                 else:
                     self.file_pd = None
-                self.btn_view_pd.grid(row=0, column=5, sticky=W)
-                self.txt_pattern_content.insert('end-1c', "\n" + wrap_text('Click right button to see diagram >>', 65) + "\n\n")
+                    self.txt_pattern_content.insert('end-1c', "\n" + wrap_text('No diagram loaded for this section',
+                                                                               65) + "\n\n")
+
             else:
                 self.txt_pattern_content.insert('end-1c', "\n" + item.content + "\n\n")
         self.txt_pattern_content['state'] = DISABLED

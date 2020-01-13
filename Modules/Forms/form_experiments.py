@@ -400,24 +400,24 @@ class FormChildExperiment:
         lbl_sep9.grid(row=0, column=0, padx=10, pady=10, rowspan=2)
         lbl_short_desc_prob = Label(frm_aux1, text='Short description*')
         lbl_short_desc_prob.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_short_desc_prob.grid(row=0, column=1, pady=10, rowspan=2, sticky=NW)
+        lbl_short_desc_prob.grid(row=0, column=1, pady=10, sticky=W)
         lbl_description_prob = Label(frm_aux1, text='Description*')
         lbl_description_prob.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_description_prob.grid(row=0, column=5, pady=10, sticky=NW)
+        lbl_description_prob.grid(row=1, column=1, pady=10, sticky=NW)
         lbl_sep10 = Label(frm_aux1)
         lbl_sep10.grid(row=0, column=2, rowspan=2, padx=10, pady=10)
         lbl_sep18 = Label(frm_aux1)
-        lbl_sep18.grid(row=0, column=4, padx=20, pady=10, rowspan=2)
-        lbl_sep24 = Label(frm_aux1)
-        lbl_sep24.grid(row=0, column=6, padx=10, pady=10, rowspan=2)
-        self.txt_short_desc_prob = Text(frm_aux1, height=1, width=40)
+        lbl_sep18.grid(row=0, column=5, padx=10, pady=10, rowspan=2)
+        #lbl_sep24 = Label(frm_aux1)
+        #lbl_sep24.grid(row=0, column=6, padx=10, pady=10, rowspan=2)
+        self.txt_short_desc_prob = Text(frm_aux1, height=1, width=100)
         self.txt_short_desc_prob.config(font=TEXT_FONT)
-        self.txt_short_desc_prob.grid(row=0, column=3, pady=10, rowspan=2, sticky=NW)
-        self.txt_description_prob = Text(frm_aux1, height=8, width=40)
+        self.txt_short_desc_prob.grid(row=0, column=3, pady=10, sticky=W)
+        self.txt_description_prob = Text(frm_aux1, height=10, width=100)
         self.txt_description_prob.config(font=TEXT_FONT)
-        self.txt_description_prob.grid(row=0, column=7, pady=10, rowspan=2, sticky=W)
+        self.txt_description_prob.grid(row=1, column=3, pady=10, sticky=W)
         vsb_txt_desc_prob = Scrollbar(frm_aux1, orient="vertical", command=self.txt_description_prob.yview)
-        vsb_txt_desc_prob.grid(row=0, column=8, pady=10, rowspan=2, sticky=NS)
+        vsb_txt_desc_prob.grid(row=1, column=4, pady=10, sticky=NS)
         self.txt_description_prob.configure(yscrollcommand=vsb_txt_desc_prob.set)
         self.btn_save_prob = Button(frm_aux1, image=self.save_icon, command=self.click_save_problem)
         btn_save_prob_ttp = CreateToolTip(self.btn_save_prob, 'Save problem')
@@ -425,29 +425,29 @@ class FormChildExperiment:
         btn_cancel_prob_ttp = CreateToolTip(self.btn_cancel_prob, 'Cancel')
         self.btn_back_prob = Button(frm_aux1, image=self.back_icon, command=self.click_back_problem)
         btn_back_prob_ttp = CreateToolTip(self.btn_back_prob, 'Go back')
-        frm_aux1.grid(row=0, column=0, padx=10, pady=10)
+        frm_aux1.grid(row=0, column=0, padx=10, pady=10, sticky=EW)
         lbl_sep11 = Label(frm_aux2)
         lbl_sep11.grid(row=0, column=0, rowspan=6, padx=10, pady=10)
         lbl_sep12 = Label(frm_aux2)
         lbl_sep12.grid(row=0, column=2, rowspan=6, padx=10, pady=10)
         lbl_sep15 = Label(frm_aux2)
-        lbl_sep15.grid(row=0, column=6, padx=20, pady=10, rowspan=6)
+        lbl_sep15.grid(row=1, column=5, padx=20, pady=10, rowspan=5)
         lbl_sep16 = Label(frm_aux2)
-        lbl_sep16.grid(row=0, column=8, padx=10, pady=10, rowspan=6)
+        lbl_sep16.grid(row=1, column=7, padx=10, pady=10, rowspan=5)
         lbl_sep17 = Label(frm_aux2)
-        lbl_sep17.grid(row=0, column=12, padx=10, pady=10, rowspan=6)
-        lbl_annotations_esol = Label(frm_aux2, text='Notes')
+        lbl_sep17.grid(row=0, column=11, padx=10, pady=10, rowspan=6)
+        lbl_annotations_esol = Label(frm_aux2, text='Notes\t\t')
         lbl_annotations_esol.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_annotations_esol.grid(row=0, column=1, pady=10, sticky=NW)
-        self.txt_annotations_esol = Text(frm_aux2, height=4, width=50)
+        self.txt_annotations_esol = Text(frm_aux2, height=10, width=97)
         self.txt_annotations_esol.config(font=TEXT_FONT)
-        self.txt_annotations_esol.grid(row=0, column=3, pady=10, columnspan=2)
+        self.txt_annotations_esol.grid(row=0, column=3, pady=10, columnspan=6)
         vsb_txt_annot_iso = Scrollbar(frm_aux2, orient="vertical", command=self.txt_annotations_esol.yview)
-        vsb_txt_annot_iso.grid(row=0, column=5, pady=10, sticky=NS)
+        vsb_txt_annot_iso.grid(row=0, column=9, pady=10, sticky=NS)
         self.txt_annotations_esol.configure(yscrollcommand=vsb_txt_annot_iso.set)
         lbl_diagram_esol = Label(frm_aux2, text='Diagram')
         lbl_diagram_esol.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_diagram_esol.grid(row=1, column=1, pady=10, rowspan=5, sticky=NW)
+        lbl_diagram_esol.grid(row=1, column=1, pady=10, sticky=W)
         self.canvas_esol = Canvas(frm_aux2, width=110, height=110)
         self.canvas_esol.config(background='white', borderwidth=1)
         self.canvas_esol.grid(row=1, column=3, pady=10, rowspan=5, sticky=E)
@@ -456,22 +456,18 @@ class FormChildExperiment:
         self.btn_quit_esol = Button(frm_aux2, image=self.remove_icon, command=self.click_remove_esol)
         btn_quit_esol_ttp = CreateToolTip(self.btn_quit_esol, 'Remove image')
         self.btn_view_esol = Button(frm_aux2, image=self.view_icon, command=self.click_view_esol)
-        #self.btn_view_esol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
         btn_view_esol_ttp = CreateToolTip(self.btn_view_esol, 'View image')
         lbl_patterns = Label(frm_aux2, text='Patterns')
         lbl_patterns.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_patterns.grid(row=0, column=7, pady=10, sticky=NW)
-        self.lbx_patterns_esol = Listbox(frm_aux2, height=13, width=50, exportselection=0)
-        self.lbx_patterns_esol.grid(row=0, column=9, pady=10, sticky=W, rowspan=6)
+        lbl_patterns.grid(row=1, column=6, pady=10, sticky=W)
+        self.lbx_patterns_esol = Listbox(frm_aux2, height=7, width=61, exportselection=0)
+        self.lbx_patterns_esol.grid(row=1, column=8, pady=10, sticky=W, rowspan=5)
         vsb_lbx_pat_esol = Scrollbar(frm_aux2, orient="vertical", command=self.lbx_patterns_esol.yview)
-        vsb_lbx_pat_esol.grid(row=0, column=10, pady=10, rowspan=6, sticky=NS)
+        vsb_lbx_pat_esol.grid(row=1, column=9, pady=10, rowspan=5, sticky=NS)
         self.lbx_patterns_esol.configure(yscrollcommand=vsb_lbx_pat_esol.set)
         self.btn_pat_esol = Button(frm_aux2, image=self.patterns_icon, command=self.click_pat_esol)
         btn_pat_esol_ttp = CreateToolTip(self.btn_pat_esol, 'Configure patterns')
         frm_aux2.grid(row=1, column=0, padx=10, pady=10, sticky=EW)
-
-        #sep_aux2 = Separator(self.tlevel_problem, orient=VERTICAL)
-        #sep_aux2.grid(row=0, column=1, sticky=NS, rowspan=3)
 
         # Components for selecting patterns
         lbl_sep8 = Label(self.tlevel_patterns)
@@ -543,6 +539,7 @@ class FormChildExperiment:
         """
         Hides all forms that are currently active
         """
+        self.click_back_sc()
         self.clear_exp_fields()
         self.main_title.set('Experiments')
         self.frm_child_exp_list.grid_forget()
@@ -782,14 +779,6 @@ class FormChildExperiment:
                 if self.connection.message.action == 5:  # An error ocurred while finishing experiment
                     messagebox.showerror(parent=self.frm_child_exp_list, title='Can not finish experiment',
                                          message=self.connection.message.information[0])
-                # Get report in .zip (temporarly)
-                self.directive = Message(action=106, information=[id_exp_selected])
-                self.connection = self.directive.send_directive(self.connection)
-                report_file = File()
-                path = report_file.write_permanent_file(self.connection.message.information[0],
-                                                        self.connection.message.information[1])
-                messagebox.showinfo(parent=self.frm_child_exp_list, title='Report created',
-                                    message='Zipped report created in app main folder')
                 self.retrieve_list_exp()
         else:
             messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
@@ -1387,8 +1376,7 @@ class FormChildExperiment:
         self.lbx_egroup_pat['bg'] = self.enabled_color
         self.lbx_cgroup_pat['bg'] = self.enabled_color
         self.frm_child_general_sc.grid_forget()
-        if self.experiment.design_type == 2:
-            self.frm_aux9.grid_forget() # Hide experimental group configuration
+        self.frm_aux9.grid_forget() # Hide experimental group configuration
         self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_save_problem(self):
@@ -1788,8 +1776,8 @@ class FormChildExperiment:
         self.btn_delete_prob.grid(row=10, column=6, padx=20, pady=10, sticky=W)
         self.btn_save_sc.grid(row=0, column=0, padx=25, pady=10, sticky=W)
         self.btn_cancel_sc.grid(row=1, column=0, padx=25, pady=10, sticky=W)
-        self.btn_save_prob.grid(row=0, column=9, padx=25, pady=5, sticky=W)
-        self.btn_cancel_prob.grid(row=1, column=9, padx=25, pady=5, sticky=W)
+        self.btn_save_prob.grid(row=0, column=6, padx=25, pady=5, sticky=W)
+        self.btn_cancel_prob.grid(row=1, column=6, padx=25, pady=5, sticky=NW)
         self.btn_open_dd.grid(row=2, column=10, padx=10, pady=10, sticky=W)
         self.btn_quit_dd.grid(row=4, column=10, padx=10, pady=10, sticky=W)
         self.btn_egroup.grid(row=0, column=4, padx=10, sticky=E)
@@ -1797,9 +1785,9 @@ class FormChildExperiment:
         self.btn_egroup_pat.grid(row=0, column=4, padx=10, sticky=E)
         self.btn_cgroup_pat.grid(row=0, column=5, padx=10, sticky=E)
         self.btn_copy_pat.grid(row=2, column=0, padx=20, sticky=NSEW)
-        self.btn_pat_esol.grid(row=0, column=11, pady=10, padx=10, sticky=E)
-        self.btn_open_esol.grid(row=2, column=4, padx=10, pady=10, sticky=E)
-        self.btn_quit_esol.grid(row=4, column=4, padx=10, pady=10, sticky=E)
+        self.btn_pat_esol.grid(row=1, column=10, pady=10, padx=5, sticky=W)
+        self.btn_open_esol.grid(row=1, column=4, padx=10, pady=5, sticky=W)
+        self.btn_quit_esol.grid(row=2, column=4, padx=10, pady=5, sticky=W)
 
     def show_view_buttons(self):
         """
@@ -1808,7 +1796,7 @@ class FormChildExperiment:
         """
         self.btn_view_prob.grid(row=7, column=6, padx=20, pady=10, sticky=NW)
         self.btn_back_sc.grid(row=0, column=0, padx=25, pady=5, sticky=NW)
-        self.btn_back_prob.grid(row=0, column=9, padx=25, pady=5, sticky=NW)
+        self.btn_back_prob.grid(row=0, column=6, padx=25, pady=5, sticky=NW)
         self.btn_view_dd.grid(row=1, column=10, padx=10, pady=10, sticky=NW)
         self.btn_view_esol.grid(row=1, column=4, padx=10, pady=10, sticky=NE)
 
