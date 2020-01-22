@@ -582,7 +582,7 @@ class FormChildReport:
         """
         if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
             id_selected_sc = int(self.trv_available_sc.item(self.trv_available_sc.selection())['text'])  # Retrieve id of selected item from TreeView
-            self.directive = Message(action=85, information=[id_selected_sc, 'report'])
+            self.directive = Message(action=85, information=[id_selected_sc, 'report', 1])
             self.connection = self.directive.send_directive(self.connection)
             ids_exec_egroup = self.connection.message.information[3]
             ids_exec_cgroup = self.connection.message.information[4]
@@ -712,14 +712,13 @@ class FormChildReport:
 
     def click_csv(self):
         # Get report in .zip (temporarly)
-        pass
-        '''self.directive = Message(action=106, information=[self.experiment.id])
+        self.directive = Message(action=106, information=[self.experiment.id])
         self.connection = self.directive.send_directive(self.connection)
         report_file = File()
         path = report_file.write_permanent_file(self.connection.message.information[0],
                                                 self.connection.message.information[1])
         messagebox.showinfo(parent=self.frm_child_exp_list, title='Report created',
-                            message='Zipped report created in app main folder')'''
+                            message='Zipped report created in app main folder')
 
     def click_back_scenario(self):
         """

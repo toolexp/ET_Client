@@ -383,6 +383,7 @@ class WindowHome:
         os.mkdir('./Resources/temp/')
         self.window.destroy()
 
+
 if __name__ == '__main__':
     connection = Connection()
     try:
