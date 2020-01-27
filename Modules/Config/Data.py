@@ -29,6 +29,20 @@ def wrap_text(string, lenght=90):
     return '\n'.join(textwrap.wrap(string, lenght))
 
 
+def treeview_sort_column(tv, col, reverse):
+    l = [(tv.set(k, col), k) for k in tv.get_children('')]
+    l.sort(reverse=reverse)
+
+    # rearrange items in sorted positions
+    for index, (val, k) in enumerate(l):
+        tv.move(k, '', index)
+
+    # reverse sort next time
+    tv.heading(col, command=lambda: \
+               treeview_sort_column(tv, col, not reverse))
+
+
+
 class Category:
     def __init__(self, id=0, name='', classification_id=0):
         self.id = id

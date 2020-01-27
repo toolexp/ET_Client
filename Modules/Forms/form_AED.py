@@ -53,15 +53,17 @@ class FormChildAED:
         # Components for List Form
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', 'Surname', 'E-mail'))
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('N', 'Name', 'Surname', 'E-mail'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available.heading('#1', text='Name', anchor=CENTER)
-        self.trv_available.heading('#2', text='Surname', anchor=CENTER)
-        self.trv_available.heading('#3', text='E-mail', anchor=CENTER)
+        self.trv_available.heading('#1', text='N', anchor=CENTER)
+        self.trv_available.heading('#2', text='Name', anchor=CENTER)
+        self.trv_available.heading('#3', text='Surname', anchor=CENTER)
+        self.trv_available.heading('#4', text='E-mail', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
+        self.trv_available.column('#1', width=20, minwidth=20, stretch=NO)
         self.trv_available.column('#2', width=200, minwidth=200, stretch=NO)
-        self.trv_available.column('#3', width=400, minwidth=400, stretch=NO)
+        self.trv_available.column('#3', width=200, minwidth=200, stretch=NO)
+        self.trv_available.column('#4', width=400, minwidth=400, stretch=NO)
         self.trv_available.grid(row=0, column=1, sticky=W, pady=25)
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
@@ -135,9 +137,9 @@ class FormChildAED:
             raise Exception('Error en recuperacion: tipo de usuario')
         self.connection = self.directive.send_directive(self.connection)
         # Adding elements in the list
-        for item in self.connection.message.information:
+        for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2], elements[3]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2], elements[3]))
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
 

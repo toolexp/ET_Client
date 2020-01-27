@@ -3,7 +3,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoIma
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator, Combobox, Notebook, Style
 from Modules.Config.Data import Message, CreateToolTip, Experiment, Pattern, wrap_text, Designer, ExperimentalSC, \
-    Problem, File, Solution
+    Problem, File, Solution, treeview_sort_column
 from Modules.Config.Visual import *
 from PIL import ImageTk, Image
 import os
@@ -282,7 +282,7 @@ class FormChildExperiment:
         btn_egroup_ttp = CreateToolTip(self.btn_egroup, 'Configure experimental group')
         frm_aux8.grid(row=0, column=0, sticky=W)
         self.frm_aux9 = Frame(tab_designers)
-        lbl_cgroup = Label(self.frm_aux9, text='\tControl group*')
+        lbl_cgroup = Label(self.frm_aux9, text='Control group*  \t')
         lbl_cgroup.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_cgroup.grid(row=0, column=0, sticky=NW, pady=10)
         lbl_sep5 = Label(self.frm_aux9)
@@ -310,7 +310,7 @@ class FormChildExperiment:
         self.btn_egroup_pat = Button(frm_aux13, image=self.patterns_icon, command=self.click_egroup_pat)
         btn_egroup_pat_ttp = CreateToolTip(self.btn_egroup_pat, 'Configure patterns')
         self.frm_aux11 = Frame(tab_designers_patterns)
-        lbl_cgroup_pat = Label(self.frm_aux11, text='\tControl group')
+        lbl_cgroup_pat = Label(self.frm_aux11, text='Control group\t')
         lbl_cgroup_pat.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_cgroup_pat.grid(row=0, column=0, pady=10, rowspan=5, sticky=NW)
         lbl_sep14 = Label(self.frm_aux11)
@@ -340,7 +340,8 @@ class FormChildExperiment:
         # Components for selecting designers
         lbl_sep7 = Label(self.tlevel_designers)
         lbl_sep7.grid(row=0, column=0, rowspan=10, padx=25, pady=25)
-        self.trv_available_designers = Treeview(self.tlevel_designers, height=10, columns=('N', 'Available designers'))
+        self.trv_available_designers = Treeview(self.tlevel_designers, height=10, columns=('N', 'Available designers'),
+                                                show='headings')
         self.trv_available_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_designers.heading('#1', text='N', anchor=CENTER)
         self.trv_available_designers.heading('#2', text='Available designers', anchor=CENTER)
@@ -358,7 +359,8 @@ class FormChildExperiment:
         self.btn_remove_designer = Button(self.tlevel_designers, image=self.delete_icon, command=self.click_remove_designer)
         self.btn_remove_designer.grid(row=4, column=3, padx=25)
         btn_remove_designer_ttp = CreateToolTip(self.btn_remove_designer, 'Remove designer')
-        self.trv_selected_designers = Treeview(self.tlevel_designers, height=10, columns=('N', 'Selected designers'))
+        self.trv_selected_designers = Treeview(self.tlevel_designers, height=10, columns=('N', 'Selected designers'),
+                                                show='headings')
         self.trv_selected_designers.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_designers.heading('#1', text='N', anchor=CENTER)
         self.trv_selected_designers.heading('#2', text='Selected designers', anchor=CENTER)
@@ -488,7 +490,7 @@ class FormChildExperiment:
         self.trv_selected_patterns.grid(row=0, column=4, rowspan=10, pady=25, sticky=W)
         vsb_trv_selpat = Scrollbar(self.tlevel_patterns, orient="vertical", command=self.trv_selected_patterns.yview)
         vsb_trv_selpat.grid(row=0, column=5, rowspan=10, pady=25, sticky=NS)
-        self.trv_selected_designers.configure(yscrollcommand=vsb_trv_selpat.set)
+        self.trv_selected_patterns.configure(yscrollcommand=vsb_trv_selpat.set)
         sep_patterns = Separator(self.tlevel_patterns, orient=VERTICAL)
         sep_patterns.grid(row=0, column=6, sticky=NS, padx=25, rowspan=10)
         btn_save_pats = Button(self.tlevel_patterns, image=self.save_icon, command=self.click_save_patterns)
@@ -705,15 +707,6 @@ class FormChildExperiment:
                     self.main_title.set('Experiment: ' + self.experiment.name)
                 else:
                     self.click_back_exp()
-            elif validation_option == 1:
-                messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
-                                       message='You must insert a name for the experiment')
-            elif validation_option == 2:
-                messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
-                                       message='You must insert a description for the experiment')
-            else:
-                messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
-                                       message='You must select a design type for the experiment')
         else:   # Update selected experiment
             design_type_aux = 1 if self.cbx_dt_exp.get() == 'One group' else 2
             decision_aux = 1
@@ -743,16 +736,13 @@ class FormChildExperiment:
                         self.connection = self.directive.send_directive(self.connection)
                         self.directive = Message(action=89, information=[self.experiment.id])
                         self.connection = self.directive.send_directive(self.connection)
-                    self.click_back_exp()
-                elif validation_option == 1:
-                    messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
-                                           message='You must insert a name for the experiment')
-                elif validation_option == 2:
-                    messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
-                                           message='You must insert a description for the experiment')
-                else:
-                    messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
-                                           message='You must select a design type for the experiment')
+                    decision = messagebox.askyesno(parent=self.frm_child_sc_list, title='Keep configuring experiment',
+                                                   message='Do you want to continue configuring the scenarios associated with '
+                                                           'the experiment?')
+                    if decision:
+                        self.main_title.set('Experiment: ' + self.experiment.name)
+                    else:
+                        self.click_back_exp()
 
     def click_cancel_exp(self):
         """
@@ -808,7 +798,7 @@ class FormChildExperiment:
         if not self.view_decision:
             if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
                 values = self.trv_available_sc.item(self.trv_available_sc.focus())['values']
-                if values[3] != 'finished':
+                if values[3] == 'created':
                     if values[4] == '':
                         self.trv_available_sc.item(self.trv_available_sc.focus(), values=(values[0], values[1], values[2],
                                                                                           values[3], '✓'))
@@ -831,8 +821,9 @@ class FormChildExperiment:
         Function activated when 'New' experimental scenario button is pressed, allows user to create a new experimental
         scenario. Shows visual components for the creation of an experimental scenario
         """
-        if self.experiment.design_type != 0:  # When an experiment is finished, no new scenarios can be created
+        if self.experiment.design_type != 0:  # Scenarios can be created only when an experiment is already created
             self.experimental_scenario = ExperimentalSC()
+            self.cancel_sc_decision = False  # Decision changes when any changes in general sc configuration form is done
             self.reload_available()
             self.visual_problems = []
             self.txt_title_sc.focus_set()
@@ -876,18 +867,18 @@ class FormChildExperiment:
             if self.file_dd is not None:
                 self.show_dd_file()
             self.txt_access_sc.insert('1.0', self.experimental_scenario.access_code)
-            for item in self.experimental_scenario.experimental_group:
-                self.lbx_egroup.insert(END, '{} {}'.format(item.name, item.surname))
-            for item in self.experimental_scenario.control_group:
-                self.lbx_cgroup.insert(END, '{} {}'.format(item.name, item.surname))
+            for index, item in enumerate(self.experimental_scenario.experimental_group):
+                self.lbx_egroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
+            for index, item in enumerate(self.experimental_scenario.control_group):
+                self.lbx_cgroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
             self.visual_problems = []
-            for item in self.experimental_scenario.problems:
+            for index, item in enumerate(self.experimental_scenario.problems):
                 self.visual_problems.append(item.id_visual)
-                self.lbx_problems.insert(END, item.brief_description)
-            for item in self.experimental_scenario.egroup_patterns:
-                self.lbx_egroup_pat.insert(END, item.get_main_section())
-            for item in self.experimental_scenario.cgroup_patterns:
-                self.lbx_cgroup_pat.insert(END, item.get_main_section())
+                self.lbx_problems.insert(END, '{}) {}'.format(index + 1, item.brief_description))
+            for index, item in enumerate(self.experimental_scenario.egroup_patterns):
+                self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+            for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
+                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
             self.txt_title_sc['bg'] = self.disabled_color
             self.txt_description_sc['bg'] = self.disabled_color
             self.txt_access_sc['bg'] = self.disabled_color
@@ -939,6 +930,7 @@ class FormChildExperiment:
                 self.experimental_scenario.retrieve_patterns_groups(self.av_patterns)
                 self.experimental_scenario.retrieve_problems(self.av_patterns)
                 self.reload_available()
+                self.cancel_sc_decision = False  # Decision changes when any changes in general sc configuration form is done
                 # Fill visual components
                 self.txt_title_sc.insert('1.0', self.experimental_scenario.title)
                 self.txt_description_sc.insert('1.0', self.experimental_scenario.description)
@@ -946,18 +938,18 @@ class FormChildExperiment:
                 if self.file_dd is not None:
                     self.show_dd_file()
                 self.txt_access_sc.insert('1.0', self.experimental_scenario.access_code)
-                for item in self.experimental_scenario.experimental_group:
-                    self.lbx_egroup.insert(END, '{} {}'.format(item.name, item.surname))
-                for item in self.experimental_scenario.control_group:
-                    self.lbx_cgroup.insert(END, '{} {}'.format(item.name, item.surname))
+                for index, item in enumerate(self.experimental_scenario.experimental_group):
+                    self.lbx_egroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
+                for index, item in enumerate(self.experimental_scenario.control_group):
+                    self.lbx_cgroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
                 self.visual_problems = []
-                for item in self.experimental_scenario.problems:
+                for index, item in enumerate(self.experimental_scenario.problems):
                     self.visual_problems.append(item.id_visual)
-                    self.lbx_problems.insert(END, item.brief_description)
-                for item in self.experimental_scenario.egroup_patterns:
-                    self.lbx_egroup_pat.insert(END, item.get_main_section())
-                for item in self.experimental_scenario.cgroup_patterns:
-                    self.lbx_cgroup_pat.insert(END, item.get_main_section())
+                    self.lbx_problems.insert(END, '{}) {}'.format(index + 1, item.brief_description))
+                for index, item in enumerate(self.experimental_scenario.egroup_patterns):
+                    self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
+                    self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
                 self.frm_child_general_sc['text'] = 'Update experimental scenario'
                 if self.experiment.design_type == 2:
                     self.frm_aux9.grid(row=1, column=0, sticky=W)
@@ -996,26 +988,18 @@ class FormChildExperiment:
             messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select an '
                                                                                                 'item')
 
-    def click_cancel_experiment_sc(self):
-        """
-        Function activated when 'Cancel experiment-scenario' button is pressed in 'Experimental scenarios list form', it
-        goes back to the 'Experiments' list home form
-        """
-        decision = messagebox.askyesno(parent=self.frm_child_sc_list, title='Cancel',
-                                       message='Are you sure you want to cancel?')
-        if decision:
-            self.main_title.set('Experiments')
-            self.experiment = None
-            self.frm_child_sc_list.grid_forget()
-            self.frm_child_exp_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
-
     def click_cancel_problem(self):
         """
         Function activated when 'Cancel' button is pressed in 'Problem configuration tlevel', it goes back
         to the 'Experimental scenario configuration form'
         """
-        decision = messagebox.askyesno(parent=self.tlevel_problem, title='Cancel',
-                                       message='Are you sure you want to cancel?')
+        decision = True
+        if self.txt_short_desc_prob.get('1.0', 'end-1c') != self.problem.brief_description or \
+                self.txt_description_prob.get('1.0', 'end-1c') != self.problem.description or \
+                self.txt_annotations_esol.get('1.0', 'end-1c') != self.problem.solution.annotations or \
+                self.lbx_patterns_esol.size() != len(self.problem.solution.patterns_id):
+            decision = messagebox.askyesno(parent=self.tlevel_problem, title='Cancel',
+                                           message='Are you sure you want to cancel?')
         if decision:
             self.click_back_problem()
 
@@ -1065,6 +1049,13 @@ class FormChildExperiment:
         for index, item in enumerate(self.experimental_scenario.experimental_group):
             self.trv_selected_designers.insert('', 'end', text=item.id,
                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
+        '''
+        for col in self.trv_available_designers['columns']:
+            self.trv_available_designers.heading(col, text=col, command=lambda:
+            treeview_sort_column(self.trv_available_designers, col, False))
+        for col in self.trv_selected_designers['columns']:
+            self.trv_selected_designers.heading(col, text=col, command=lambda:
+                treeview_sort_column(self.trv_selected_designers, col, False))'''
         self.tlevel_designers.deiconify()
         self.tlevel_designers.grab_set()
         self.tlevel_designers_type = 1
@@ -1182,7 +1173,7 @@ class FormChildExperiment:
                 decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
                                                message='Are you sure you don\'t want to configure patterns for '
                                                        'experimental group?')
-                if decision: #  Confirm saving withouth patterns for experimental group
+                if decision:    # Confirm saving without patterns for experimental group
                     patterns_decision = True
             if self.experiment.design_type == 2:
                 if self.lbx_cgroup_pat.size() == 0:
@@ -1198,6 +1189,12 @@ class FormChildExperiment:
                 self.experimental_scenario.description = self.txt_description_sc.get('1.0', 'end-1c')
                 self.experimental_scenario.access_code = self.txt_access_sc.get('1.0', 'end-1c')
                 if self.experimental_scenario.id == 0:  # New experimental scenario
+                    # Ask if the new scenario turn into execution after creation
+                    estado_inicial = 'created'
+                    decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Execute scenario',
+                                                   message='Do you want to execute the newly configured scenario?')
+                    if decision:
+                        estado_inicial = 'execution'
                     # Create context diagram in DB (if exist)
                     id_diagram = None
                     if self.file_dd is not None:
@@ -1209,17 +1206,17 @@ class FormChildExperiment:
                     self.directive = Message(action=81,
                                              information=[self.experimental_scenario.title,
                                                           self.experimental_scenario.description,
-                                                          self.experimental_scenario.access_code, id_diagram,
-                                                          self.experiment.id, [], [], [], []])
+                                                          self.experimental_scenario.access_code, estado_inicial,
+                                                          id_diagram, self.experiment.id, [], [], [], []])
                     for item in self.experimental_scenario.experimental_group:
-                        self.directive.information[5].append(item.id)
+                        self.directive.information[6].append(item.id)
                     for item in self.experimental_scenario.egroup_patterns:
-                        self.directive.information[7].append(item.id)
+                        self.directive.information[8].append(item.id)
                     if self.experiment.design_type == 2:
                         for item in self.experimental_scenario.control_group:
-                            self.directive.information[6].append(item.id)
+                            self.directive.information[7].append(item.id)
                         for item in self.experimental_scenario.cgroup_patterns:
-                            self.directive.information[8].append(item.id)
+                            self.directive.information[9].append(item.id)
                     self.connection = self.directive.send_directive(self.connection)
                     id_exp_scenario = self.connection.message.information[0]
                     # Create problems and its associated objects
@@ -1315,29 +1312,18 @@ class FormChildExperiment:
                 self.retrieve_list_sc()
                 self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
-        elif validation_option == 1:
-            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
-                                   message='Check mandatory text fields, some of them are empty')
-        elif validation_option == 2:
-            messagebox.showwarning(parent=self.frm_child_general_sc, title='Duplicated designers',
-                                   message='At least one designer is in both, experimental and control group')
-        elif validation_option == 3:
-            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
-                                   message='Experimental group can not be empty')
-        elif validation_option == 4:
-            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
-                                   message='Control group can not be empty')
-        else:
-            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
-                                   message='You must configure at least one problem')
-
     def click_cancel_sc(self):
         """
         Function activated when 'Cancel' button is pressed in 'Experimental scenario configuration form', it goes back
         to the 'Experimental scenarios list form'
         """
-        decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Cancel',
-                                       message='Are you sure you want to cancel?')
+        decision = True
+        if self.txt_title_sc.get('1.0', 'end-1c') != self.experimental_scenario.title or \
+                self.txt_description_sc.get('1.0', 'end-1c') != self.experimental_scenario.description or \
+                self.txt_access_sc.get('1.0', 'end-1c') != self.experimental_scenario.access_code or \
+                self.file_dd != self.experimental_scenario.description_diagram or self.cancel_sc_decision:
+            decision = messagebox.askyesno(parent=self.tlevel_problem, title='Cancel',
+                                           message='Are you sure you want to cancel?')
         if decision:
             self.click_back_sc()
 
@@ -1381,13 +1367,9 @@ class FormChildExperiment:
                 self.problem.solution.diagram = self.file_esol
                 self.experimental_scenario.problems.append(self.problem)
                 self.visual_problems.append(self.problem.id_visual)
-                self.lbx_problems.insert(END, self.problem.brief_description)
-                self.clear_problem_fields()
-                self.tlevel_problem.grab_release()
-                self.tlevel_problem.withdraw()
-        else:
-            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
-                                   message='Check mandatory text fields, some of them are empty')
+                self.lbx_problems.insert(END, '{}) {}'.format(self.lbx_problems.size() + 1, self.problem.brief_description))
+                self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
+                self.click_back_problem()
 
     def click_back_problem(self):
         """
@@ -1408,31 +1390,33 @@ class FormChildExperiment:
         """
         Function that moves a 'Designer' from available tree view to selected tree view (in tlevel_designer)
         """
-        if self.trv_available_designers.item(self.trv_available_designers.selection())['text'] != '' and \
-                self.trv_selected_designers.item(self.trv_selected_designers.selection())['text'] == '':
+        if len(self.trv_available_designers.selection()) != 0 and len(self.trv_selected_designers.selection()) == 0:
             if len(self.trv_selected_designers.get_children()) != 0:
-                index = int(self.trv_selected_designers.get_children()[-1]['values'][0])
+                index = self.trv_selected_designers.item(self.trv_selected_designers.get_children()[-1])['values'][0]
             else:
                 index = 0
-            values = self.trv_available_designers.item(self.trv_available_designers.focus())['values']
-            self.trv_selected_designers.insert('', 'end', text=self.trv_available_designers.item(
-                self.trv_available_designers.focus())['text'], values=(index+1, values[1:]))
-            self.trv_available_designers.delete(self.trv_available_designers.selection())
+            for row in self.trv_available_designers.selection():
+                index += 1
+                values = self.trv_available_designers.item(row)['values']
+                self.trv_selected_designers.insert('', 'end', text=self.trv_available_designers.item(row)['text'],
+                                                   values=(index, values[1]))
+                self.trv_available_designers.delete(row)
 
     def click_remove_designer(self):
         """
         Function that moves a 'Designer' from selected tree view to available tree view (in tlevel_designer)
         """
-        if self.trv_selected_designers.item(self.trv_selected_designers.selection())['text'] != '' and \
-                self.trv_available_designers.item(self.trv_available_designers.selection())['text'] == '':
+        if len(self.trv_selected_designers.selection()) != 0 and len(self.trv_available_designers.selection()) == 0:
             if len(self.trv_available_designers.get_children()) != 0:
-                index = int(self.trv_available_designers.get_children()[-1]['values'][0])
+                index = self.trv_available_designers.item(self.trv_available_designers.get_children()[-1])['values'][0]
             else:
                 index = 0
-            values = self.trv_selected_designers.item(self.trv_selected_designers.focus())['values']
-            self.trv_available_designers.insert('', 'end', text=self.trv_selected_designers.item(
-                self.trv_selected_designers.focus())['text'], values=(index+1, values[1:]))
-            self.trv_selected_designers.delete(self.trv_selected_designers.selection())
+            for row in self.trv_selected_designers.selection():
+                index += 1
+                values = self.trv_selected_designers.item(row)['values']
+                self.trv_available_designers.insert('', 'end', text=self.trv_selected_designers.item(row)['text'],
+                                                    values=(index, values[1]))
+                self.trv_selected_designers.delete(row)
 
     def click_trv_sdesigners(self, event):
         """
@@ -1473,8 +1457,9 @@ class FormChildExperiment:
                 self.av_designers_egroup.append(item)
             # Clear patterns from listbox and insert new ones
             self.lbx_egroup.delete(0, END)
-            for item in self.experimental_scenario.experimental_group:
-                self.lbx_egroup.insert(END, '{} {}'.format(item.name, item.surname))
+            for index, item in enumerate(self.experimental_scenario.experimental_group):
+                self.lbx_egroup.insert(END, '{}) {} {}'.format(index+1, item.surname, item.name))
+            self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
         elif self.tlevel_designers_type == 2:   # Current view is for control group
             # Compare current available designers in treeview with available designers in object
             for item1 in reversed(self.av_designers_cgroup):
@@ -1505,8 +1490,9 @@ class FormChildExperiment:
                 self.av_designers_cgroup.append(item)
             # Clear patterns from listbox and insert new ones
             self.lbx_cgroup.delete(0, END)
-            for item in self.experimental_scenario.control_group:
-                self.lbx_cgroup.insert(END, '{} {}'.format(item.name, item.surname))
+            for index, item in enumerate(self.experimental_scenario.control_group):
+                self.lbx_cgroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
+            self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
         else:
             raise Exception('Tipo de grupo de disenadores es incongruente')
         self.tlevel_designers.grab_release()
@@ -1523,31 +1509,33 @@ class FormChildExperiment:
         """
         Function that moves a 'Pattern' from available tree view to selected tree view (in tlevel_patterns)
         """
-        if self.trv_available_patterns.item(self.trv_available_patterns.selection())['text'] != '' and \
-                self.trv_selected_patterns.item(self.trv_selected_patterns.selection())['text'] == '':
+        if len(self.trv_available_patterns.selection()) != 0 and len(self.trv_selected_patterns.selection()) == 0:
             if len(self.trv_selected_patterns.get_children()) != 0:
-                index = int(self.trv_selected_patterns.get_children()[-1]['values'][0])
+                index = self.trv_selected_patterns.item(self.trv_selected_patterns.get_children()[-1])['values'][0]
             else:
                 index = 0
-            values = self.trv_available_patterns.item(self.trv_available_patterns.focus())['values']
-            self.trv_selected_patterns.insert('', 'end', text=self.trv_available_patterns.item(
-                self.trv_available_patterns.focus())['text'], values=(index+1, values[1:]))
-            self.trv_available_patterns.delete(self.trv_available_patterns.selection())
+            for row in self.trv_available_patterns.selection():
+                index += 1
+                values = self.trv_available_patterns.item(row)['values']
+                self.trv_selected_patterns.insert('', 'end', text=self.trv_available_patterns.item(row)['text'],
+                                                  values=(index, values[1]))
+                self.trv_available_patterns.delete(row)
 
     def click_remove_pattern(self):
         """
         Function that moves a 'Pattern' from selected tree view to available tree view (in tlevel_patterns)
         """
-        if self.trv_selected_patterns.item(self.trv_selected_patterns.selection())['text'] != '' and \
-                self.trv_available_patterns.item(self.trv_available_patterns.selection())['text'] == '':
+        if len(self.trv_selected_patterns.selection()) != 0 and len(self.trv_available_patterns.selection()) == 0:
             if len(self.trv_available_patterns.get_children()) != 0:
-                index = int(self.trv_available_patterns.get_children()[-1]['values'][0])
+                index = self.trv_available_patterns.item(self.trv_available_patterns.get_children()[-1])['values'][0]
             else:
                 index = 0
-            values = self.trv_selected_patterns.item(self.trv_selected_patterns.focus())['values']
-            self.trv_available_patterns.insert('', 'end', text=self.trv_selected_patterns.item(
-                self.trv_selected_patterns.focus())['text'], values=(index+1, values[1:]))
-            self.trv_selected_patterns.delete(self.trv_selected_patterns.selection())
+            for row in self.trv_selected_patterns.selection():
+                index += 1
+                values = self.trv_selected_patterns.item(row)['values']
+                self.trv_available_patterns.insert('', 'end', text=self.trv_selected_patterns.item(row)['text'],
+                                                   values=(index, values[1]))
+                self.trv_selected_patterns.delete(row)
 
     def click_trv_spatterns(self, event):
         """
@@ -1587,8 +1575,9 @@ class FormChildExperiment:
                 self.av_patterns_egroup.append(item)
             # Clear patterns from listbox and insert new ones
             self.lbx_egroup_pat.delete(0, END)
-            for item in self.experimental_scenario.egroup_patterns:
-                self.lbx_egroup_pat.insert(END, item.get_main_section())
+            for index, item in enumerate(self.experimental_scenario.egroup_patterns):
+                self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+            self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
         elif self.tlevel_patterns_type == 2:     # Current view is for patterns of control group
             for item1 in reversed(self.av_patterns_cgroup):
                 found = False
@@ -1618,8 +1607,9 @@ class FormChildExperiment:
                 self.av_patterns_cgroup.append(item)
             # Clear patterns from listbox and insert new ones
             self.lbx_cgroup_pat.delete(0, END)
-            for item in self.experimental_scenario.cgroup_patterns:
-                self.lbx_cgroup_pat.insert(END, item.get_main_section())
+            for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
+                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+            self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
         elif self.tlevel_patterns_type == 3:     # Current view is for patterns of expected solution
             for item1 in reversed(self.av_patterns_esol):
                 found = False
@@ -1756,9 +1746,9 @@ class FormChildExperiment:
             self.lbx_cgroup_pat.delete(0, END)
             for item in self.av_patterns_egroup:
                 self.av_patterns_cgroup.append(item)
-            for item in self.experimental_scenario.egroup_patterns:  # Copy patterns from exp. group to control group
+            for index, item in enumerate(self.experimental_scenario.egroup_patterns):  # Copy patterns from exp. group to control group
                 self.experimental_scenario.cgroup_patterns.append(item)
-                self.lbx_cgroup_pat.insert(END, item.get_main_section())
+                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
         else:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='No patterns',
                                    message='You must insert at least one pattern to experimental group patterns\' list')
@@ -1928,6 +1918,7 @@ class FormChildExperiment:
             self.canvas_dd.delete(self.file_dd.image)  # clear canvas
             self.render_dd = None
             self.file_dd = None  # set file NULL
+        self.tab_control.select(0)
         self.experimental_scenario = None
         self.frm_aux9.grid_forget()
         self.frm_aux11.grid_forget()
@@ -1961,11 +1952,17 @@ class FormChildExperiment:
         :return:
         """
         if len(self.txt_name_exp.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
+                                   message='You must insert a name for the experiment')
             return 1
         if len(self.txt_description_exp.get('1.0', 'end-1c')) == 0:
-            return 2
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
+                                   message='You must insert a description for the experiment')
+            return 1
         if self.cbx_dt_exp.get() == 0:
-            return 3
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
+                                   message='You must select a design type for the experiment')
+            return 1
         return 0
 
     def validate_problem_fields(self):
@@ -1973,7 +1970,13 @@ class FormChildExperiment:
         Validation of fullfilled mandatory visual visual components when creating or updating a design problem
         :return:
         """
-        if len(self.txt_short_desc_prob.get('1.0', 'end-1c')) == 0 or len(self.txt_description_prob.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_short_desc_prob.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
+                                   message='You must insert a brief description for the problem')
+            return 1
+        if len(self.txt_description_prob.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
+                                   message='You must insert a full description for the problem')
             return 1
         return 0
 
@@ -1982,20 +1985,37 @@ class FormChildExperiment:
         Validation of fullfilled mandatory visual visual components when creating or updating an experimental scenario
         :return:
         """
-        if len(self.txt_title_sc.get('1.0', 'end-1c')) == 0 or len(self.txt_description_sc.get('1.0', 'end-1c')) == 0\
-                or len(self.txt_access_sc.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_title_sc.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='You must insert a title for the scenario')
+            return 1
+        if len(self.txt_description_sc.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='You must insert a description for the scenario')
+            return 1
+        if len(self.txt_access_sc.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='You must insert an access code for the scenario')
             return 1
         if self.experiment.design_type == 2:
             for item1 in self.experimental_scenario.experimental_group:
                 for item2 in self.experimental_scenario.control_group:
                     if item1.id == item2.id:
-                        return 2
+                        messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                               message='At least one designer is in both, experimental and control group')
+                        return 1
         if self.lbx_egroup.size() == 0:
-            return 3
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='Experimental group can not be empty')
+            return 1
         if self.experiment.design_type == 2 and self.lbx_cgroup.size() == 0:
-            return 4
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='Control group can not be empty')
+            return 1
         if self.lbx_problems.size() == 0:
-            return 5
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
+                                   message='You must configure at least one problem')
+            return 1
         return 0
 
     def show_dd_file(self):
