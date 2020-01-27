@@ -55,8 +55,6 @@ class FormChildPattern:
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
         self.back_icon = PhotoImage(file=r"./Resources/back.png")
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
-        self.style = Style()
-        self.style.layout('TNotebook.Tab', [])  # turn off tabs
         #self.style.configure("Treeview", foreground="gray", rowheight=50)
         self.disabled_color = self.frm_child_list.cget('bg')
 
@@ -262,6 +260,8 @@ class FormChildPattern:
         """
         Show the List form when the Patterns administration is called
         """
+        self.style = Style()
+        self.style.layout('TNotebook.Tab', [])  # turn off tabs
         self.get_patterns()
         self.retrieve_list()
         self.frm_child_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
