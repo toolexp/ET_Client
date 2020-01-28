@@ -81,6 +81,7 @@ class FormChildExperiment:
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
         self.designers_icon = PhotoImage(file=r"./Resources/people.png")
         self.patterns_icon = PhotoImage(file=r"./Resources/pattern.png")
+        self.check_icon = PhotoImage(file=r"./Resources/check.png")
         self.disabled_color = self.frm_child_exp_list.cget('bg')
 
         # Components for experiment list form (list of experiments)
@@ -374,7 +375,7 @@ class FormChildExperiment:
         self.trv_selected_designers.configure(yscrollcommand=vsb_trv_seldes.set)
         sep_designers = Separator(self.tlevel_designers, orient=VERTICAL)
         sep_designers.grid(row=0, column=6, sticky=NS, padx=25, rowspan=10)
-        btn_save_des = Button(self.tlevel_designers, image=self.save_icon, command=self.click_save_designers)
+        btn_save_des = Button(self.tlevel_designers, image=self.check_icon, command=self.click_save_designers)
         btn_save_des.grid(row=0, column=7, padx=10, sticky=E)
         btn_save_des_ttp = CreateToolTip(btn_save_des, 'Save designers')
         btn_cancel_des = Button(self.tlevel_designers, image=self.cancel_icon, command=self.click_cancel_designers)
@@ -397,8 +398,6 @@ class FormChildExperiment:
         lbl_sep10.grid(row=0, column=2, rowspan=2, padx=10, pady=10)
         lbl_sep18 = Label(frm_aux1)
         lbl_sep18.grid(row=0, column=5, padx=10, pady=10, rowspan=2)
-        #lbl_sep24 = Label(frm_aux1)
-        #lbl_sep24.grid(row=0, column=6, padx=10, pady=10, rowspan=2)
         self.txt_short_desc_prob = Text(frm_aux1, height=1, width=100)
         self.txt_short_desc_prob.config(font=TEXT_FONT)
         self.txt_short_desc_prob.grid(row=0, column=3, pady=10, sticky=W)
@@ -408,7 +407,7 @@ class FormChildExperiment:
         vsb_txt_desc_prob = Scrollbar(frm_aux1, orient="vertical", command=self.txt_description_prob.yview)
         vsb_txt_desc_prob.grid(row=1, column=4, pady=10, sticky=NS)
         self.txt_description_prob.configure(yscrollcommand=vsb_txt_desc_prob.set)
-        self.btn_save_prob = Button(frm_aux1, image=self.save_icon, command=self.click_save_problem)
+        self.btn_save_prob = Button(frm_aux1, image=self.check_icon, command=self.click_save_problem)
         btn_save_prob_ttp = CreateToolTip(self.btn_save_prob, 'Save problem')
         self.btn_cancel_prob = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel_problem)
         btn_cancel_prob_ttp = CreateToolTip(self.btn_cancel_prob, 'Cancel')
@@ -493,7 +492,7 @@ class FormChildExperiment:
         self.trv_selected_patterns.configure(yscrollcommand=vsb_trv_selpat.set)
         sep_patterns = Separator(self.tlevel_patterns, orient=VERTICAL)
         sep_patterns.grid(row=0, column=6, sticky=NS, padx=25, rowspan=10)
-        btn_save_pats = Button(self.tlevel_patterns, image=self.save_icon, command=self.click_save_patterns)
+        btn_save_pats = Button(self.tlevel_patterns, image=self.check_icon, command=self.click_save_patterns)
         btn_save_pats.grid(row=0, column=7, padx=10, sticky=E)
         btn_save_pats_ttp = CreateToolTip(btn_save_pats, 'Save patterns')
         btn_cancel_pats = Button(self.tlevel_patterns, image=self.cancel_icon, command=self.click_cancel_patterns)
@@ -559,7 +558,7 @@ class FormChildExperiment:
         """
         Function activated when 'View experiment' button is pressed, allows user to view info of an experiment
         """
-        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+        if len(self.trv_available_exp.selection()) == 1:
             id_exp_selected = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
             self.view_decision = True  # Decision when viewing an experiment
             # Retrieve selected experiment
@@ -587,7 +586,7 @@ class FormChildExperiment:
             self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
-                                   message='You must select an item')
+                                   message='You must select one item')
 
     def click_config_exp(self):
         """
@@ -595,7 +594,7 @@ class FormChildExperiment:
         When configuring an experiment, the user will be allowed to administrate experimental scenarios associated with
         the experiment
         """
-        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+        if len(self.trv_available_exp.selection()) == 1:
             id_exp_selected = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
             if self.trv_available_exp.item(self.trv_available_exp.selection())['values'][4] != 'finished':
                 self.view_decision = False  # Decision when viewing an experiment
@@ -625,13 +624,13 @@ class FormChildExperiment:
                                        message='The experiment can not be configured because, it is finished')
         else:
             messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
-                                   message='You must select an item')
+                                   message='You must select one item')
 
     def click_delete_exp(self):
         """
         Function activated when 'Delete' button is pressed, it removes an experiment from the database
         """
-        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+        if len(self.trv_available_exp.selection()) == 1:
             # MessageBox asking confirmation
             decision = messagebox.askyesno(parent=self.frm_child_exp_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
@@ -645,13 +644,13 @@ class FormChildExperiment:
                 else:
                     self.retrieve_list_exp()
         else:
-            messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection', message='You must select one item')
 
     def click_exec_exp(self):
         """
         Execute an experiment and all it's configured experimental scenarios (change their states)
         """
-        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+        if len(self.trv_available_exp.selection()) == 1:
             id_exp_selected = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])
             self.directive = Message(action=93, information=[id_exp_selected, 'execution'])
             self.connection = self.directive.send_directive(self.connection)
@@ -661,14 +660,14 @@ class FormChildExperiment:
             self.retrieve_list_exp()
         else:
             messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
-                                   message='You must select an item')
+                                   message='You must select one item')
 
     def click_finish_exp(self):
         """
         Function activated when 'Finish experiment' button is pressed. Finishes an experiment and generates a report
         for it. After finishing it, its structure wont be able to be modified, neither its information
         """
-        if self.trv_available_exp.item(self.trv_available_exp.selection())['text'] != '':
+        if len(self.trv_available_exp.selection()) == 1:
             decision = messagebox.askyesno(parent=self.frm_child_exp_list, title='Confirmation',
                                            message='Are you sure you want to finish the experiment?')
             if decision:
@@ -681,7 +680,7 @@ class FormChildExperiment:
                 self.retrieve_list_exp()
         else:
             messagebox.showwarning(parent=self.frm_child_exp_list, title='No selection',
-                                   message='You must select an item')
+                                   message='You must select one item')
 
     def click_save_exp(self):
         """
@@ -842,7 +841,7 @@ class FormChildExperiment:
         Function activated when 'View' experimental scenario button is pressed. It allows the user to view information
         of the selected experimental scenario, but can not make any changes.
         """
-        if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
+        if len(self.trv_available_sc.selection()) == 1:
             id_sc_selected = int(self.trv_available_sc.item(self.trv_available_sc.selection())['text'])
             # Retrieve selected Experimental scenario and its components
             self.directive = Message(action=85, information=[id_sc_selected])
@@ -900,7 +899,7 @@ class FormChildExperiment:
             self.frm_child_sc_list.grid_forget()
             self.frm_child_general_sc.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select an '
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select one '
                                                                                                 'item')
 
     def click_update_sc(self):
@@ -908,7 +907,7 @@ class FormChildExperiment:
         Function activated when 'Update' experimental scenario button is pressed, allows user to modify information of a
         selected scenario. Shows visual components for the modification of an experimental scenario.
         """
-        if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
+        if len(self.trv_available_sc.selection()) == 1:
             values = self.trv_available_sc.item(self.trv_available_sc.selection())['values']
             if values[3] == 'created':  # Scenario can be modified only when it is in creation process
                 id_sc_selected = int(self.trv_available_sc.item(self.trv_available_sc.selection())['text'])
@@ -961,7 +960,7 @@ class FormChildExperiment:
                                      message='You are not allowed to modify the selected scenario, because '
                                              'it has finished or it is in execution')
         else:
-            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select an '
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select one '
                                                                                                 'item')
 
     def click_delete_sc(self):
@@ -969,7 +968,7 @@ class FormChildExperiment:
         Function activated when 'Delete' experiment sc button is pressed, it removes an experimental scenario from the
         database
         """
-        if self.trv_available_sc.item(self.trv_available_sc.selection())['text'] != '':
+        if len(self.trv_available_sc.selection()) == 1:
             values = self.trv_available_sc.item(self.trv_available_sc.selection())['values']
             if values[3] == 'created':  # Scenario can be deleted only when it is in creation process
                 decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
@@ -985,180 +984,8 @@ class FormChildExperiment:
                                      message='You are not allowed to delete the selected scenario, because '
                                              'it has finished or it is in execution')
         else:
-            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select an '
+            messagebox.showwarning(parent=self.frm_child_sc_list, title='No selection', message='You must select one '
                                                                                                 'item')
-
-    def click_cancel_problem(self):
-        """
-        Function activated when 'Cancel' button is pressed in 'Problem configuration tlevel', it goes back
-        to the 'Experimental scenario configuration form'
-        """
-        decision = True
-        if self.txt_short_desc_prob.get('1.0', 'end-1c') != self.problem.brief_description or \
-                self.txt_description_prob.get('1.0', 'end-1c') != self.problem.description or \
-                self.txt_annotations_esol.get('1.0', 'end-1c') != self.problem.solution.annotations or \
-                self.lbx_patterns_esol.size() != len(self.problem.solution.patterns_id):
-            decision = messagebox.askyesno(parent=self.tlevel_problem, title='Cancel',
-                                           message='Are you sure you want to cancel?')
-        if decision:
-            self.click_back_problem()
-
-    def click_cancel_designers(self):
-        self.tlevel_designers.grab_release()
-        self.tlevel_designers.withdraw()
-        self.tlevel_designers_type = 0
-
-    def click_cancel_patterns(self):
-        self.tlevel_patterns.grab_release()
-        self.tlevel_patterns.withdraw()
-        self.tlevel_patterns_type = 0
-
-    def click_cancel_diagram(self):
-        self.tlevel_diagram.grab_release()
-        self.tlevel_diagram.withdraw()
-
-    def click_cgroup_sc(self):
-        # Clear treeviews
-        for item in self.trv_available_designers.get_children():
-            self.trv_available_designers.delete(item)
-        for item in self.trv_selected_designers.get_children():
-            self.trv_selected_designers.delete(item)
-        # Fill available designers treeview
-        for index, item in enumerate(self.av_designers_cgroup):
-            self.trv_available_designers.insert('', 'end', text=item.id,
-                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
-        # Fill selected designers treeview
-        for index, item in enumerate(self.experimental_scenario.control_group):
-            self.trv_selected_designers.insert('', 'end', text=item.id,
-                                               values=(index+1, '{} {}'.format(item.name, item.surname)))
-        self.tlevel_designers.deiconify()
-        self.tlevel_designers.grab_set()
-        self.tlevel_designers_type = 2
-
-    def click_egroup_sc(self):
-        # Clear treeviews
-        for item in self.trv_available_designers.get_children():
-            self.trv_available_designers.delete(item)
-        for item in self.trv_selected_designers.get_children():
-            self.trv_selected_designers.delete(item)
-        # Fill available designers treeview
-        for index, item in enumerate(self.av_designers_egroup):
-            self.trv_available_designers.insert('', 'end', text=item.id,
-                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
-        # Fill selected designers treeview
-        for index, item in enumerate(self.experimental_scenario.experimental_group):
-            self.trv_selected_designers.insert('', 'end', text=item.id,
-                                               values=(index+1, '{} {}'.format(item.name, item.surname)))
-        '''
-        for col in self.trv_available_designers['columns']:
-            self.trv_available_designers.heading(col, text=col, command=lambda:
-            treeview_sort_column(self.trv_available_designers, col, False))
-        for col in self.trv_selected_designers['columns']:
-            self.trv_selected_designers.heading(col, text=col, command=lambda:
-                treeview_sort_column(self.trv_selected_designers, col, False))'''
-        self.tlevel_designers.deiconify()
-        self.tlevel_designers.grab_set()
-        self.tlevel_designers_type = 1
-
-    def click_upload_dd(self):
-        """
-        Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
-        """
-        if self.file_dd is None:
-            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
-                                                  filetypes=[("Diagrams", ".jpg .png .tiff")])
-            if not filename:
-                return  # user cancelled; stop this method
-            self.file_dd = File()
-            self.file_dd.read_file(filename)
-            self.show_dd_file()
-
-    def click_remove_dd(self):
-        """
-        Remove an uploaded file from the system validating it is already uploaded. This method also delete
-        any image in the canvas that may be fulfilled with an image.
-        """
-        if self.file_dd is not None:  # if an image was already loaded
-            self.canvas_dd.delete(self.file_dd.image)  # clear canvas
-            self.render_dd = None
-            self.file_dd = None
-
-    def click_view_dd(self):
-        # Fill summary problem canvas with retrieved image
-        if self.file_dd is not None:
-            load = Image.open(self.file_dd.filename)
-            load = load.resize((500, 500), Image.ANTIALIAS)
-            self.render_dd_exp = ImageTk.PhotoImage(load)
-            self.canvas_expanded.delete()
-            self.file_dd.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_dd_exp)  # and display new image
-            self.tlevel_diagram.deiconify()
-            self.tlevel_diagram.grab_set()
-        else:
-            messagebox.showwarning(parent=self.frm_child_general_sc, title='No diagram',
-                                   message='No diagram uploaded in this section')
-
-    def click_new_problem(self):
-        self.problem = Problem()
-        self.av_patterns_esol = self.av_patterns[:]
-        self.txt_title_sc.focus_set()
-        self.tlevel_problem.title('New problem')
-        self.txt_short_desc_prob.focus_set()
-        self.tlevel_problem.deiconify()
-        self.tlevel_problem.grab_set()
-
-    def click_delete_problem(self):
-        element = self.lbx_problems.curselection()
-        if element is not None:  # Check if listbox is selected
-            if element:
-                decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
-                                               message='Are you sure you want to delete the item?')
-                if decision:    # Confirm decision
-                    index = element[0]
-                    id_selected = self.visual_problems[index]
-                    self.lbx_problems.delete(element)  # Remove from listbox
-                    for item in reversed(self.experimental_scenario.problems):  # Remove from object
-                        if item.id_visual == id_selected:
-                            if self.experimental_scenario.id != 0:  # When updating an experimental scenario must remove from db
-                                self.directive = Message(action=54, information=[item.id])
-                                self.connection = self.directive.send_directive(self.connection)
-                            self.experimental_scenario.problems.remove(item)
-                            break
-            else:
-                messagebox.showwarning(parent=self.frm_child_general_sc, title='No selection',
-                                       message='You must select an item')
-
-    def click_view_problem(self):
-        element = self.lbx_problems.curselection()
-        if element is not None:  # Check if listbox is selected
-            if element:
-                index = element[0]
-                id_selected = self.visual_problems[index]
-                for item in self.experimental_scenario.problems:  # Find selected problem
-                    if item.id_visual == id_selected:
-                        self.problem = item
-                        break
-                self.txt_short_desc_prob['bg'] = self.disabled_color
-                self.txt_description_prob['bg'] = self.disabled_color
-                self.txt_annotations_esol['bg'] = self.disabled_color
-                self.lbx_patterns_esol['bg'] = self.disabled_color
-                self.txt_short_desc_prob.insert('1.0', self.problem.brief_description)
-                self.txt_description_prob.insert('1.0', wrap_text(self.problem.description, 40))
-                self.txt_annotations_esol.insert('1.0', wrap_text(self.problem.solution.annotations, 50))
-                for item in self.problem.solution.patterns:
-                    self.lbx_patterns_esol.insert(END, item.get_main_section())
-                self.txt_short_desc_prob['state'] = DISABLED
-                self.txt_description_prob['state'] = DISABLED
-                self.txt_annotations_esol['state'] = DISABLED
-                self.lbx_patterns_esol['state'] = DISABLED
-                self.file_esol = self.problem.solution.diagram
-                if self.file_esol is not None:
-                    self.show_esol_file()
-                self.tlevel_problem.title('View problem')
-                self.tlevel_problem.deiconify()
-                self.tlevel_problem.grab_set()
-            else:
-                messagebox.showwarning(parent=self.frm_child_general_sc, title='No selection',
-                                       message='You must select an item')
 
     def click_save_sc(self):
         """
@@ -1344,6 +1171,178 @@ class FormChildExperiment:
         self.frm_child_general_sc.grid_forget()
         self.frm_aux9.grid_forget() # Hide experimental group configuration
         self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+
+    def click_cancel_problem(self):
+        """
+        Function activated when 'Cancel' button is pressed in 'Problem configuration tlevel', it goes back
+        to the 'Experimental scenario configuration form'
+        """
+        decision = True
+        if self.txt_short_desc_prob.get('1.0', 'end-1c') != self.problem.brief_description or \
+                self.txt_description_prob.get('1.0', 'end-1c') != self.problem.description or \
+                self.txt_annotations_esol.get('1.0', 'end-1c') != self.problem.solution.annotations or \
+                self.lbx_patterns_esol.size() != len(self.problem.solution.patterns_id):
+            decision = messagebox.askyesno(parent=self.tlevel_problem, title='Cancel',
+                                           message='Are you sure you want to cancel?')
+        if decision:
+            self.click_back_problem()
+
+    def click_cancel_designers(self):
+        self.tlevel_designers.grab_release()
+        self.tlevel_designers.withdraw()
+        self.tlevel_designers_type = 0
+
+    def click_cancel_patterns(self):
+        self.tlevel_patterns.grab_release()
+        self.tlevel_patterns.withdraw()
+        self.tlevel_patterns_type = 0
+
+    def click_cancel_diagram(self):
+        self.tlevel_diagram.grab_release()
+        self.tlevel_diagram.withdraw()
+
+    def click_cgroup_sc(self):
+        # Clear treeviews
+        for item in self.trv_available_designers.get_children():
+            self.trv_available_designers.delete(item)
+        for item in self.trv_selected_designers.get_children():
+            self.trv_selected_designers.delete(item)
+        # Fill available designers treeview
+        for index, item in enumerate(self.av_designers_cgroup):
+            self.trv_available_designers.insert('', 'end', text=item.id,
+                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
+        # Fill selected designers treeview
+        for index, item in enumerate(self.experimental_scenario.control_group):
+            self.trv_selected_designers.insert('', 'end', text=item.id,
+                                               values=(index+1, '{} {}'.format(item.name, item.surname)))
+        self.tlevel_designers.deiconify()
+        self.tlevel_designers.grab_set()
+        self.tlevel_designers_type = 2
+
+    def click_egroup_sc(self):
+        # Clear treeviews
+        for item in self.trv_available_designers.get_children():
+            self.trv_available_designers.delete(item)
+        for item in self.trv_selected_designers.get_children():
+            self.trv_selected_designers.delete(item)
+        # Fill available designers treeview
+        for index, item in enumerate(self.av_designers_egroup):
+            self.trv_available_designers.insert('', 'end', text=item.id,
+                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
+        # Fill selected designers treeview
+        for index, item in enumerate(self.experimental_scenario.experimental_group):
+            self.trv_selected_designers.insert('', 'end', text=item.id,
+                                               values=(index+1, '{} {}'.format(item.name, item.surname)))
+        '''
+        for col in self.trv_available_designers['columns']:
+            self.trv_available_designers.heading(col, text=col, command=lambda:
+            treeview_sort_column(self.trv_available_designers, col, False))
+        for col in self.trv_selected_designers['columns']:
+            self.trv_selected_designers.heading(col, text=col, command=lambda:
+                treeview_sort_column(self.trv_selected_designers, col, False))'''
+        self.tlevel_designers.deiconify()
+        self.tlevel_designers.grab_set()
+        self.tlevel_designers_type = 1
+
+    def click_upload_dd(self):
+        """
+        Create a File object that is uploaded by the user, validating that there is not a file uploaded already.
+        """
+        if self.file_dd is None:
+            filename = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select image file",
+                                                  filetypes=[("Diagrams", ".jpg .png .tiff")])
+            if not filename:
+                return  # user cancelled; stop this method
+            self.file_dd = File()
+            self.file_dd.read_file(filename)
+            self.show_dd_file()
+
+    def click_remove_dd(self):
+        """
+        Remove an uploaded file from the system validating it is already uploaded. This method also delete
+        any image in the canvas that may be fulfilled with an image.
+        """
+        if self.file_dd is not None:  # if an image was already loaded
+            self.canvas_dd.delete(self.file_dd.image)  # clear canvas
+            self.render_dd = None
+            self.file_dd = None
+
+    def click_view_dd(self):
+        # Fill summary problem canvas with retrieved image
+        if self.file_dd is not None:
+            load = Image.open(self.file_dd.filename)
+            load = load.resize((500, 500), Image.ANTIALIAS)
+            self.render_dd_exp = ImageTk.PhotoImage(load)
+            self.canvas_expanded.delete()
+            self.file_dd.image = self.canvas_expanded.create_image(0, 0, anchor='nw', image=self.render_dd_exp)  # and display new image
+            self.tlevel_diagram.deiconify()
+            self.tlevel_diagram.grab_set()
+        else:
+            messagebox.showwarning(parent=self.frm_child_general_sc, title='No diagram',
+                                   message='No diagram uploaded in this section')
+
+    def click_new_problem(self):
+        self.problem = Problem()
+        self.av_patterns_esol = self.av_patterns[:]
+        self.txt_title_sc.focus_set()
+        self.tlevel_problem.title('New problem')
+        self.txt_short_desc_prob.focus_set()
+        self.tlevel_problem.deiconify()
+        self.tlevel_problem.grab_set()
+
+    def click_delete_problem(self):
+        element = self.lbx_problems.curselection()
+        if element is not None:  # Check if listbox is selected
+            if element:
+                decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Confirmation',
+                                               message='Are you sure you want to delete the item?')
+                if decision:    # Confirm decision
+                    index = element[0]
+                    id_selected = self.visual_problems[index]
+                    self.lbx_problems.delete(element)  # Remove from listbox
+                    for item in reversed(self.experimental_scenario.problems):  # Remove from object
+                        if item.id_visual == id_selected:
+                            if self.experimental_scenario.id != 0:  # When updating an experimental scenario must remove from db
+                                self.directive = Message(action=54, information=[item.id])
+                                self.connection = self.directive.send_directive(self.connection)
+                            self.experimental_scenario.problems.remove(item)
+                            break
+            else:
+                messagebox.showwarning(parent=self.frm_child_general_sc, title='No selection',
+                                       message='You must select one item')
+
+    def click_view_problem(self):
+        element = self.lbx_problems.curselection()
+        if element is not None:  # Check if listbox is selected
+            if element:
+                index = element[0]
+                id_selected = self.visual_problems[index]
+                for item in self.experimental_scenario.problems:  # Find selected problem
+                    if item.id_visual == id_selected:
+                        self.problem = item
+                        break
+                self.txt_short_desc_prob['bg'] = self.disabled_color
+                self.txt_description_prob['bg'] = self.disabled_color
+                self.txt_annotations_esol['bg'] = self.disabled_color
+                self.lbx_patterns_esol['bg'] = self.disabled_color
+                self.txt_short_desc_prob.insert('1.0', self.problem.brief_description)
+                self.txt_description_prob.insert('1.0', wrap_text(self.problem.description, 40))
+                self.txt_annotations_esol.insert('1.0', wrap_text(self.problem.solution.annotations, 50))
+                for item in self.problem.solution.patterns:
+                    self.lbx_patterns_esol.insert(END, item.get_main_section())
+                self.txt_short_desc_prob['state'] = DISABLED
+                self.txt_description_prob['state'] = DISABLED
+                self.txt_annotations_esol['state'] = DISABLED
+                self.lbx_patterns_esol['state'] = DISABLED
+                self.file_esol = self.problem.solution.diagram
+                if self.file_esol is not None:
+                    self.show_esol_file()
+                self.tlevel_problem.title('View problem')
+                self.tlevel_problem.deiconify()
+                self.tlevel_problem.grab_set()
+            else:
+                messagebox.showwarning(parent=self.frm_child_general_sc, title='No selection',
+                                       message='You must select one item')
 
     def click_save_problem(self):
         """

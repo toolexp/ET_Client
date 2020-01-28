@@ -482,10 +482,13 @@ class Solution:
 
 
 class Template:
-    def __init__(self, id=0, name='', description=''):
+    def __init__(self, id=0, name='', description='', sections=None):
+        if sections is None:
+            sections = []
         self.id = id
         self.name = name
         self.description = description
+        self.sections = sections
 
 
 class TimerClass:

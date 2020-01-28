@@ -53,13 +53,15 @@ class FormChildClassification:
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
         lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
-        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('Name', '# categories'))
+        self.trv_available = Treeview(self.frm_child_list, height=15, columns=('N', 'Name', '# categories'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
-        self.trv_available.heading('#1', text='Name', anchor=CENTER)
-        self.trv_available.heading('#2', text='# categories', anchor=CENTER)
+        self.trv_available.heading('#1', text='N', anchor=CENTER)
+        self.trv_available.heading('#2', text='Name', anchor=CENTER)
+        self.trv_available.heading('#3', text='# categories', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
-        self.trv_available.column('#1', width=200, minwidth=200, stretch=NO)
-        self.trv_available.column('#2', width=150, minwidth=150, stretch=NO)
+        self.trv_available.column('#1', width=20, minwidth=20, stretch=NO)
+        self.trv_available.column('#2', width=200, minwidth=200, stretch=NO)
+        self.trv_available.column('#3', width=150, minwidth=150, stretch=NO)
         self.trv_available.grid(row=0, column=1, sticky=W, pady=25)
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
         vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
@@ -117,9 +119,9 @@ class FormChildClassification:
         self.directive = Message(action=67, information=[])
         self.connection = self.directive.send_directive(self.connection)
         # Adding elements into the list
-        for item in self.connection.message.information:
+        for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(elements[1], elements[2]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2]))
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
 
@@ -132,22 +134,6 @@ class FormChildClassification:
         self.frm_child_list.grid_forget()
         self.frm_child_crud.grid_forget()
 
-    def click_delete(self):
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
-                                           message='Are you sure you want to delete the item?')
-            if decision:
-                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-                self.directive = Message(action=69, information=[self.id_selected])
-                self.connection = self.directive.send_directive(self.connection)
-                if self.connection.message.action == 5:  # An error ocurred while deleting the item
-                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
-                                         message=self.connection.message.information[0])
-                else:
-                    self.retrieve_list()
-        else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
-
     def click_new(self):
         self.decide = True
         self.frm_child_crud['text'] = 'New Classification'
@@ -158,7 +144,7 @@ class FormChildClassification:
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_view(self):
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+        if len(self.trv_available.selection()) == 1:
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
             self.directive = Message(action=70, information=[self.id_selected])
             self.connection = self.directive.send_directive(self.connection)
@@ -180,10 +166,10 @@ class FormChildClassification:
             self.frm_child_list.grid_forget()
             self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def click_update(self):
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+        if len(self.trv_available.selection()) == 1:
             self.decide = False
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
             self.directive = Message(action=70, information=[self.id_selected, 'validate'])
@@ -207,7 +193,23 @@ class FormChildClassification:
                 self.frm_child_list.grid_forget()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
+
+    def click_delete(self):
+        if len(self.trv_available.selection()) == 1:
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
+                                           message='Are you sure you want to delete the item?')
+            if decision:
+                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                self.directive = Message(action=69, information=[self.id_selected])
+                self.connection = self.directive.send_directive(self.connection)
+                if self.connection.message.action == 5:  # An error ocurred while deleting the item
+                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
+                                         message=self.connection.message.information[0])
+                else:
+                    self.retrieve_list()
+        else:
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def click_save(self):
         validation_opt = self.validate_fields()

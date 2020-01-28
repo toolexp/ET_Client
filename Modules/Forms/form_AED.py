@@ -158,32 +158,6 @@ class FormChildAED:
         self.frm_child_list.grid_forget()
         self.frm_child_crud.grid_forget()
 
-    def click_delete(self):
-        """
-        Method that removes a selected user from the initial list (changes are updated in DB)
-        """
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
-                                           message='Are you sure you want to delete the item?')
-            if decision:
-                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-                if self.title == 'Experimenter':
-                    self.directive = Message(action=19, information=[self.id_selected])
-                elif self.title == 'Designer':
-                    self.directive = Message(action=24, information=[self.id_selected])
-                elif self.title == 'Administrator':
-                    self.directive = Message(action=14, information=[self.id_selected])
-                else:
-                    raise Exception('Error en recuperacion: tipo de usuario')
-                self.connection = self.directive.send_directive(self.connection)
-                if self.connection.message.action == 5:     # An error ocurred while deleting the item
-                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
-                                         message=self.connection.message.information[0])
-                else:
-                    self.retrieve_list()
-        else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
-
     def click_new(self):
         """
         Initialize CRUD Form for creating a new user.
@@ -202,7 +176,7 @@ class FormChildAED:
         """
         Initialize CRUD Form for updating a user. It loads information of selected User into visual components
         """
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+        if len(self.trv_available.selection()) == 1:
             self.decide = False
             self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
             if self.title == 'Experimenter':
@@ -233,7 +207,33 @@ class FormChildAED:
                 self.txt_passwd_conf.grid(row=5, column=1, padx=20)
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
+
+    def click_delete(self):
+        """
+        Method that removes a selected user from the initial list (changes are updated in DB)
+        """
+        if len(self.trv_available.selection()) == 1:
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
+                                           message='Are you sure you want to delete the item?')
+            if decision:
+                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                if self.title == 'Experimenter':
+                    self.directive = Message(action=19, information=[self.id_selected])
+                elif self.title == 'Designer':
+                    self.directive = Message(action=24, information=[self.id_selected])
+                elif self.title == 'Administrator':
+                    self.directive = Message(action=14, information=[self.id_selected])
+                else:
+                    raise Exception('Error en recuperacion: tipo de usuario')
+                self.connection = self.directive.send_directive(self.connection)
+                if self.connection.message.action == 5:     # An error ocurred while deleting the item
+                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
+                                         message=self.connection.message.information[0])
+                else:
+                    self.retrieve_list()
+        else:
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def click_save(self):
         """

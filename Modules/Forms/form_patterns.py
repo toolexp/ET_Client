@@ -324,24 +324,6 @@ class FormChildPattern:
         self.tab_control.tab(1, state='disabled')
         self.tab_control.tab(2, state='disabled')
 
-    def click_delete(self):
-        """
-        Method that removes a selected pattern from the initial list (changes are updated in DB)
-        """
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
-                                           message='Are you sure you want to delete the item?')
-            if decision:
-                self.directive = Message(action=44, information=[self.id_selected_pattern])
-                self.connection = self.directive.send_directive(self.connection)
-                if self.connection.message.action == 5:  # An error ocurred while deleting the item
-                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
-                                         message=self.connection.message.information[0])
-                else:
-                    self.go_back_form()
-        else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
-
     def click_new(self):
         """
         Initialize CRUD Form for creating a new pattern. It uploads available templates to the combobox
@@ -365,8 +347,50 @@ class FormChildPattern:
         self.frm_child_crud['text'] = 'New Pattern'
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
+    def click_view(self):
+        if len(self.trv_available.selection()) == 1:
+            # Just to check if the pattern is not associated to other components
+            self.directive = Message(action=45, information=[self.id_selected_pattern])
+            self.connection = self.directive.send_directive(self.connection)
+            self.initialize_variables()
+            self.decide_view = True
+            # Retrieve pattern from the list of available patterns
+            for item in self.patterns:
+                if item.id == self.id_selected_pattern:
+                    self.new_pattern = item
+                    break
+            # Retrieve content if neccesary
+            for index, item in enumerate(self.new_pattern.sections):
+                if item.diagram_id != 0:
+                    self.directive = Message(action=65,
+                                             information=[item.diagram_id])  # Ask for the diagram of this section
+                    self.connection = self.directive.send_directive(self.connection)
+                    file_aux = File()
+                    file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
+                    self.new_pattern.sections[index].file = file_aux
+                elif item.category_id != 0:
+                    self.directive = Message(action=75,
+                                             information=[item.category_id])  # Ask for the category of this section
+                    self.connection = self.directive.send_directive(self.connection)
+                    category_aux = Category(item.category_id, self.connection.message.information[0],
+                                            self.connection.message.information[1])
+                    self.new_pattern.sections[index].category = category_aux
+            # Fill visual components with pattern info
+            self.cbx_template.set(
+                '{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
+            self.cbx_template['state'] = DISABLED
+            self.set_trv_summary(self.new_pattern.sections)
+            self.txt_section['bg'] = self.disabled_color
+            self.frm_child_crud['text'] = 'View Pattern'
+            self.btn_back.grid(row=0, column=2, padx=20, pady=5)
+            self.btn_view_diagram_section.grid(row=1, column=0, padx=20, pady=5, sticky=E)
+            self.frm_child_list.grid_forget()
+            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        else:
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
+
     def click_update(self):
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
+        if len(self.trv_available.selection()) == 1:
             # Just to check if the pattern is not associated to other components
             self.directive = Message(action=45, information=[self.id_selected_pattern, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
@@ -411,49 +435,25 @@ class FormChildPattern:
                 self.frm_child_list.grid_forget()
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
-    def click_view(self):
-        if self.trv_available.item(self.trv_available.selection())['text'] != '':
-            # Just to check if the pattern is not associated to other components
-            self.directive = Message(action=45, information=[self.id_selected_pattern])
-            self.connection = self.directive.send_directive(self.connection)
-            self.initialize_variables()
-            self.decide_view = True
-            # Retrieve pattern from the list of available patterns
-            for item in self.patterns:
-                if item.id == self.id_selected_pattern:
-                    self.new_pattern = item
-                    break
-            # Retrieve content if neccesary
-            for index, item in enumerate(self.new_pattern.sections):
-                if item.diagram_id != 0:
-                    self.directive = Message(action=65,
-                                             information=[item.diagram_id])  # Ask for the diagram of this section
-                    self.connection = self.directive.send_directive(self.connection)
-                    file_aux = File()
-                    file_aux.write_file(self.connection.message.information[0], self.connection.message.information[1])
-                    self.new_pattern.sections[index].file = file_aux
-                elif item.category_id != 0:
-                    self.directive = Message(action=75,
-                                             information=[item.category_id])  # Ask for the category of this section
-                    self.connection = self.directive.send_directive(self.connection)
-                    category_aux = Category(item.category_id, self.connection.message.information[0],
-                                            self.connection.message.information[1])
-                    self.new_pattern.sections[index].category = category_aux
-            # Fill visual components with pattern info
-            self.cbx_template.set(
-                '{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
-            self.cbx_template['state'] = DISABLED
-            self.set_trv_summary(self.new_pattern.sections)
-            self.txt_section['bg'] = self.disabled_color
-            self.frm_child_crud['text'] = 'View Pattern'
-            self.btn_back.grid(row=0, column=2, padx=20, pady=5)
-            self.btn_view_diagram_section.grid(row=1, column=0, padx=20, pady=5, sticky=E)
-            self.frm_child_list.grid_forget()
-            self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+    def click_delete(self):
+        """
+        Method that removes a selected pattern from the initial list (changes are updated in DB)
+        """
+        if len(self.trv_available.selection()) == 1:
+            decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
+                                           message='Are you sure you want to delete the item?')
+            if decision:
+                self.directive = Message(action=44, information=[self.id_selected_pattern])
+                self.connection = self.directive.send_directive(self.connection)
+                if self.connection.message.action == 5:  # An error ocurred while deleting the item
+                    messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
+                                         message=self.connection.message.information[0])
+                else:
+                    self.go_back_form()
         else:
-            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select an item')
+            messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def click_save(self):
         if self.new_pattern is not None and self.selected_section is not None:
