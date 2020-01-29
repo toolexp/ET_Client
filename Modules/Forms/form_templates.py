@@ -57,18 +57,18 @@ class FormChildTemplate:
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
-        lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
+        lbl_sep1.grid(row=0, column=0, padx=10, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=20, columns=('N', 'Name'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='N', anchor=CENTER)
         self.trv_available.heading('#2', text='Name', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=20, minwidth=20, stretch=NO)
-        self.trv_available.column('#2', width=300, minwidth=300, stretch=NO)
+        self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_template_summary)
-        self.trv_available.grid(row=0, column=1, rowspan=2, sticky=W, pady=25)
+        self.trv_available.grid(row=0, column=1, sticky=W, pady=25)
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
-        vsb_trv_av.grid(row=0, column=2, rowspan=2, pady=25, sticky=NS)
+        vsb_trv_av.grid(row=0, column=2, pady=25, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
         frm_aux4 = Frame(self.frm_child_list)
         btn_new = Button(frm_aux4, image=self.new_icon, command=self.click_new)
@@ -83,45 +83,60 @@ class FormChildTemplate:
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
         btn_delete.grid(row=3, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete template')
-        frm_aux4.grid(row=0, column=4, pady=25, padx=25, rowspan=2, sticky=NW)
+        frm_aux4.grid(row=0, column=3, pady=25, padx=25, sticky=NW)
         sep_template = Separator(self.frm_child_list, orient=VERTICAL)
-        sep_template.grid(row=0, column=5, sticky=NS, rowspan=2, padx=25)
-        lbl_sep3 = Label(self.frm_child_list)
-        lbl_sep3.grid(row=0, column=6, padx=15, pady=25)
-        lbl_details = Label(self.frm_child_list, text='Details')
+        sep_template.grid(row=0, column=4, sticky=NS, padx=25)
+        frm_aux3 = Frame(self.frm_child_list)
+        lbl_sep3 = Label(frm_aux3)
+        lbl_sep3.grid(row=0, column=0, padx=10, pady=25, rowspan=3)
+        lbl_details = Label(frm_aux3, text='Details')
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
-        lbl_details.grid(row=0, column=7, sticky=W, pady=25)
-        self.txt_summary = Text(self.frm_child_list, height=18, width=50)
+        lbl_details.grid(row=0, column=1, sticky=W, pady=25, columnspan=2)
+        self.txt_summary = Text(frm_aux3, height=22, width=50)
         self.txt_summary.config(font=TEXT_FONT, bg=self.disabled_color)
-        self.txt_summary.grid(row=1, column=7, pady=10, sticky=NW)
-        vsb_txt_sum = Scrollbar(self.frm_child_list, orient="vertical", command=self.txt_summary.yview)
-        vsb_txt_sum.grid(row=1, column=8, pady=1, sticky=NS)
+        self.txt_summary.grid(row=1, column=1)
+        vsb_txt_sum = Scrollbar(frm_aux3, orient="vertical", command=self.txt_summary.yview)
+        vsb_txt_sum.grid(row=1, column=2, sticky=NS)
         self.txt_summary.configure(yscrollcommand=vsb_txt_sum.set)
-        lbl_sep4 = Label(self.frm_child_list)
-        lbl_sep4.grid(row=0, column=9, padx=25, pady=25)
+        lbl_sep4 = Label(frm_aux3)
+        lbl_sep4.grid(row=0, column=3, padx=10, pady=25, rowspan=3)
+        lbl_sep5 = Label(frm_aux3)
+        lbl_sep5.grid(row=2, column=1, pady=5, columnspan=2)
+        frm_aux3.grid(row=0, column=5)
 
         # Components for CRUD FRM
-        frm_aux1 = Frame(self.frm_child_crud)
-        frm_aux2 = Frame(self.frm_child_crud)
-        lbl_name = Label(frm_aux1, text='Name*')
+        lbl_sep6 = Label(self.frm_child_crud)
+        lbl_sep6.grid(row=0, column=0, padx=10, pady=25, rowspan=10)
+        lbl_name = Label(self.frm_child_crud, text='Name*')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_name.grid(pady=10, padx=50, sticky=W)
-        lbl_description = Label(frm_aux1, text='Description*')
+        lbl_name.grid(row=0, column=1, pady=25, sticky=NW)
+        lbl_description = Label(self.frm_child_crud, text='Description*')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_description.grid(pady=10, padx=50, sticky=NW)
-        self.txt_name = Text(frm_aux1, height=1, width=50)
+        lbl_description.grid(row=0, column=6, pady=25, sticky=NW)
+        lbl_sep3 = Label(self.frm_child_crud)
+        lbl_sep3.grid(row=0, column=2, padx=10, pady=25)
+        self.txt_name = Text(self.frm_child_crud, height=1, width=30)
         self.txt_name.config(font=TEXT_FONT)
-        self.txt_name.grid(row=0, column=1, padx=10, sticky=W)
-        self.txt_description = Text(frm_aux1, height=4, width=50)
+        self.txt_name.grid(row=0, column=3, pady=25, sticky=NW)
+        lbl_sep4 = Label(self.frm_child_crud)
+        lbl_sep4.grid(row=0, column=7, padx=10, pady=25)
+        self.txt_description = Text(self.frm_child_crud, height=5, width=49)
         self.txt_description.config(font=TEXT_FONT)
-        self.txt_description.grid(row=1, column=1, padx=10, pady=10, sticky=W)
-        lbl_available_d = Label(frm_aux2, text='Available sections')
+        self.txt_description.grid(row=0, column=8, pady=25, sticky=W)
+        vsb_txt_desc = Scrollbar(self.frm_child_crud, orient="vertical", command=self.txt_description.yview)
+        vsb_txt_desc.grid(row=0, column=9, pady=25, sticky=NS)
+        self.txt_description.configure(yscrollcommand=vsb_txt_desc.set)
+        lbl_sep7 = Label(self.frm_child_crud)
+        lbl_sep7.grid(row=0, column=5, padx=10, pady=25, rowspan=3)
+        lbl_sep8 = Label(self.frm_child_crud)
+        lbl_sep8.grid(row=0, column=10, padx=10, pady=25, rowspan=2)
+        lbl_available_d = Label(self.frm_child_crud, text='Available sections')
         lbl_available_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_available_d.grid(row=0, column=0, pady=10, sticky=W)
-        lbl_selected_d = Label(frm_aux2, text='Selected sections*')
+        lbl_available_d.grid(row=1, column=1, pady=10, sticky=W, columnspan=4)
+        lbl_selected_d = Label(self.frm_child_crud, text='Selected sections*')
         lbl_selected_d.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_selected_d.grid(row=0, column=5, pady=10, sticky=W)
-        self.trv_available_sections = Treeview(frm_aux2, height=10, columns=('N', 'Name', 'Data Type'))
+        lbl_selected_d.grid(row=1, column=6, pady=10, sticky=W, columnspan=4)
+        self.trv_available_sections = Treeview(self.frm_child_crud, height=10, columns=('N', 'Name', 'Data Type'))
         self.trv_available_sections.heading('#0', text='ID', anchor=CENTER)
         self.trv_available_sections.heading('#1', text='N', anchor=CENTER)
         self.trv_available_sections.heading('#2', text='Name', anchor=CENTER)
@@ -131,15 +146,11 @@ class FormChildTemplate:
         self.trv_available_sections.column('#2', width=150, minwidth=150, stretch=NO)
         self.trv_available_sections.column('#3', width=120, minwidth=120, stretch=NO)
         self.trv_available_sections.bind("<Button-1>", self.click_trv_asections)
-        self.trv_available_sections.grid(row=1, column=0, rowspan=10, sticky=W, pady=10)
-        vsb_trv_avs = Scrollbar(frm_aux2, orient="vertical", command=self.trv_available_sections.yview)
-        vsb_trv_avs.grid(row=1, column=1, rowspan=10, pady=10, sticky=NS)
+        self.trv_available_sections.grid(row=2, column=1, rowspan=7, columnspan=3,sticky=W, pady=10)
+        vsb_trv_avs = Scrollbar(self.frm_child_crud, orient="vertical", command=self.trv_available_sections.yview)
+        vsb_trv_avs.grid(row=2, column=4, rowspan=7, pady=10, sticky=NS)
         self.trv_available_sections.configure(yscrollcommand=vsb_trv_avs.set)
-        lbl_sep3 = Label(frm_aux2)
-        lbl_sep3.grid(row=1, column=2, padx=10, pady=10)
-        lbl_sep4 = Label(frm_aux2)
-        lbl_sep4.grid(row=1, column=4, padx=10, pady=10)
-        self.trv_selected_sections = Treeview(frm_aux2, height=10, columns=('N', 'Name', 'Data type', 'Mandatory', 'Main'))
+        self.trv_selected_sections = Treeview(self.frm_child_crud, height=10, columns=('N', 'Name', 'Data type', 'Mandatory', 'Main'))
         self.trv_selected_sections.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_sections.heading('#1', text='N', anchor=CENTER)
         self.trv_selected_sections.heading('#2', text='Name', anchor=CENTER)
@@ -154,37 +165,36 @@ class FormChildTemplate:
         self.trv_selected_sections.column('#5', width=80, minwidth=80, stretch=NO)
         self.trv_selected_sections.bind("<Button-1>", self.click_trv_ssections)
         self.trv_selected_sections.bind("<Double-1>", self.click_switch_mandatory)
-        self.trv_selected_sections.grid(row=1, column=5, rowspan=10, sticky=W, pady=10)
-        vsb_trv_ses = Scrollbar(frm_aux2, orient="vertical", command=self.trv_selected_sections.yview)
-        vsb_trv_ses.grid(row=1, column=6, rowspan=10, pady=10, sticky=NS)
+        self.trv_selected_sections.grid(row=2, column=6, rowspan=7, columnspan=3, sticky=W, pady=10)
+        vsb_trv_ses = Scrollbar(self.frm_child_crud, orient="vertical", command=self.trv_selected_sections.yview)
+        vsb_trv_ses.grid(row=2, column=9, rowspan=7, pady=10, sticky=NS)
         self.trv_selected_sections.configure(yscrollcommand=vsb_trv_ses.set)
-        self.lbl_note_optional = Label(frm_aux2, text='NOTES:\tTo switch between optional and mandatory, double click '
+        self.lbl_note_optional = Label(self.frm_child_crud, text='NOTES:\tTo switch between optional and mandatory, double click '
                                                       'on selected section.\n\tChoose one or up to three main sections '
                                                       'by first selecting the target sections\n\tand then clicking the '
                                                       'star button.\n')
         self.lbl_note_optional.config(fg=TEXT_COLOR, font=NOTE_FONT, justify=LEFT)
-        self.btn_add = Button(frm_aux2, image=self.add_icon, command=self.click_add)
+        self.btn_add = Button(self.frm_child_crud, image=self.add_icon, command=self.click_add)
         btn_add_ttp = CreateToolTip(self.btn_add, 'Add section')
-        self.btn_remove = Button(frm_aux2, image=self.delete_icon, command=self.click_remove)
+        self.btn_remove = Button(self.frm_child_crud, image=self.delete_icon, command=self.click_remove)
         btn_remove_ttp = CreateToolTip(self.btn_remove, 'Remove section')
-        self.btn_main_section = Button(frm_aux2, image=self.star_icon, command=self.click_main_section)
-        btn_main_section_ttp = CreateToolTip(self.btn_main_section, 'Main section')
-        self.btn_up = Button(frm_aux2, image=self.up_arrow, command=self.click_up)
+        self.btn_main_section = Button(self.frm_child_crud, image=self.star_icon, command=self.click_main_section)
+        btn_main_section_ttp = CreateToolTip(self.btn_main_section, 'Main section(s)')
+        self.btn_up = Button(self.frm_child_crud, image=self.up_arrow, command=self.click_up)
         btn_up_ttp = CreateToolTip(self.btn_up, 'Move up')
-        self.btn_down = Button(frm_aux2, image=self.down_arrow, command=self.click_down)
+        self.btn_down = Button(self.frm_child_crud, image=self.down_arrow, command=self.click_down)
         btn_down_ttp = CreateToolTip(self.btn_down, 'Move down')
-        frm_aux1.grid(row=0, column=0, padx=40, pady=10, rowspan=10)
-        frm_aux2.grid(row=10, column=0, padx=40, pady=10)
         sep_aux1 = Separator(self.frm_child_crud, orient=VERTICAL)
-        sep_aux1.grid(row=0, column=1, sticky=NS, rowspan=11)
-        self.enabled_color = self.txt_name.cget('bg')
-
-        self.btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
+        sep_aux1.grid(row=0, column=11, sticky=NS, rowspan=10)
+        frm_aux1 = Frame(self.frm_child_crud)
+        self.btn_save = Button(frm_aux1, image=self.save_icon, command=self.click_save)
         btn_save_ttp = CreateToolTip(self.btn_save, 'Save template')
-        self.btn_back = Button(self.frm_child_crud, image=self.back_icon, command=self.click_back)
+        self.btn_back = Button(frm_aux1, image=self.back_icon, command=self.click_back)
         btn_back_ttp = CreateToolTip(self.btn_back, 'Go back')
-        self.btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
+        self.btn_cancel = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel)
         btn_cancel_ttp = CreateToolTip(self.btn_cancel, 'Cancel')
+        frm_aux1.grid(row=0, column=12, pady=10, padx=25, sticky=NW, rowspan=10)
+        self.enabled_color = self.txt_name.cget('bg')
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -238,6 +248,7 @@ class FormChildTemplate:
         self.frm_child_crud.grid_forget()
 
     def click_new(self):
+        self.view_decision = False  # Decision when viewing a template
         self.template = Template()
         self.retrieve_sections()
         self.txt_name.focus_set()
@@ -248,6 +259,7 @@ class FormChildTemplate:
 
     def click_view(self):
         if len(self.trv_available.selection()) == 1:
+            self.view_decision = True  # Decision when viewing a template
             self.directive = Message(action=40, information=[self.id_selected])
             self.connection = self.directive.send_directive(self.connection)
             self.template = Template(id=self.id_selected, name=self.connection.message.information[0],
@@ -258,7 +270,7 @@ class FormChildTemplate:
             self.retrieve_sections(self.template.sections)
             self.txt_name.focus_set()
             self.disable_visual_components()
-            self.btn_back.grid(row=0, column=2, padx=30, sticky=W)
+            self.btn_back.grid(row=0, column=0, padx=5, pady=5, sticky=W)
             self.frm_child_list.grid_forget()
             self.frm_child_crud['text'] = 'View template'
             self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
@@ -267,6 +279,7 @@ class FormChildTemplate:
 
     def click_update(self):
         if len(self.trv_available.selection()) == 1:
+            self.view_decision = False  # Decision when viewing a template
             self.directive = Message(action=40, information=[self.id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # An error ocurred while trying to update the item
@@ -303,14 +316,14 @@ class FormChildTemplate:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def show_cu_buttons(self):
-        self.btn_add.grid(row=4, column=3)
-        self.btn_remove.grid(row=5, column=3)
-        self.btn_main_section.grid(row=1, column=7)
-        self.btn_down.grid(row=5, column=7)
-        self.btn_up.grid(row=4, column=7)
-        self.btn_save.grid(row=0, column=2, padx=30, sticky=W)
-        self.btn_cancel.grid(row=1, column=2, padx=30, sticky=W)
-        self.lbl_note_optional.grid(row=11, column=5, columnspan=3, sticky=W)
+        self.btn_add.grid(row=5, column=5, padx=25)
+        self.btn_remove.grid(row=6, column=5, padx=25)
+        self.btn_main_section.grid(row=2, column=10, padx=25)
+        self.btn_down.grid(row=6, column=10, padx=25)
+        self.btn_up.grid(row=5, column=10, padx=25)
+        self.btn_save.grid(row=0, column=0, padx=5, pady=5, sticky=W)
+        self.btn_cancel.grid(row=1, column=0, padx=5, pady=5, sticky=W)
+        self.lbl_note_optional.grid(row=9, column=6, columnspan=4, sticky=W)
 
     def disable_visual_components(self):
         self.txt_name['bg'] = self.disabled_color
@@ -433,8 +446,7 @@ class FormChildTemplate:
         self.trv_available_sections.selection_remove(self.trv_available_sections.selection())
 
     def click_save(self):
-        validation_option = self.validate_fields()
-        if validation_option == 0:
+        if self.validate_fields():
             self.template.name = self.txt_name.get('1.0', 'end-1c')
             self.template.description = self.txt_description.get('1.0', 'end-1c')
             if self.template.id == 0:  # Creating a template
@@ -484,15 +496,15 @@ class FormChildTemplate:
         if len(self.txt_name.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must provide a name')
-            return 1
+            return False
         if len(self.txt_description.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must provide a description')
-            return 1
+            return False
         if len(self.trv_selected_sections.get_children()) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must select at least one section')
-            return 1
+            return False
         for item in self.trv_selected_sections.get_children():
             if self.trv_selected_sections.item(item)['values'][2] == 'Text' or \
                     self.trv_selected_sections.item(item)['values'][2] == 'Classification':
@@ -501,18 +513,18 @@ class FormChildTemplate:
         if not text_section:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='At least one section has to be of text type')
-            return 1
+            return False
         for item in self.trv_selected_sections.get_children():
             if self.trv_selected_sections.item(item)['values'][4] == '✓':
                 if self.trv_selected_sections.item(item)['values'][2] == 'Text':
-                    return 0
+                    return True
                 else:
                     messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
                                            message='The main section has to be of text type')
-                    return 1
+                    return False
         messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
                                message='You must set one of the selected section as main')
-        return 1
+        return False
 
     def clear_fields(self):
         self.txt_name['state'] = NORMAL
@@ -527,15 +539,14 @@ class FormChildTemplate:
         self.lbl_note_optional.grid_forget()
 
     def click_switch_mandatory(self, event):
-        # Make sure only one item in 'selected sections' is selected
-        if len(self.trv_selected_sections.selection()) == 1 and len(self.trv_available_sections.selection()) == 0:
-            values = self.trv_selected_sections.item(
-                self.trv_selected_sections.focus())['values']
-            if values[3] == '':
-                self.trv_selected_sections.item(self.trv_selected_sections.focus(),
-                                                values=(values[0], values[1], values[2], '✓', values[4]))
-            else:
-                self.trv_selected_sections.item(self.trv_selected_sections.focus(),
-                                                values=(values[0], values[1], values[2], '', values[4]))
-
-
+        if not self.view_decision:  # Only if not viewing a template
+            # Make sure only one item in 'selected sections' is selected
+            if len(self.trv_selected_sections.selection()) == 1 and len(self.trv_available_sections.selection()) == 0:
+                values = self.trv_selected_sections.item(
+                    self.trv_selected_sections.focus())['values']
+                if values[3] == '':
+                    self.trv_selected_sections.item(self.trv_selected_sections.focus(),
+                                                    values=(values[0], values[1], values[2], '✓', values[4]))
+                else:
+                    self.trv_selected_sections.item(self.trv_selected_sections.focus(),
+                                                    values=(values[0], values[1], values[2], '', values[4]))

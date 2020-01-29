@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Frame, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
-from Modules.Config.Data import Message, CreateToolTip
+from Modules.Config.Data import Message, CreateToolTip, Classification
 from Modules.Config.Visual import *
 
 
@@ -52,7 +52,7 @@ class FormChildClassification:
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
-        lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
+        lbl_sep1.grid(row=0, column=0, padx=10, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=15, columns=('N', 'Name', '# categories'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='N', anchor=CENTER)
@@ -135,7 +135,7 @@ class FormChildClassification:
         self.frm_child_crud.grid_forget()
 
     def click_new(self):
-        self.decide = True
+        self.classification = Classification()
         self.frm_child_crud['text'] = 'New Classification'
         self.txt_name_class.focus_set()
         self.btn_save.grid(row=0, column=5, padx=20)
@@ -145,14 +145,17 @@ class FormChildClassification:
 
     def click_view(self):
         if len(self.trv_available.selection()) == 1:
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.directive = Message(action=70, information=[self.id_selected])
+            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            # Retrieve selected classification from the database
+            self.directive = Message(action=70, information=[id_selected])
             self.connection = self.directive.send_directive(self.connection)
+            self.classification = Classification(id=id_selected, name=self.connection.message.information[0],
+                                                 categories=self.connection.message.information[1])
             # Insert information into visual components
-            self.txt_name_class.insert('1.0', self.connection.message.information[0])
+            self.txt_name_class.insert('1.0', self.classification.name)
             # Section to insert categories in textbox
             length_string = 0
-            for item in self.connection.message.information[1]:
+            for item in self.classification.categories:
                 elements = item.split('¥')
                 self.txt_categories.insert('end-1c', elements[1] + '\n')
                 length_string += len(elements[1]) + 1
@@ -170,18 +173,19 @@ class FormChildClassification:
 
     def click_update(self):
         if len(self.trv_available.selection()) == 1:
-            self.decide = False
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.directive = Message(action=70, information=[self.id_selected, 'validate'])
+            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            self.directive = Message(action=70, information=[id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:     # An error ocurred while trying to update the item
                 messagebox.showerror(parent=self.frm_child_list, title='Can not update the item',
                                      message=self.connection.message.information[0])
             else:
-                self.txt_name_class.insert('1.0', self.connection.message.information[0])
+                self.classification = Classification(id=id_selected, name=self.connection.message.information[0],
+                                                     categories=self.connection.message.information[1])
+                self.txt_name_class.insert('1.0', self.classification.name)
                 # Section to insert categories in textbox
                 length_string = 0
-                for item in self.connection.message.information[1]:
+                for item in self.classification.categories:
                     elements = item.split('¥')
                     self.txt_categories.insert('end-1c', elements[1] + '\n')
                     length_string += len(elements[1]) + 1
@@ -200,8 +204,8 @@ class FormChildClassification:
             decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
-                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-                self.directive = Message(action=69, information=[self.id_selected])
+                id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                self.directive = Message(action=69, information=[id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:  # An error ocurred while deleting the item
                     messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
@@ -212,72 +216,73 @@ class FormChildClassification:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def click_save(self):
-        validation_opt = self.validate_fields()
-        if validation_opt == 0:
-            name_aux = self.txt_name_class.get('1.0', 'end-1c')
-            if self.decide:
-                self.directive = Message(action=66, information=[name_aux])
+        if self.validate_fields():
+            self.classification.name = self.txt_name_class.get('1.0', 'end-1c')
+            if self.classification.id == 0:     # Creating a new classification
+                self.directive = Message(action=66, information=[self.classification.name])
                 self.connection = self.directive.send_directive(self.connection)
-                id_classification = self.connection.message.information[0]
-                categories_aux = self.txt_categories.get('1.0', 'end-1c').split('\n')
-                for item in categories_aux:
+                self.classification.id = self.connection.message.information[0]
+                self.classification.categories = self.txt_categories.get('1.0', 'end-1c').split('\n')
+                for item in self.classification.categories:
                     if item:    # None blank space will be saved
-                        self.directive = Message(action=71, information=[item, id_classification])
+                        self.directive = Message(action=71, information=[item, self.classification.id])
                         self.connection = self.directive.send_directive(self.connection)
-            else:
-                # Update classification name
-                self.directive = Message(action=68, information=[self.id_selected, name_aux])
+            else:   # Updating a classification
+                self.directive = Message(action=68, information=[self.classification.id, self.classification.name])
                 self.connection = self.directive.send_directive(self.connection)
                 # Delete categories associated with the current classification
-                self.directive = Message(action=74, information=[self.id_selected])
+                self.directive = Message(action=74, information=[self.classification.id])
                 self.connection = self.directive.send_directive(self.connection)
                 # Create categories for the current classification
-                categories_aux = self.txt_categories.get('1.0', 'end-1c').split('\n')
-                for item in categories_aux:
-                    if item:
-                        self.directive = Message(action=71, information=[item, self.id_selected])
+                self.classification.categories = self.txt_categories.get('1.0', 'end-1c').split('\n')
+                for item in self.classification.categories:
+                    if item:  # None blank space will be saved
+                        self.directive = Message(action=71, information=[item, self.classification.id])
                         self.connection = self.directive.send_directive(self.connection)
-            self.clear_fields()
-            self.frm_child_crud.grid_forget()
-            self.show_frm()
-        elif validation_opt == 1:
-            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
-                                   message='There are mandatory fields that need to be filled!')
-        else:
-            messagebox.showwarning(parent=self.frm_child_crud, title='Category problem',
-                                   message='A category can not be empty!')
+            self.click_back()
 
     def click_back(self):
-        self.txt_name_class['state'] = NORMAL
-        self.txt_categories['state'] = NORMAL
-        self.txt_name_class['bg'] = self.enabled_color
-        self.txt_categories['bg'] = self.enabled_color
         self.clear_fields()
         self.frm_child_crud.grid_forget()
         self.show_frm()
 
     def click_cancel(self):
-        decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
-                                       message='Are you sure you want to cancel?')
+        decision = True
+        categories_aux = len(self.txt_categories.get('1.0', 'end-1c').split('\n'))
+        categories_aux = categories_aux - 1 if self.classification.id == 0 else categories_aux
+        if self.txt_name_class.get('1.0', 'end-1c') != self.classification.name or \
+                categories_aux != len(self.classification.categories):
+            decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
+                                           message='Are you sure you want to cancel?')
         if decision:
-            self.clear_fields()
-            self.frm_child_crud.grid_forget()
-            self.show_frm()
+            self.click_back()
 
     def validate_fields(self):
-        if len(self.txt_name_class.get('1.0', 'end-1c')) != 0 and len(self.txt_categories.get('1.0', 'end-1c')) != 0:
+        if len(self.txt_name_class.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert a name for the classification')
+            return False
+        if len(self.txt_categories.get('1.0', 'end-1c')) != 0:
             categories_aux = self.txt_categories.get('1.0', 'end-1c').split('\n')
             for item in categories_aux:
                 for char in item:
                     if char.isspace() or char == '\t' or not char or char == '\n':
-                        return 2
-            return 0
+                        messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                               message='A category can not be empty')
+                        return False
+            return True
         else:
-            return 1
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert at least one category')
+            return False
 
     def clear_fields(self):
         self.btn_save.grid_forget()
         self.btn_cancel.grid_forget()
         self.btn_back.grid_forget()
+        self.txt_name_class['state'] = NORMAL
+        self.txt_categories['state'] = NORMAL
+        self.txt_name_class['bg'] = self.enabled_color
+        self.txt_categories['bg'] = self.enabled_color
         self.txt_name_class.delete('1.0', 'end-1c')
         self.txt_categories.delete('1.0', 'end-1c')

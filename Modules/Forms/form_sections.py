@@ -52,7 +52,7 @@ class FormChildSection:
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
-        lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
+        lbl_sep1.grid(row=0, column=0, padx=10, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=15, columns=('N', 'Name', 'Description', 'Data Type'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='N', anchor=CENTER)
@@ -87,22 +87,22 @@ class FormChildSection:
         self.frm_aux1 = Frame(self.frm_child_crud)
         lbl_type = Label(self.frm_aux1, text='Data type*')
         lbl_type.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_type.grid(row=0, column=0, pady=10, padx=50, sticky=W)
+        lbl_type.grid(row=0, column=0, pady=10, padx=20, sticky=W)
         lbl_name = Label(self.frm_aux1, text='Name*')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_name.grid(row=1, column=0, pady=10, padx=50, sticky=W)
+        lbl_name.grid(row=1, column=0, pady=10, padx=20, sticky=W)
         lbl_description = Label(self.frm_aux1, text='Description*\t')
         lbl_description.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_description.grid(row=2, column=0, pady=10, padx=50, sticky=NW)
+        lbl_description.grid(row=2, column=0, pady=10, padx=20, sticky=NW)
         self.cbx_data = Combobox(self.frm_aux1, state="readonly")
         self.cbx_data['values'] = ['Text', 'File', 'Classification']
         self.cbx_data.grid(row=0, column=2, pady=10, sticky=W)
         self.cbx_data.bind("<<ComboboxSelected>>", self.cbx_data_selected)
-        self.txt_name = Text(self.frm_aux1, height=1, width=60, font=TEXT_FONT)
+        self.txt_name = Text(self.frm_aux1, height=1, width=50, font=TEXT_FONT)
         self.txt_name.grid(row=1, column=2, pady=10, sticky=W)
         lbl_sep2 = Label(self.frm_aux1)
         lbl_sep2.grid(row=0, column=1, rowspan=3, padx=10, pady=10)
-        self.txt_description = Text(self.frm_aux1, height=6, width=60, font=TEXT_FONT)
+        self.txt_description = Text(self.frm_aux1, height=6, width=50, font=TEXT_FONT)
         self.txt_description.grid(row=2, column=2, pady=10, sticky=W)
         vsb_txt_desc = Scrollbar(self.frm_aux1, orient="vertical", command=self.txt_description.yview)
         vsb_txt_desc.grid(row=2, column=3, pady=10, sticky=NS)
@@ -121,10 +121,10 @@ class FormChildSection:
         self.frm_aux2 = Frame(self.frm_aux1)
         lbl_class = Label(self.frm_aux2, text='Classification\t')
         lbl_class.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_class.grid(row=0, column=0, pady=10, padx=50, sticky=W)
+        lbl_class.grid(row=0, column=0, pady=10, padx=20, sticky=W)
         lbl_category = Label(self.frm_aux2, text='Categories')
         lbl_category.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        lbl_category.grid(row=1, column=0, pady=10, padx=50, sticky=NW)
+        lbl_category.grid(row=1, column=0, pady=10, padx=20, sticky=NW)
         lbl_sep3 = Label(self.frm_aux2)
         lbl_sep3.grid(row=0, column=1, rowspan=2, padx=10, pady=10)
         self.cbx_classification = Combobox(self.frm_aux2, state="readonly")
@@ -251,7 +251,7 @@ class FormChildSection:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
 
     def click_save(self):
-        if self.validate_section_fields():
+        if self.validate_fields():
             self.section.name = self.txt_name.get('1.0', 'end-1c')
             self.section.description = self.txt_description.get('1.0', 'end-1c')
             self.section.data_type = self.cbx_data.get()
@@ -273,19 +273,9 @@ class FormChildSection:
                     self.directive = Message(action=33, information=[self.section.section_id, self.section.name,
                                                                      self.section.description, self.section.data_type])
             self.connection = self.directive.send_directive(self.connection)
-            self.clear_fields()
-            self.frm_child_crud.grid_forget()
-            self.show_frm()
+            self.click_back()
 
     def click_back(self):
-        self.txt_name['state'] = NORMAL
-        self.txt_description['state'] = NORMAL
-        self.cbx_data['state'] = NORMAL
-        self.cbx_classification['state'] = NORMAL
-        self.lbx_category['state'] = NORMAL
-        self.txt_name['bg'] = self.enabled_color
-        self.txt_description['bg'] = self.enabled_color
-        self.lbx_category['bg'] = self.enabled_color
         self.clear_fields()
         self.frm_child_crud.grid_forget()
         self.show_frm()
@@ -298,9 +288,7 @@ class FormChildSection:
             decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
                                            message='Are you sure you want to cancel?')
         if decision:
-            self.clear_fields()
-            self.frm_child_crud.grid_forget()
-            self.show_frm()
+            self.click_back()
 
     def cbx_data_selected(self, event):
         if self.cbx_data.get() == 'Classification':
@@ -330,7 +318,7 @@ class FormChildSection:
             self.cbx_classification['values'] += ('{}'.format(elements[1]),)
             self.classifications.append(int(elements[0]))
 
-    def validate_section_fields(self):
+    def validate_fields(self):
         if len(self.txt_name.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must insert a name for the section')
@@ -353,6 +341,14 @@ class FormChildSection:
         self.btn_save.grid_forget()
         self.btn_cancel.grid_forget()
         self.btn_back.grid_forget()
+        self.txt_name['state'] = NORMAL
+        self.txt_description['state'] = NORMAL
+        self.cbx_data['state'] = NORMAL
+        self.cbx_classification['state'] = NORMAL
+        self.lbx_category['state'] = NORMAL
+        self.txt_name['bg'] = self.enabled_color
+        self.txt_description['bg'] = self.enabled_color
+        self.lbx_category['bg'] = self.enabled_color
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
         self.cbx_data.set('')

@@ -367,8 +367,8 @@ class FormParentDesigner:
                     self.load_problem()
 
     def save_changes(self):
-        validation_option = self.validate_component_frm()  # Validate any problem with info inserted into visual components
-        if validation_option == 0:  # No problem, proceed to save info
+        # Validate any problem with info inserted into visual components
+        if self.validate_component_frm():  # No problem, proceed to save info
             self.solution_time += self.time_thread.seconds
             self.time_thread.stop() # Stop thread timer
             acquisition_end_date = datetime.now()
@@ -421,12 +421,6 @@ class FormParentDesigner:
                                                               solution_aux.patterns_id])
             self.connection = self.directive.send_directive(self.connection)
             return True
-        elif validation_option == 1:
-            messagebox.showwarning(parent=self.frm_general, title='Missing information',
-                                   message="You haven't selected any pattern")
-        else:
-            messagebox.showwarning(parent=self.frm_general, title='Missing information',
-                                   message='You must add annotations to your solution')
         return False
 
     def finish_experiment(self):
@@ -439,15 +433,15 @@ class FormParentDesigner:
 
     def validate_component_frm(self):
         if self.pattern_decision:
-            if self.lbx_sel_patterns.size() != 0:
-                if len(self.txt_solution_desc.get('1.0', 'end-1c')) != 0:
-                    return 0
-                return 2
-            return 1
-        else:
-            if len(self.txt_solution_desc.get('1.0', 'end-1c')) != 0:
-                return 0
-            return 2
+            if self.lbx_sel_patterns.size() == 0:
+                messagebox.showwarning(parent=self.frm_general, title='Missing information',
+                                       message="You haven't selected any pattern")
+                return False
+        if len(self.txt_solution_desc.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_general, title='Missing information',
+                                   message='You must add annotations to your solution')
+            return False
+        return True
 
     def click_attach_file(self):
         """

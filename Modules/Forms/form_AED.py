@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Entry, Button, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
-from Modules.Config.Data import Message, CreateToolTip
+from Modules.Config.Data import Message, CreateToolTip, Designer
 from Modules.Config.Visual import *
 import hashlib
 
@@ -52,7 +52,7 @@ class FormChildAED:
 
         # Components for List Form
         lbl_sep1 = Label(self.frm_child_list)
-        lbl_sep1.grid(row=0, column=0, padx=25, pady=25)
+        lbl_sep1.grid(row=0, column=0, padx=10, pady=25)
         self.trv_available = Treeview(self.frm_child_list, height=15, columns=('N', 'Name', 'Surname', 'E-mail'))
         self.trv_available.heading('#0', text='ID', anchor=CENTER)
         self.trv_available.heading('#1', text='N', anchor=CENTER)
@@ -81,42 +81,40 @@ class FormChildAED:
         frm_aux4.grid(row=0, column=3, pady=25, padx=25, sticky=NW)
 
         # Components for CRUD FRM
-        frm_aux = Frame(self.frm_child_crud)
-        lbl_name = Label(frm_aux, text='Name*')
+        lbl_name = Label(self.frm_child_crud, text='Name*')
         lbl_name.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_name.grid(row=0, column=0, pady=10, padx=20, sticky=W)
-        lbl_surname = Label(frm_aux, text='Surname*')
+        lbl_surname = Label(self.frm_child_crud, text='Surname*')
         lbl_surname.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_surname.grid(row=1, column=0, pady=10, padx=20, sticky=W)
-        lbl_email = Label(frm_aux, text='E-mail*')
+        lbl_email = Label(self.frm_child_crud, text='E-mail*')
         lbl_email.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_email.grid(row=2, column=0, pady=10, padx=20, sticky=W)
-        self.lbl_old_passwd = Label(frm_aux, text='Old password*')
+        self.lbl_old_passwd = Label(self.frm_child_crud, text='Old password*')
         self.lbl_old_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        self.lbl_passwd = Label(frm_aux, text='New password*')
+        self.lbl_passwd = Label(self.frm_child_crud, text='New password*')
         self.lbl_passwd.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        self.lbl_passwd_conf = Label(frm_aux, text='Confirm new password*')
+        self.lbl_passwd_conf = Label(self.frm_child_crud, text='Confirm new password*')
         self.lbl_passwd_conf.config(fg=TEXT_COLOR, font=LABEL_FONT)
-        self.txt_name = Entry(frm_aux)
-        self.txt_name.grid(row=0, column=1, padx=20)
-        self.txt_surname = Entry(frm_aux)
-        self.txt_surname.grid(row=1, column=1, padx=20)
-        self.txt_email = Entry(frm_aux)
-        self.txt_email.grid(row=2, column=1, padx=20)
-        self.txt_old_passwd= Entry(frm_aux, show="*")
-        self.txt_passwd = Entry(frm_aux, show="*")
-        self.txt_passwd_conf = Entry(frm_aux, show="*")
-        frm_aux.grid(row=0, column=0, pady=10, padx=20, rowspan=10)
-
+        self.txt_name = Entry(self.frm_child_crud)
+        self.txt_name.grid(row=0, column=1, pady=10, padx=20, sticky=W)
+        self.txt_surname = Entry(self.frm_child_crud)
+        self.txt_surname.grid(row=1, column=1, pady=10, padx=20, sticky=W)
+        self.txt_email = Entry(self.frm_child_crud)
+        self.txt_email.grid(row=2, column=1, pady=10, padx=20, sticky=W)
+        self.txt_old_passwd= Entry(self.frm_child_crud, show="*")
+        self.txt_passwd = Entry(self.frm_child_crud, show="*")
+        self.txt_passwd_conf = Entry(self.frm_child_crud, show="*")
         sep_aux2 = Separator(self.frm_child_crud, orient=VERTICAL)
-        sep_aux2.grid(row=0, column=1, sticky=NS, rowspan=10)
-
-        btn_save = Button(self.frm_child_crud, image=self.save_icon, command=self.click_save)
-        btn_save.grid(row=1, column=2, padx=20)
+        sep_aux2.grid(row=0, column=2, sticky=NS, rowspan=6)
+        frm_aux = Frame(self.frm_child_crud)
+        btn_save = Button(frm_aux, image=self.save_icon, command=self.click_save)
+        btn_save.grid(row=0, column=0, padx=5, pady=5, sticky=E)
         btn_save_ttp = CreateToolTip(btn_save, 'Save ' + self.title.lower())
-        btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
-        btn_cancel.grid(row=2, column=2, padx=20)
+        btn_cancel = Button(frm_aux, image=self.cancel_icon, command=self.click_cancel)
+        btn_cancel.grid(row=1, column=0, padx=5, pady=5, sticky=E)
         btn_cancel_ttp = CreateToolTip(btn_cancel, 'Cancel')
+        frm_aux.grid(row=0, column=3, pady=10, padx=25, sticky=N, rowspan=6)
 
     def retrieve_list(self):
         """
@@ -163,14 +161,14 @@ class FormChildAED:
         """
         Initialize CRUD Form for creating a new user.
         """
-        self.decide = True
+        self.user = Designer()
         self.frm_child_list.grid_forget()
         self.txt_name.focus_set()
         self.frm_child_crud['text'] = 'New ' + self.title.lower()
         self.lbl_passwd.grid(row=3, column=0, pady=10, padx=20, sticky=W)
         self.lbl_passwd_conf.grid(row=4, column=0, pady=10, padx=20, sticky=W)
-        self.txt_passwd.grid(row=3, column=1, padx=20)
-        self.txt_passwd_conf.grid(row=4, column=1, padx=20)
+        self.txt_passwd.grid(row=3, column=1, pady=10, padx=20, sticky=W)
+        self.txt_passwd_conf.grid(row=4, column=1, pady=10, padx=20, sticky=W)
         self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
 
     def click_update(self):
@@ -178,34 +176,34 @@ class FormChildAED:
         Initialize CRUD Form for updating a user. It loads information of selected User into visual components
         """
         if len(self.trv_available.selection()) == 1:
-            self.decide = False
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
             if self.title == 'Experimenter':
-                self.directive = Message(action=20, information=[self.id_selected])
+                self.directive = Message(action=20, information=[id_selected])
             elif self.title == 'Designer':
-                self.directive = Message(action=25, information=[self.id_selected, 'validate'])
-            elif self.title == 'Administrator':
-                self.directive = Message(action=15, information=[self.id_selected])
+                self.directive = Message(action=25, information=[id_selected, 'validate'])
             else:
-                raise Exception('Error en recuperacion: tipo de usuario')
+                self.directive = Message(action=15, information=[id_selected])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # An error ocurred while trying to update the item
                 messagebox.showerror(parent=self.frm_child_list, title='Can not update the item',
                                      message=self.connection.message.information[0])
             else:
-                self.txt_name.insert(0, self.connection.message.information[0])
-                self.txt_surname.insert(0, self.connection.message.information[1])
-                self.txt_email.insert(0, self.connection.message.information[2])
-                self.current_password = self.connection.message.information[3]
+                self.user = Designer(id=id_selected, name=self.connection.message.information[0],
+                                     surname=self.connection.message.information[1],
+                                     user=self.connection.message.information[2],
+                                     password=self.connection.message.information[3])
+                self.txt_name.insert(0, self.user.name)
+                self.txt_surname.insert(0, self.user.surname)
+                self.txt_email.insert(0, self.user.user)
                 self.frm_child_list.grid_forget()
                 self.txt_name.focus_set()
                 self.frm_child_crud['text'] = 'Update ' + self.title.lower()
                 self.lbl_old_passwd.grid(row=3, column=0, pady=10, padx=20, sticky=W)
                 self.lbl_passwd.grid(row=4, column=0, pady=10, padx=20, sticky=W)
                 self.lbl_passwd_conf.grid(row=5, column=0, pady=10, padx=20, sticky=W)
-                self.txt_old_passwd.grid(row=3, column=1, padx=20)
-                self.txt_passwd.grid(row=4, column=1, padx=20)
-                self.txt_passwd_conf.grid(row=5, column=1, padx=20)
+                self.txt_old_passwd.grid(row=3, column=1, pady=10, padx=20, sticky=W)
+                self.txt_passwd.grid(row=4, column=1, pady=10, padx=20, sticky=W)
+                self.txt_passwd_conf.grid(row=5, column=1, pady=10, padx=20, sticky=W)
                 self.frm_child_crud.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
         else:
             messagebox.showwarning(parent=self.frm_child_list, title='No selection', message='You must select one item')
@@ -218,15 +216,13 @@ class FormChildAED:
             decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
-                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
                 if self.title == 'Experimenter':
-                    self.directive = Message(action=19, information=[self.id_selected])
+                    self.directive = Message(action=19, information=[id_selected])
                 elif self.title == 'Designer':
-                    self.directive = Message(action=24, information=[self.id_selected])
-                elif self.title == 'Administrator':
-                    self.directive = Message(action=14, information=[self.id_selected])
+                    self.directive = Message(action=24, information=[id_selected])
                 else:
-                    raise Exception('Error en recuperacion: tipo de usuario')
+                    self.directive = Message(action=14, information=[id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:     # An error ocurred while deleting the item
                     messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
@@ -240,36 +236,34 @@ class FormChildAED:
         """
         Saves information of the user inserted into the visual components and sends to the server
         """
-        validation_option = self.validate_fields()
-        if validation_option == 0:
-            name_aux = self.txt_name.get()
-            surname_aux = self.txt_surname.get()
-            email_aux = self.txt_email.get()
-            passwd_aux = self.txt_passwd.get()
-            if self.decide:
+        if self.validate_fields():
+            self.user.name = self.txt_name.get()
+            self.user.surname = self.txt_surname.get()
+            self.user.user = self.txt_email.get()
+            self.user.password = self.txt_passwd.get()
+            if self.user.id == 0:   # Creating an user
                 if self.title == 'Experimenter':
-                    self.directive = Message(action=16, information=[name_aux, surname_aux, email_aux,
-                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
+                    self.directive = Message(action=16, information=[self.user.name, self.user.surname, self.user.user,
+                                                                     hashlib.sha1(self.user.password.encode()).hexdigest()])
                 elif self.title == 'Designer':
-                    self.directive = Message(action=21, information=[name_aux, surname_aux, email_aux,
-                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
-                elif self.title == 'Administrator':
-                    self.directive = Message(action=11, information=[name_aux, surname_aux, email_aux,
-                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
+                    self.directive = Message(action=21, information=[self.user.name, self.user.surname, self.user.user,
+                                                                     hashlib.sha1(self.user.password.encode()).hexdigest()])
                 else:
-                    raise Exception('Error en guardar: tipo de usuario')
-            else:
+                    self.directive = Message(action=11, information=[self.user.name, self.user.surname, self.user.user,
+                                                                     hashlib.sha1(self.user.password.encode()).hexdigest()])
+            else:   # Updating an user
                 if self.title == 'Experimenter':
-                    self.directive = Message(action=18, information=[self.id_selected, name_aux, surname_aux, email_aux,
-                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
+                    self.directive = Message(action=18, information=[self.user.id, self.user.name, self.user.surname,
+                                                                     self.user.user,
+                                                                     hashlib.sha1(self.user.password.encode()).hexdigest()])
                 elif self.title == 'Designer':
-                    self.directive = Message(action=23, information=[self.id_selected, name_aux, surname_aux, email_aux,
-                                                                     hashlib.sha1(passwd_aux.encode()).hexdigest()])
-                elif self.title == 'Administrator':
-                    self.directive = Message(action=13, information=[self.id_selected, name_aux, surname_aux, email_aux,
-                                                                     passwd_aux])
+                    self.directive = Message(action=23, information=[self.user.id, self.user.name, self.user.surname,
+                                                                     self.user.user,
+                                                                     hashlib.sha1(self.user.password.encode()).hexdigest()])
                 else:
-                    raise Exception('Error en guardar: tipo de usuario')
+                    self.directive = Message(action=13, information=[self.user.id, self.user.name, self.user.surname,
+                                                                     self.user.user,
+                                                                     self.user.password])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:
                 messagebox.showwarning(parent=self.frm_child_crud, title='Repeated e-mail',
@@ -278,45 +272,60 @@ class FormChildAED:
                 self.clear_fields()
                 self.frm_child_crud.grid_forget()
                 self.show_frm()
-        elif validation_option == 1:
-            messagebox.showwarning(parent=self.frm_child_crud, title='Password field',
-                                   message='The passwords you provided are not the same')
-        elif validation_option == 3:
-            messagebox.showwarning(parent=self.frm_child_crud, title='Old password field',
-                                   message='The old password is incorrect')
-        else:
-            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
-                                   message='There are mandatory fields that need to be filled!')
 
     def click_cancel(self):
         """
-
+        Function activated when 'Cancel' button is pressed in frm_child_crud
         """
-        decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
-                                       message='Are you sure you want to cancel?')
+        decision = True
+        if self.txt_name.get() != self.user.name or \
+                self.txt_surname.get() != self.user.surname or \
+                self.txt_email.get() != self.user.user or len(self.txt_passwd.get()) != 0 or \
+                len(self.txt_passwd_conf.get()) != 0:
+            if self.user.id != 0 and len(self.txt_passwd_conf.get()) != 0 or self.user.id == 0:
+                decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
+                                               message='Are you sure you want to cancel?')
         if decision:
             self.clear_fields()
             self.frm_child_crud.grid_forget()
             self.show_frm()
 
     def validate_fields(self):
-        if len(self.txt_name.get()) != 0 and len(self.txt_surname.get()) != 0 and len(self.txt_email.get()) != 0 and \
-                len(self.txt_passwd.get()) != 0 and len(self.txt_passwd_conf.get()) != 0:
-            if self.decide:
-                if self.txt_passwd.get() == self.txt_passwd_conf.get():
-                    return 0
-                else:
-                    return 1
-            else:
-                if self.current_password == hashlib.sha1(self.txt_old_passwd.get().encode()).hexdigest():
-                    if self.txt_passwd.get() == self.txt_passwd_conf.get():
-                        return 0
-                    else:
-                        return 1
-                else:
-                    return 3
-        else:
-            return 2
+        if len(self.txt_name.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert a name for the {}'.format(self.title.lower()))
+            return False
+        if len(self.txt_surname.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert a surname for the {}'.format(self.title.lower()))
+            return False
+        if len(self.txt_email.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert an e-mail for the {}'.format(self.title.lower()))
+            return False
+        # If updating an user
+        if self.user.id != 0 and len(self.txt_old_passwd.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert the old password for the {}'.format(self.title.lower()))
+            return False
+        if len(self.txt_passwd.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert a new password for the {}'.format(self.title.lower()))
+            return False
+        if len(self.txt_passwd_conf.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must confirm the new password for the {}'.format(self.title.lower()))
+            return False
+        if self.txt_passwd.get() != self.txt_passwd_conf.get():
+            messagebox.showwarning(parent=self.frm_child_crud, title='Password field',
+                                   message='The new password you provided does not match the confirmation')
+            return False
+        # If updating an user
+        if self.user.id != 0 and self.user.password != hashlib.sha1(self.txt_old_passwd.get().encode()).hexdigest():
+            messagebox.showwarning(parent=self.frm_child_crud, title='Old password field',
+                                   message='The old password is incorrect')
+            return False
+        return True
 
     def clear_fields(self):
         self.txt_name.delete(0, END)

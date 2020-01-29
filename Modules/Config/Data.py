@@ -42,12 +42,20 @@ def treeview_sort_column(tv, col, reverse):
                treeview_sort_column(tv, col, not reverse))
 
 
-
 class Category:
     def __init__(self, id=0, name='', classification_id=0):
         self.id = id
         self.name = name
         self.classification_id = classification_id
+
+
+class Classification:
+    def __init__(self, id=0, name='', categories=None):
+        if categories is None:
+            categories = []
+        self.id = id
+        self.name = name
+        self.categories = categories
 
 
 class CreateToolTip(object):

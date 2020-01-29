@@ -688,8 +688,7 @@ class FormChildExperiment:
         to a selected experiment (updated)
         """
         if self.experiment.id == 0:  # Create an experiment
-            validation_option = self.validate_exp_fields()
-            if validation_option == 0:
+            if self.validate_exp_fields():
                 self.experiment.name = self.txt_name_exp.get('1.0', 'end-1c')
                 self.experiment.description = self.txt_description_exp.get('1.0', 'end-1c')
                 self.experiment.design_type = 1 if self.cbx_dt_exp.get() == 'One group' else 2
@@ -721,8 +720,7 @@ class FormChildExperiment:
                 else:
                     decision_aux = 0
             if decision_aux == 1:
-                validation_option = self.validate_exp_fields()
-                if validation_option == 0:
+                if self.validate_exp_fields():
                     self.experiment.name = self.txt_name_exp.get('1.0', 'end-1c')
                     self.experiment.description = self.txt_description_exp.get('1.0', 'end-1c')
                     self.experiment.design_type = design_type_aux
@@ -991,8 +989,7 @@ class FormChildExperiment:
         """
         Function that saves all inserted information of a new scenario component into the database
         """
-        validation_option = self.validate_sc_fields()
-        if validation_option == 0:
+        if self.validate_sc_fields():
             patterns_decision = True
             if self.lbx_egroup_pat.size() == 0:
                 patterns_decision = False
@@ -1348,8 +1345,7 @@ class FormChildExperiment:
         """
         Function that saves all inserted information when creating or updating a problem
         """
-        validation_option = self.validate_problem_fields()
-        if validation_option == 0:
+        if self.validate_problem_fields():
             patterns_decision = True
             if self.lbx_patterns_esol.size() == 0:
                 patterns_decision = False
@@ -1953,16 +1949,16 @@ class FormChildExperiment:
         if len(self.txt_name_exp.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
                                    message='You must insert a name for the experiment')
-            return 1
+            return False
         if len(self.txt_description_exp.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
                                    message='You must insert a description for the experiment')
-            return 1
+            return False
         if self.cbx_dt_exp.get() == 0:
             messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
                                    message='You must select a design type for the experiment')
-            return 1
-        return 0
+            return False
+        return True
 
     def validate_problem_fields(self):
         """
@@ -1972,12 +1968,12 @@ class FormChildExperiment:
         if len(self.txt_short_desc_prob.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
                                    message='You must insert a brief description for the problem')
-            return 1
+            return False
         if len(self.txt_description_prob.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
                                    message='You must insert a full description for the problem')
-            return 1
-        return 0
+            return False
+        return True
 
     def validate_sc_fields(self):
         """
@@ -1987,35 +1983,35 @@ class FormChildExperiment:
         if len(self.txt_title_sc.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must insert a title for the scenario')
-            return 1
+            return False
         if len(self.txt_description_sc.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must insert a description for the scenario')
-            return 1
+            return False
         if len(self.txt_access_sc.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must insert an access code for the scenario')
-            return 1
+            return False
         if self.experiment.design_type == 2:
             for item1 in self.experimental_scenario.experimental_group:
                 for item2 in self.experimental_scenario.control_group:
                     if item1.id == item2.id:
                         messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                                message='At least one designer is in both, experimental and control group')
-                        return 1
+                        return False
         if self.lbx_egroup.size() == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='Experimental group can not be empty')
-            return 1
+            return False
         if self.experiment.design_type == 2 and self.lbx_cgroup.size() == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='Control group can not be empty')
-            return 1
+            return False
         if self.lbx_problems.size() == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must configure at least one problem')
-            return 1
-        return 0
+            return False
+        return True
 
     def show_dd_file(self):
         """
