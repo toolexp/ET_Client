@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
-from Modules.Config.Data import Message, wrap_text, CreateToolTip
+from Modules.Config.Data import Message, wrap_text, CreateToolTip, Section
 from Modules.Config.Visual import *
 
 
@@ -142,7 +142,7 @@ class FormChildSection:
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
-        self.directive = Message(action=32, information=[])
+        self.directive = Message(action=32)
         self.connection = self.directive.send_directive(self.connection)
         # Adding elements into the list
         for index, item in enumerate(self.connection.message.information):
@@ -161,7 +161,7 @@ class FormChildSection:
         self.frm_child_crud.grid_forget()
 
     def click_new(self):
-        self.decide = True
+        self.section = Section()
         self.txt_name.focus_set()
         self.frm_child_crud['text'] = 'New section'
         self.btn_save.grid(row=0, column=5, padx=20)
@@ -171,17 +171,19 @@ class FormChildSection:
 
     def click_view(self):
         if len(self.trv_available.selection()) == 1:
-            self.decide = False
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.directive = Message(action=35, information=[self.id_selected])
+            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            self.directive = Message(action=35, information=[id_selected])
             self.connection = self.directive.send_directive(self.connection)
-            self.txt_name.insert('1.0', self.connection.message.information[0])
-            self.txt_description.insert('1.0', wrap_text(self.connection.message.information[1], 65))
-            self.cbx_data.set(self.connection.message.information[2])
-            if self.connection.message.information[2] == 'Classification':
-                id_class = self.connection.message.information[3]
+            self.section = Section(section_id=id_selected, name=self.connection.message.information[0],
+                                   description=self.connection.message.information[1],
+                                   data_type=self.connection.message.information[2])
+            self.txt_name.insert('1.0', self.section.name)
+            self.txt_description.insert('1.0', self.section.description)
+            self.cbx_data.set(self.section.data_type)
+            if self.section.data_type == 'Classification':
+                self.section.classification_id = self.connection.message.information[3]
                 self.retrieve_classifications()
-                self.directive = Message(action=70, information=[id_class])
+                self.directive = Message(action=70, information=[self.section.classification_id])
                 self.connection = self.directive.send_directive(self.connection)
                 self.cbx_classification.set(self.connection.message.information[0])
                 self.cbx_class_selected()
@@ -203,21 +205,23 @@ class FormChildSection:
 
     def click_update(self):
         if len(self.trv_available.selection()) == 1:
-            self.decide = False
-            self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-            self.directive = Message(action=35, information=[self.id_selected, 'validate'])
+            id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+            self.directive = Message(action=35, information=[id_selected, 'validate'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # An error ocurred while trying to update the item
                 messagebox.showerror(parent=self.frm_child_list, title='Can not update the item',
                                      message=self.connection.message.information[0])
             else:
-                self.txt_name.insert('1.0', self.connection.message.information[0])
-                self.txt_description.insert('1.0', wrap_text(self.connection.message.information[1], 65))
-                self.cbx_data.set(self.connection.message.information[2])
-                if self.connection.message.information[2] == 'Classification':
-                    id_class = self.connection.message.information[3]
+                self.section = Section(section_id=id_selected, name=self.connection.message.information[0],
+                                       description=self.connection.message.information[1],
+                                       data_type=self.connection.message.information[2])
+                self.txt_name.insert('1.0', self.section.name)
+                self.txt_description.insert('1.0', self.section.description)
+                self.cbx_data.set(self.section.data_type)
+                if self.section.data_type == 'Classification':
+                    self.section.classification_id = self.connection.message.information[3]
                     self.retrieve_classifications()
-                    self.directive = Message(action=70, information=[id_class])
+                    self.directive = Message(action=70, information=[self.section.classification_id])
                     self.connection = self.directive.send_directive(self.connection)
                     self.cbx_classification.set(self.connection.message.information[0])
                     self.cbx_class_selected()
@@ -235,8 +239,8 @@ class FormChildSection:
             decision = messagebox.askyesno(parent=self.frm_child_list, title='Confirmation',
                                            message='Are you sure you want to delete the item?')
             if decision:
-                self.id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
-                self.directive = Message(action=34, information=[self.id_selected])
+                id_selected = int(self.trv_available.item(self.trv_available.selection())['text'])
+                self.directive = Message(action=34, information=[id_selected])
                 self.connection = self.directive.send_directive(self.connection)
                 if self.connection.message.action == 5:  # An error ocurred while deleting the item
                     messagebox.showerror(parent=self.frm_child_list, title='Can not delete the item',
@@ -248,30 +252,30 @@ class FormChildSection:
 
     def click_save(self):
         if self.validate_section_fields():
-            name_aux = self.txt_name.get('1.0', 'end-1c')
-            description_aux = self.txt_description.get('1.0', 'end-1c')
-            type_aux = self.cbx_data.get()
-            if self.decide:
-                if type_aux == 'Classification':
+            self.section.name = self.txt_name.get('1.0', 'end-1c')
+            self.section.description = self.txt_description.get('1.0', 'end-1c')
+            self.section.data_type = self.cbx_data.get()
+            if self.section.section_id == 0:    # If creating a section
+                if self.section.data_type == 'Classification':
                     id_class = self.classifications[self.cbx_classification.current()]
-                    self.directive = Message(action=31, information=[name_aux, description_aux, type_aux, id_class])
+                    self.directive = Message(action=31, information=[self.section.name, self.section.description,
+                                                                     self.section.data_type, id_class])
                 else:
-                    self.directive = Message(action=31, information=[name_aux, description_aux, type_aux])
-            else:
-                if type_aux == 'Classification':
+                    self.directive = Message(action=31, information=[self.section.name, self.section.description,
+                                                                     self.section.data_type])
+            else:   # If updating a section
+                if self.section.data_type == 'Classification':
                     id_class = self.classifications[self.cbx_classification.current()]
-                    self.directive = Message(action=33, information=[self.id_selected, name_aux, description_aux,
-                                                                    type_aux, id_class])
+                    self.directive = Message(action=33, information=[self.section.section_id, self.section.name,
+                                                                     self.section.description, self.section.data_type,
+                                                                     id_class])
                 else:
-                    self.directive = Message(action=33, information=[self.id_selected, name_aux, description_aux,
-                                                                     type_aux])
+                    self.directive = Message(action=33, information=[self.section.section_id, self.section.name,
+                                                                     self.section.description, self.section.data_type])
             self.connection = self.directive.send_directive(self.connection)
             self.clear_fields()
             self.frm_child_crud.grid_forget()
             self.show_frm()
-        else:
-            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
-                                   message='There are mandatory fields that need to be filled!')
 
     def click_back(self):
         self.txt_name['state'] = NORMAL
@@ -287,8 +291,12 @@ class FormChildSection:
         self.show_frm()
 
     def click_cancel(self):
-        decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
-                                       message='Are you sure you want to cancel?')
+        decision = True
+        if self.txt_name.get('1.0', 'end-1c') != self.section.name or \
+                self.txt_description.get('1.0', 'end-1c') != self.section.description or \
+                self.cbx_data.get() != self.section.data_type:
+            decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
+                                           message='Are you sure you want to cancel?')
         if decision:
             self.clear_fields()
             self.frm_child_crud.grid_forget()
@@ -314,7 +322,7 @@ class FormChildSection:
     def retrieve_classifications(self):
         self.classifications = []
         self.lbx_category.delete(0, END)
-        self.directive = Message(action=67, information=[])
+        self.directive = Message(action=67)
         self.connection = self.directive.send_directive(self.connection)
         self.cbx_classification['values'] = []
         for item in self.connection.message.information:
@@ -323,19 +331,23 @@ class FormChildSection:
             self.classifications.append(int(elements[0]))
 
     def validate_section_fields(self):
-        if len(self.cbx_data.get()) != 0:
-            if len(self.txt_name.get('1.0','end-1c')) != 0 and len(self.txt_description.get('1.0','end-1c')) != 0:
-                if self.cbx_data.get() == 'Classification':
-                    if len(self.cbx_classification.get()) != 0:
-                        return True
-                    else:
-                        return False
-                else:
-                    return True
-            else:
-                return False
-        else:
+        if len(self.txt_name.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert a name for the section')
             return False
+        if len(self.txt_description.get('1.0', 'end-1c')) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must insert a description for the section')
+            return False
+        if len(self.cbx_data.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must select data type for the section')
+            return False
+        if self.cbx_data.get() == 'Classification' and len(self.cbx_classification.get()) == 0:
+            messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
+                                   message='You must select a classification for this section')
+            return False
+        return True
 
     def clear_fields(self):
         self.btn_save.grid_forget()

@@ -116,7 +116,7 @@ class FormChildClassification:
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
-        self.directive = Message(action=67, information=[])
+        self.directive = Message(action=67)
         self.connection = self.directive.send_directive(self.connection)
         # Adding elements into the list
         for index, item in enumerate(self.connection.message.information):

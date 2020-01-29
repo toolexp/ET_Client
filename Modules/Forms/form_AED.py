@@ -78,7 +78,7 @@ class FormChildAED:
         btn_delete = Button(frm_aux4, image=self.remove_icon, command=self.click_delete)
         btn_delete.grid(row=2, column=0, pady=5, padx=5, sticky=E)
         btn_delete_ttp = CreateToolTip(btn_delete, 'Delete ' + self.title.lower())
-        frm_aux4.grid(row=0, column=4, pady=25, padx=25, sticky=NW)
+        frm_aux4.grid(row=0, column=3, pady=25, padx=25, sticky=NW)
 
         # Components for CRUD FRM
         frm_aux = Frame(self.frm_child_crud)
@@ -128,11 +128,11 @@ class FormChildAED:
             self.trv_available.delete(item)
         # Retrieve information from the server
         if self.title == 'Experimenter':
-            self.directive = Message(action=17, information=[])
+            self.directive = Message(action=17)
         elif self.title == 'Designer':
-            self.directive = Message(action=22, information=[])
+            self.directive = Message(action=22)
         elif self.title == 'Administrator':
-            self.directive = Message(action=12, information=[])
+            self.directive = Message(action=12)
         else:
             raise Exception('Error en recuperacion: tipo de usuario')
         self.connection = self.directive.send_directive(self.connection)
@@ -140,6 +140,7 @@ class FormChildAED:
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2], elements[3]))
+        # Mark first element of the treeview if exist
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
 

@@ -326,7 +326,7 @@ class FormChildTemplate:
     def retrieve_sections(self, s_sections=None):
         if s_sections is None:
             s_sections = []
-        self.directive = Message(action=32, information=[])
+        self.directive = Message(action=32)
         self.connection = self.directive.send_directive(self.connection)
         a_sections = self.connection.message.information
         for item in self.trv_available_sections.get_children():

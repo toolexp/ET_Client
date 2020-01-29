@@ -511,7 +511,7 @@ class FormChildExperiment:
         # Remove existing elements in the list
         for item in self.trv_available_exp.get_children():
             self.trv_available_exp.delete(item)
-        self.directive = Message(action=92, information=[])
+        self.directive = Message(action=92)
         self.connection = self.directive.send_directive(self.connection)
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
