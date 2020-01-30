@@ -302,16 +302,27 @@ class Message:
 
 
 class Pattern:
-    def __init__(self, id=0, template=None, sections=None, main_section=None):
+    def __init__(self, id=0, template=None, sections=None, main_sections=None):
+        if main_sections is None:
+            main_sections = []
         if sections is None:
             sections = []
         self.id = id
         self.template = template
         self.sections = sections
-        self.main_section = main_section
+        self.main_sections = main_sections
 
-    def get_main_section(self):
-        return self.main_section.content
+    def get_main_sections(self):
+        contents = []
+        for item in self.main_sections:
+            contents.append(item.content)
+        current_length = len(contents)
+        for index in range(0, 3 - current_length):
+            contents.append('')
+        return contents
+
+    def get_joined_main_s(self):
+        return ' '.join(self.get_main_sections())
 
     @staticmethod
     def get_available_patterns(connection):
@@ -330,7 +341,7 @@ class Pattern:
                                     connection.message.information[1])
             sections = connection.message.information[2]
             current_sections = []
-            current_m_section = None
+            current_m_sections = []
             for item2 in sections:
                 elements = item2.split('¥')
                 directive = Message(action=47, information=[int(id_pattern), int(elements[0])])
@@ -343,10 +354,10 @@ class Pattern:
                                       pattern_section_id=int(elements_content[0]), diagram_id=elements_content[4],
                                       category_id=elements_content[5], content=elements_content[1])
                 if section_aux.main == '✓':
-                    current_m_section = section_aux
+                    current_m_sections.append(section_aux)
                 current_sections.append(section_aux)
             pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections,
-                                  main_section=current_m_section)
+                                  main_sections=current_m_sections)
             patterns.append(pattern_aux)
         return patterns
 
@@ -363,7 +374,7 @@ class Pattern:
                                     connection.message.information[1])
             sections = connection.message.information[2]
             current_sections = []
-            current_m_section = None
+            current_m_sections = []
             for item2 in sections:
                 elements = item2.split('¥')
                 directive = Message(action=47, information=[int(id_pattern), int(elements[0])])
@@ -376,10 +387,10 @@ class Pattern:
                                       pattern_section_id=int(elements_content[0]), diagram_id=elements_content[4],
                                       category_id=elements_content[5], content=elements_content[1])
                 if section_aux.main == '✓':
-                    current_m_section = section_aux
+                    current_m_sections.append(section_aux)
                 current_sections.append(section_aux)
             pattern_aux = Pattern(id=int(id_pattern), template=template_aux, sections=current_sections,
-                                  main_section=current_m_section)
+                                  main_sections=current_m_sections)
             patterns.append(pattern_aux)
         return patterns
 

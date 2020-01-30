@@ -873,9 +873,9 @@ class FormChildExperiment:
                 self.visual_problems.append(item.id_visual)
                 self.lbx_problems.insert(END, '{}) {}'.format(index + 1, item.brief_description))
             for index, item in enumerate(self.experimental_scenario.egroup_patterns):
-                self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
             for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
-                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
             self.txt_title_sc['bg'] = self.disabled_color
             self.txt_description_sc['bg'] = self.disabled_color
             self.txt_access_sc['bg'] = self.disabled_color
@@ -944,9 +944,9 @@ class FormChildExperiment:
                     self.visual_problems.append(item.id_visual)
                     self.lbx_problems.insert(END, '{}) {}'.format(index + 1, item.brief_description))
                 for index, item in enumerate(self.experimental_scenario.egroup_patterns):
-                    self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                    self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
                 for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
-                    self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                    self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
                 self.frm_child_general_sc['text'] = 'Update experimental scenario'
                 if self.experiment.design_type == 2:
                     self.frm_aux9.grid(row=1, column=0, sticky=W)
@@ -1326,7 +1326,7 @@ class FormChildExperiment:
                 self.txt_description_prob.insert('1.0', wrap_text(self.problem.description, 40))
                 self.txt_annotations_esol.insert('1.0', wrap_text(self.problem.solution.annotations, 50))
                 for item in self.problem.solution.patterns:
-                    self.lbx_patterns_esol.insert(END, item.get_main_section())
+                    self.lbx_patterns_esol.insert(END, item.get_joined_main_s())
                 self.txt_short_desc_prob['state'] = DISABLED
                 self.txt_description_prob['state'] = DISABLED
                 self.txt_annotations_esol['state'] = DISABLED
@@ -1571,7 +1571,7 @@ class FormChildExperiment:
             # Clear patterns from listbox and insert new ones
             self.lbx_egroup_pat.delete(0, END)
             for index, item in enumerate(self.experimental_scenario.egroup_patterns):
-                self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
             self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
         elif self.tlevel_patterns_type == 2:     # Current view is for patterns of control group
             for item1 in reversed(self.av_patterns_cgroup):
@@ -1603,7 +1603,7 @@ class FormChildExperiment:
             # Clear patterns from listbox and insert new ones
             self.lbx_cgroup_pat.delete(0, END)
             for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
-                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
             self.cancel_sc_decision = True  # Decision changes when any changes in general sc configuration form is done
         elif self.tlevel_patterns_type == 3:     # Current view is for patterns of expected solution
             for item1 in reversed(self.av_patterns_esol):
@@ -1635,7 +1635,7 @@ class FormChildExperiment:
             # Clear patterns from listbox and insert new ones
             self.lbx_patterns_esol.delete(0, END)
             for item in self.problem.solution.patterns:
-                self.lbx_patterns_esol.insert(END, item.get_main_section())
+                self.lbx_patterns_esol.insert(END, item.get_joined_main_s())
         else:
             raise Exception('Tipo de grupo de patrones es incongruente')
         self.tlevel_patterns.grab_release()
@@ -1687,10 +1687,10 @@ class FormChildExperiment:
             self.trv_selected_patterns.delete(item)
         # Fill available patterns treeview
         for index, item in enumerate(self.av_patterns_esol):
-            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_main_section()))
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
         # Fill selected patterns treeview
         for index, item in enumerate(self.problem.solution.patterns):
-            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_main_section()))
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
         self.tlevel_patterns_type = 3
@@ -1703,10 +1703,10 @@ class FormChildExperiment:
             self.trv_selected_patterns.delete(item)
         # Fill available patterns treeview
         for index, item in enumerate(self.av_patterns_cgroup):
-            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_main_section()))
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
         # Fill selected patterns treeview
         for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
-            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_main_section()))
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
         self.tlevel_patterns_type = 2
@@ -1719,10 +1719,10 @@ class FormChildExperiment:
             self.trv_selected_patterns.delete(item)
         # Fill available patterns treeview
         for index, item in enumerate(self.av_patterns_egroup):
-            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_main_section()))
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
         # Fill selected patterns treeview
         for index, item in enumerate(self.experimental_scenario.egroup_patterns):
-            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_main_section()))
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
         self.tlevel_patterns_type = 1
@@ -1743,7 +1743,7 @@ class FormChildExperiment:
                 self.av_patterns_cgroup.append(item)
             for index, item in enumerate(self.experimental_scenario.egroup_patterns):  # Copy patterns from exp. group to control group
                 self.experimental_scenario.cgroup_patterns.append(item)
-                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_main_section()))
+                self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
         else:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='No patterns',
                                    message='You must insert at least one pattern to experimental group patterns\' list')

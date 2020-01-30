@@ -64,7 +64,7 @@ class FormChildTemplate:
         self.trv_available.heading('#2', text='Name', anchor=CENTER)
         self.trv_available.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_available.column('#1', width=20, minwidth=20, stretch=NO)
-        self.trv_available.column('#2', width=400, minwidth=400, stretch=NO)
+        self.trv_available.column('#2', width=375, minwidth=375, stretch=NO)
         self.trv_available.bind("<ButtonRelease-1>", self.select_template_summary)
         self.trv_available.grid(row=0, column=1, sticky=W, pady=25)
         vsb_trv_av = Scrollbar(self.frm_child_list, orient="vertical", command=self.trv_available.yview)
@@ -347,12 +347,9 @@ class FormChildTemplate:
         for item in self.trv_selected_sections.get_children():
             self.trv_selected_sections.delete(item)
         for item in s_sections:
-            item = item.split('¥')
-            item.remove(item[0])
-            item.remove(item[0])
-            item.remove(item[-2])
-            item.remove(item[-2])
-            item.remove(item[-2])
+            item_aux1 = item.split('¥')[2:6]
+            item_aux2 = [item.split('¥')[-1]]
+            item = item_aux1 + item_aux2
             item = '¥'.join(item)
             if item in a_sections:
                 a_sections.remove(item)
@@ -506,8 +503,8 @@ class FormChildTemplate:
                                    message='You must select at least one section')
             return False
         for item in self.trv_selected_sections.get_children():
-            if self.trv_selected_sections.item(item)['values'][2] == 'Text' or \
-                    self.trv_selected_sections.item(item)['values'][2] == 'Classification':
+            values = self.trv_selected_sections.item(item)['values']
+            if values[2] == 'Text' or values[2] == 'Classification':
                 text_section = True
                 break
         if not text_section:
@@ -515,12 +512,13 @@ class FormChildTemplate:
                                    message='At least one section has to be of text type')
             return False
         for item in self.trv_selected_sections.get_children():
-            if self.trv_selected_sections.item(item)['values'][4] == '✓':
-                if self.trv_selected_sections.item(item)['values'][2] == 'Text':
+            values = self.trv_selected_sections.item(item)['values']
+            if values[4] == '✓':
+                if values[2] == 'Text' or values[2] == 'Classification':
                     return True
                 else:
                     messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
-                                           message='The main section has to be of text type')
+                                           message='The main section has to be of text or classification type')
                     return False
         messagebox.showwarning(parent=self.frm_child_crud, title='Main section',
                                message='You must set one of the selected section as main')

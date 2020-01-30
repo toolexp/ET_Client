@@ -180,7 +180,7 @@ class FormChildAED:
             if self.title == 'Experimenter':
                 self.directive = Message(action=20, information=[id_selected])
             elif self.title == 'Designer':
-                self.directive = Message(action=25, information=[id_selected, 'validate'])
+                self.directive = Message(action=25, information=[id_selected])
             else:
                 self.directive = Message(action=15, information=[id_selected])
             self.connection = self.directive.send_directive(self.connection)
