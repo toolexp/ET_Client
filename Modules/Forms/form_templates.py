@@ -1,7 +1,7 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar, Toplevel
+from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
-from Modules.Config.Data import Message, CreateToolTip, wrap_text, Template
+from Modules.Config.Data import Message, CreateToolTip, Template, summarize_text
 from Modules.Config.Visual import *
 
 
@@ -53,7 +53,6 @@ class FormChildTemplate:
         self.star_icon = PhotoImage(file=r"./Resources/star.png")
         self.back_icon = PhotoImage(file=r"./Resources/back.png")
         self.view_icon = PhotoImage(file=r"./Resources/view.png")
-        self.disabled_color = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
@@ -93,7 +92,7 @@ class FormChildTemplate:
         lbl_details.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         lbl_details.grid(row=0, column=1, sticky=W, pady=25, columnspan=2)
         self.txt_summary = Text(frm_aux3, height=22, width=50)
-        self.txt_summary.config(font=TEXT_FONT, bg=self.disabled_color)
+        self.txt_summary.config(font=TEXT_FONT, bg=DISABLED_COLOR)
         self.txt_summary.grid(row=1, column=1)
         vsb_txt_sum = Scrollbar(frm_aux3, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=2, sticky=NS)
@@ -150,7 +149,8 @@ class FormChildTemplate:
         vsb_trv_avs = Scrollbar(self.frm_child_crud, orient="vertical", command=self.trv_available_sections.yview)
         vsb_trv_avs.grid(row=2, column=4, rowspan=7, pady=10, sticky=NS)
         self.trv_available_sections.configure(yscrollcommand=vsb_trv_avs.set)
-        self.trv_selected_sections = Treeview(self.frm_child_crud, height=10, columns=('N', 'Name', 'Data type', 'Mandatory', 'Main'))
+        self.trv_selected_sections = Treeview(self.frm_child_crud, height=10, columns=('N', 'Name', 'Data type',
+                                                                                       'Mandatory', 'Main'))
         self.trv_selected_sections.heading('#0', text='ID', anchor=CENTER)
         self.trv_selected_sections.heading('#1', text='N', anchor=CENTER)
         self.trv_selected_sections.heading('#2', text='Name', anchor=CENTER)
@@ -194,7 +194,6 @@ class FormChildTemplate:
         self.btn_cancel = Button(frm_aux1, image=self.cancel_icon, command=self.click_cancel)
         btn_cancel_ttp = CreateToolTip(self.btn_cancel, 'Cancel')
         frm_aux1.grid(row=0, column=12, pady=10, padx=25, sticky=NW, rowspan=10)
-        self.enabled_color = self.txt_name.cget('bg')
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -205,7 +204,7 @@ class FormChildTemplate:
         # Adding elements into the list
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, elements[1]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, summarize_text(elements[1], 375)))
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
             self.select_template_summary()
@@ -224,8 +223,8 @@ class FormChildTemplate:
             self.directive = Message(action=40, information=[self.id_selected]) # ask for the template
             self.connection = self.directive.send_directive(self.connection)
             # Insert template's name and description
-            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(wrap_text(self.connection.message.information[0], 55)))
-            self.txt_summary.insert('end-1c', "Description:\n{}\n\nSections:\n".format(wrap_text(self.connection.message.information[1], 55)))
+            self.txt_summary.insert('end-1c', "Name:\n{}\n\n".format(self.connection.message.information[0]))
+            self.txt_summary.insert('end-1c', "Description:\n{}\n\nSections:\n".format(self.connection.message.information[1]))
             self.directive = Message(action=77, information=[self.id_selected])  # ask for the sections of the selected template
             self.connection = self.directive.send_directive(self.connection)
             # Adding elements in the summary text box
@@ -326,8 +325,8 @@ class FormChildTemplate:
         self.lbl_note_optional.grid(row=9, column=6, columnspan=4, sticky=W)
 
     def disable_visual_components(self):
-        self.txt_name['bg'] = self.disabled_color
-        self.txt_description['bg'] = self.disabled_color
+        self.txt_name['bg'] = DISABLED_COLOR
+        self.txt_description['bg'] = DISABLED_COLOR
         self.txt_name['state'] = DISABLED
         self.txt_description['state'] = DISABLED
         self.btn_add.grid_forget()
@@ -355,10 +354,12 @@ class FormChildTemplate:
                 a_sections.remove(item)
         for index, item in enumerate(a_sections):
             elements = item.split('¥')
-            self.trv_available_sections.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[3]))
+            self.trv_available_sections.insert('', 'end', text=elements[0], values=(index+1, summarize_text(elements[1], 150),
+                                                                                    summarize_text(elements[3], 120)))
         for index, item in enumerate(s_sections):
             elements = item.split('¥')
-            self.trv_selected_sections.insert('', 'end', text=elements[2], values=(index+1, elements[3], elements[5],
+            self.trv_selected_sections.insert('', 'end', text=elements[2], values=(index+1, summarize_text(elements[3], 150),
+                                                                                   summarize_text(elements[5], 120),
                                                                                    elements[7], elements[8]))
 
     def click_add(self):
@@ -527,8 +528,8 @@ class FormChildTemplate:
     def clear_fields(self):
         self.txt_name['state'] = NORMAL
         self.txt_description['state'] = NORMAL
-        self.txt_name['bg'] = self.enabled_color
-        self.txt_description['bg'] = self.enabled_color
+        self.txt_name['bg'] = ENABLED_COLOR
+        self.txt_description['bg'] = ENABLED_COLOR
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
         self.btn_save.grid_forget()

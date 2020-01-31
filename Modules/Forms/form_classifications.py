@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Frame, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
-from Modules.Config.Data import Message, CreateToolTip, Classification
+from Modules.Config.Data import Message, CreateToolTip, Classification, summarize_text
 from Modules.Config.Visual import *
 
 
@@ -48,7 +48,6 @@ class FormChildClassification:
         self.save_icon = PhotoImage(file=r"./Resources/save.png")
         self.back_icon = PhotoImage(file=r"./Resources/back.png")
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
-        self.disabled_color = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
@@ -110,7 +109,6 @@ class FormChildClassification:
         btn_back_ttp = CreateToolTip(self.btn_back, 'Go back')
         self.btn_cancel = Button(self.frm_child_crud, image=self.cancel_icon, command=self.click_cancel)
         btn_cancel_ttp = CreateToolTip(self.btn_cancel, 'Cancel')
-        self.enabled_color = self.txt_name_class.cget('bg')
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -121,7 +119,8 @@ class FormChildClassification:
         # Adding elements into the list
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, summarize_text(elements[1], 200),
+                                                                           summarize_text(elements[2], 150)))
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
 
@@ -161,8 +160,8 @@ class FormChildClassification:
                 length_string += len(elements[1]) + 1
             self.txt_categories.delete('end-2c', 'end')
             self.frm_child_crud['text'] = 'View classification'
-            self.txt_name_class['bg'] = self.disabled_color
-            self.txt_categories['bg'] = self.disabled_color
+            self.txt_name_class['bg'] = DISABLED_COLOR
+            self.txt_categories['bg'] = DISABLED_COLOR
             self.txt_name_class['state'] = DISABLED
             self.txt_categories['state'] = DISABLED
             self.btn_back.grid(row=0, column=5, padx=20)
@@ -282,7 +281,7 @@ class FormChildClassification:
         self.btn_back.grid_forget()
         self.txt_name_class['state'] = NORMAL
         self.txt_categories['state'] = NORMAL
-        self.txt_name_class['bg'] = self.enabled_color
-        self.txt_categories['bg'] = self.enabled_color
+        self.txt_name_class['bg'] = ENABLED_COLOR
+        self.txt_categories['bg'] = ENABLED_COLOR
         self.txt_name_class.delete('1.0', 'end-1c')
         self.txt_categories.delete('1.0', 'end-1c')

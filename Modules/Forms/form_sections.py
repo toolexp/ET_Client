@@ -1,7 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
-from Modules.Config.Data import Message, wrap_text, CreateToolTip, Section
+from Modules.Config.Data import Message, CreateToolTip, Section, summarize_text
 from Modules.Config.Visual import *
 
 
@@ -48,7 +48,6 @@ class FormChildSection:
         self.save_icon = PhotoImage(file=r"./Resources/save.png")
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
         self.back_icon = PhotoImage(file=r"./Resources/back.png")
-        self.disabled_color = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
@@ -131,12 +130,11 @@ class FormChildSection:
         self.cbx_classification.bind("<<ComboboxSelected>>", self.cbx_class_selected)
         self.cbx_classification.grid(row=0, column=2, pady=10, sticky=NW)
         self.lbx_category = Listbox(self.frm_aux2, font=TEXT_FONT, height=10, width=50, selectmode='none')
-        self.lbx_category.config(bg=self.disabled_color)
+        self.lbx_category.config(bg=DISABLED_COLOR)
         self.lbx_category.grid(row=1, column=2, pady=10, sticky=W)
         vsb_lbx_cat = Scrollbar(self.frm_aux2, orient="vertical", command=self.lbx_category.yview)
         vsb_lbx_cat.grid(row=1, column=3, pady=10, sticky=NS)
         self.lbx_category.configure(yscrollcommand=vsb_lbx_cat.set)
-        self.enabled_color = self.txt_name.cget('bg')
 
     def retrieve_list(self):
         # Remove existing elements in the list
@@ -147,7 +145,9 @@ class FormChildSection:
         # Adding elements into the list
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2], elements[3]))
+            self.trv_available.insert('', 'end', text=elements[0], values=(index+1, summarize_text(elements[1], 200),
+                                                                           summarize_text(elements[2], 400),
+                                                                           summarize_text(elements[3], 200)))
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
 
@@ -188,9 +188,9 @@ class FormChildSection:
                 self.cbx_classification.set(self.connection.message.information[0])
                 self.cbx_class_selected()
                 self.frm_aux2.grid(row=3, column=0, columnspan=4, sticky=W)
-            self.txt_name['bg'] = self.disabled_color
-            self.txt_description['bg'] = self.disabled_color
-            self.lbx_category['bg'] = self.disabled_color
+            self.txt_name['bg'] = DISABLED_COLOR
+            self.txt_description['bg'] = DISABLED_COLOR
+            self.lbx_category['bg'] = DISABLED_COLOR
             self.txt_name['state'] = DISABLED
             self.txt_description['state'] = DISABLED
             self.cbx_data['state'] = DISABLED
@@ -346,9 +346,9 @@ class FormChildSection:
         self.cbx_data['state'] = NORMAL
         self.cbx_classification['state'] = NORMAL
         self.lbx_category['state'] = NORMAL
-        self.txt_name['bg'] = self.enabled_color
-        self.txt_description['bg'] = self.enabled_color
-        self.lbx_category['bg'] = self.enabled_color
+        self.txt_name['bg'] = ENABLED_COLOR
+        self.txt_description['bg'] = ENABLED_COLOR
+        self.lbx_category['bg'] = ENABLED_COLOR
         self.txt_name.delete('1.0', 'end-1c')
         self.txt_description.delete('1.0', 'end-1c')
         self.cbx_data.set('')

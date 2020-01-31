@@ -9,3 +9,5 @@ LABEL_FONT = (json_config["visual_font"]["type"], json_config["visual_font"]["si
 TEXT_FONT = (json_config["visual_font"]["type"], json_config["visual_font"]["size"]['text'])
 NOTE_FONT = (json_config["visual_font"]["type"], json_config["visual_font"]["size"]['note'])
 TEXT_COLOR = json_config["visual_font"]['color']['sky_blue']
+ENABLED_COLOR = 'white'
+DISABLED_COLOR = '#F0F0F0'

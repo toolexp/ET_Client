@@ -1,11 +1,13 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, filedialog, Canvas, messagebox, PhotoImage, Scrollbar, \
     Toplevel
 from tkinter.constants import *
-from tkinter.ttk import Treeview, Notebook, Combobox, Style, Separator
-from Modules.Config.Data import CreateToolTip, Message, Template, Pattern, Category, File, wrap_text, Section
+from tkinter.ttk import Treeview, Combobox, Separator
+from Modules.Config.Data import CreateToolTip, Message, Template, Pattern, Category, File, summarize_text, Section
 from PIL import Image, ImageTk
 from Modules.Config.Visual import *
 import os
+
+
 
 
 class FormParentPattern:
@@ -55,8 +57,6 @@ class FormChildPattern:
         self.cancel_icon = PhotoImage(file=r"./Resources/cancel.png")
         self.back_icon = PhotoImage(file=r"./Resources/back.png")
         self.open_icon = PhotoImage(file=r"./Resources/open.png")
-        #self.style.configure("Treeview", foreground="gray", rowheight=50)
-        self.disabled_color = self.frm_child_list.cget('bg')
 
         # Components for List FRM
         lbl_sep1 = Label(self.frm_child_list)
@@ -102,7 +102,7 @@ class FormChildPattern:
         lbl_details.grid(row=0, column=1, sticky=W, pady=25)
         self.btn_view_diagram = Button(frm_aux3, text='View >>\ndiagram', command=self.click_expand_diagram)
         self.txt_summary = Text(frm_aux3, height=22, width=50)
-        self.txt_summary.config(font=TEXT_FONT, bg=self.disabled_color)
+        self.txt_summary.config(font=TEXT_FONT, bg=DISABLED_COLOR)
         self.txt_summary.grid(row=1, column=1, columnspan=2)
         vsb_txt_sum = Scrollbar(frm_aux3, orient="vertical", command=self.txt_summary.yview)
         vsb_txt_sum.grid(row=1, column=3, sticky=NS)
@@ -160,7 +160,7 @@ class FormChildPattern:
         lbl_desc_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_desc_section.grid(row=1, column=4, pady=10, sticky=NW)
         self.txt_desc_section = Text(self.frm_aux2, height=4, width=60)
-        self.txt_desc_section.config(background=self.disabled_color, font=TEXT_FONT)
+        self.txt_desc_section.config(background=DISABLED_COLOR, font=TEXT_FONT)
         self.txt_desc_section.grid(row=2, column=4, pady=10, sticky=W)
         vsb_txt_desc = Scrollbar(self.frm_aux2, orient="vertical", command=self.txt_desc_section.yview)
         vsb_txt_desc.grid(row=2, column=5, pady=10, sticky=NS)
@@ -174,7 +174,7 @@ class FormChildPattern:
         self.frm_text = Frame(self.frm_aux2)
         self.txt_section = Text(self.frm_text, height=9, width=60)
         self.txt_section.config(font=TEXT_FONT)
-        self.txt_section.bind("<Key>", self.txt_section_modified)
+        self.txt_section.bind("<KeyRelease>", self.txt_section_modified)
         self.txt_section.grid(row=0, column=0, pady=20, sticky=W)
         vsb_txt_sec = Scrollbar(self.frm_text, orient="vertical", command=self.txt_section.yview)
         vsb_txt_sec.grid(row=0, column=1, pady=20, sticky=NS)
@@ -204,8 +204,6 @@ class FormChildPattern:
         self.cbx_category.bind("<<ComboboxSelected>>", self.cbx_category_selected)
         lbl_sep8 = Label(self.frm_classification)
         lbl_sep8.grid(row=2, column=0, pady=22)
-
-        self.enabled_color = self.txt_section.cget('bg')
 
         frm_aux3 = Frame(self.frm_child_crud)
         self.btn_save = Button(frm_aux3, image=self.save_icon, command=self.click_save)
@@ -253,9 +251,10 @@ class FormChildPattern:
         # Adding elements in the list
         for index, item in enumerate(self.patterns):
             pattern_main_sections = item.get_main_sections()
-            self.trv_available.insert('', 'end', text=item.id, values=(index+1, pattern_main_sections[0],
-                                                                       pattern_main_sections[1],
-                                                                       pattern_main_sections[2]))
+            self.trv_available.insert('', 'end', text=item.id, values=(index+1,
+                                                                       summarize_text(pattern_main_sections[0], 125),
+                                                                       summarize_text(pattern_main_sections[1], 125),
+                                                                       summarize_text(pattern_main_sections[2], 125)))
         if len(self.trv_available.get_children()) != 0:
             self.trv_available.selection_set(self.trv_available.get_children()[0])
             self.select_pattern_summary()
@@ -310,7 +309,7 @@ class FormChildPattern:
         self.txt_desc_section['state'] = NORMAL
         self.txt_desc_section.delete('1.0', 'end-1c')
         self.txt_section['state'] = NORMAL
-        self.txt_section['bg'] = self.enabled_color
+        self.txt_section['bg'] = ENABLED_COLOR
         self.txt_section.delete('1.0', 'end-1c')
         for item in self.trv_summary.get_children():
             self.trv_summary.delete(item)
@@ -383,7 +382,7 @@ class FormChildPattern:
                 '{}: {}'.format(self.new_pattern.template.name, self.new_pattern.template.description))
             self.cbx_template['state'] = DISABLED
             self.set_trv_summary(self.new_pattern.sections)
-            self.txt_section['bg'] = self.disabled_color
+            self.txt_section['bg'] = DISABLED_COLOR
             self.frm_child_crud['text'] = 'View Pattern'
             self.btn_back.grid(row=0, column=2, padx=20, pady=5)
             self.btn_view_diagram_section.grid(row=1, column=0, padx=20, pady=5, sticky=E)
@@ -641,10 +640,12 @@ class FormChildPattern:
             self.trv_summary.delete(item)
         for index, item in enumerate(sections):
             if item.content == '':
-                self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(index+1, item.name,
+                self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(index+1,
+                                                                                      summarize_text(item.name, 100),
                                                                                       item.mandatory, ''))
             else:
-                self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(index+1, item.name,
+                self.trv_summary.insert('', 'end', text=item.temp_section_id, values=(index+1,
+                                                                                      summarize_text(item.name, 100),
                                                                                       item.mandatory, '✓'))
         self.txt_desc_section['state'] = DISABLED
         self.trv_summary.selection_set(self.trv_summary.get_children()[0])
@@ -714,7 +715,7 @@ class FormChildPattern:
         # user of the GUI.
         self.txt_desc_section['state'] = NORMAL
         self.txt_desc_section.delete('1.0', 'end-1c')
-        self.txt_desc_section.insert('1.0', wrap_text(self.selected_section.description, 75))
+        self.txt_desc_section.insert('1.0', self.selected_section.description)
         self.txt_desc_section['state'] = DISABLED
 
         # This section retrieve the content of the selected section and displays (depending of the data_type) it

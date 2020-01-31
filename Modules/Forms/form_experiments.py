@@ -3,7 +3,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoIma
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator, Combobox, Notebook, Style
 from Modules.Config.Data import Message, CreateToolTip, Experiment, Pattern, wrap_text, Designer, ExperimentalSC, \
-    Problem, File, Solution, treeview_sort_column
+    Problem, File, summarize_text, treeview_sort_column
 from Modules.Config.Visual import *
 from PIL import ImageTk, Image
 import os
@@ -82,7 +82,6 @@ class FormChildExperiment:
         self.designers_icon = PhotoImage(file=r"./Resources/people.png")
         self.patterns_icon = PhotoImage(file=r"./Resources/pattern.png")
         self.check_icon = PhotoImage(file=r"./Resources/check.png")
-        self.disabled_color = self.frm_child_exp_list.cget('bg')
 
         # Components for experiment list form (list of experiments)
         lbl_sep1 = Label(self.frm_child_exp_list)
@@ -163,7 +162,6 @@ class FormChildExperiment:
         self.btn_cancel_exp = Button(frm_aux14, image=self.cancel_icon, command=self.click_cancel_exp)
         btn_cancel_exp_ttp = CreateToolTip(self.btn_cancel_exp, 'Cancel')
         frm_aux14.grid(row=0, column=5, pady=10, padx=25, sticky=NW, rowspan=3)
-        self.enabled_color = self.txt_name_exp.cget('bg')
         sep_aux1 = Separator(self.frm_child_sc_list, orient=HORIZONTAL)
         sep_aux1.grid(row=3, column=0, sticky=EW, columnspan=6)
         lbl_sep2 = Label(self.frm_child_sc_list)
@@ -202,6 +200,8 @@ class FormChildExperiment:
         btn_view_sc_ttp = CreateToolTip(self.btn_view_sc, 'View experimental scenario')
         self.btn_edit_sc = Button(frm_aux6, image=self.modify_icon, command=self.click_update_sc)
         btn_edit_sc_ttp = CreateToolTip(self.btn_edit_sc, 'Edit experimental scenario')
+        self.btn_view_designer_sc = Button(frm_aux6, image=self.modify_icon, command=self.click_update_sc)
+        btn_view_designer_sc_ttp = CreateToolTip(self.btn_view_designer_sc, 'View scenario as designer')
         self.btn_delete_sc = Button(frm_aux6, image=self.remove_icon, command=self.click_delete_sc)
         btn_delete_sc_ttp = CreateToolTip(self.btn_delete_sc, 'Delete experimental scenario')
         frm_aux6.grid(row=5, column=5, pady=10, padx=25, sticky=NW)
@@ -515,9 +515,10 @@ class FormChildExperiment:
         self.connection = self.directive.send_directive(self.connection)
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available_exp.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2],
-                                                                               'One group' if elements[3] == '1' else
-                                                                               'Two groups', elements[4]))
+            self.trv_available_exp.insert('', 'end', text=elements[0], values=(index+1, summarize_text(elements[1], 200),
+                                                                               summarize_text(elements[2], 400),
+                                                                               summarize_text('One group' if elements[3] == '1' else 'Two groups', 100),
+                                                                               summarize_text(elements[4], 100)))
         if len(self.trv_available_exp.get_children()) != 0:
             self.trv_available_exp.selection_set(self.trv_available_exp.get_children()[0])
 
@@ -573,8 +574,8 @@ class FormChildExperiment:
             self.txt_description_exp.insert('1.0', self.experiment.description)
             self.cbx_dt_exp.set('One group' if self.experiment.design_type == 1 else
                                 'Two groups')
-            self.txt_name_exp['bg'] = self.disabled_color
-            self.txt_description_exp['bg'] = self.disabled_color
+            self.txt_name_exp['bg'] = DISABLED_COLOR
+            self.txt_description_exp['bg'] = DISABLED_COLOR
             self.txt_name_exp['state'] = DISABLED
             self.txt_description_exp['state'] = DISABLED
             self.cbx_dt_exp['state'] = DISABLED
@@ -782,7 +783,8 @@ class FormChildExperiment:
         self.connection = self.directive.send_directive(self.connection)
         for index, item in enumerate(self.connection.message.information):
             elements = item.split('¥')
-            self.trv_available_sc.insert('', 'end', text=elements[0], values=(index+1, elements[1], elements[2],
+            self.trv_available_sc.insert('', 'end', text=elements[0], values=(index+1, summarize_text(elements[1], 180),
+                                                                              summarize_text(elements[2], 300),
                                                                               elements[3], elements[4]))
         if len(self.trv_available_sc.get_children()) != 0:
             self.trv_available_sc.selection_set(self.trv_available_sc.get_children()[0])
@@ -876,13 +878,13 @@ class FormChildExperiment:
                 self.lbx_egroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
             for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
                 self.lbx_cgroup_pat.insert(END, '{}) {}'.format(index + 1, item.get_joined_main_s()))
-            self.txt_title_sc['bg'] = self.disabled_color
-            self.txt_description_sc['bg'] = self.disabled_color
-            self.txt_access_sc['bg'] = self.disabled_color
-            self.lbx_egroup['bg'] = self.disabled_color
-            self.lbx_cgroup['bg'] = self.disabled_color
-            self.lbx_egroup_pat['bg'] = self.disabled_color
-            self.lbx_cgroup_pat['bg'] = self.disabled_color
+            self.txt_title_sc['bg'] = DISABLED_COLOR
+            self.txt_description_sc['bg'] = DISABLED_COLOR
+            self.txt_access_sc['bg'] = DISABLED_COLOR
+            self.lbx_egroup['bg'] = DISABLED_COLOR
+            self.lbx_cgroup['bg'] = DISABLED_COLOR
+            self.lbx_egroup_pat['bg'] = DISABLED_COLOR
+            self.lbx_cgroup_pat['bg'] = DISABLED_COLOR
             self.txt_title_sc['state'] = DISABLED
             self.txt_description_sc['state'] = DISABLED
             self.txt_access_sc['state'] = DISABLED
@@ -1158,13 +1160,13 @@ class FormChildExperiment:
         """
         self.clear_sc_fields()
         # Change color to enabled (only when viewing option)
-        self.txt_title_sc['bg'] = self.enabled_color
-        self.txt_description_sc['bg'] = self.enabled_color
-        self.txt_access_sc['bg'] = self.enabled_color
-        self.lbx_egroup['bg'] = self.enabled_color
-        self.lbx_cgroup['bg'] = self.enabled_color
-        self.lbx_egroup_pat['bg'] = self.enabled_color
-        self.lbx_cgroup_pat['bg'] = self.enabled_color
+        self.txt_title_sc['bg'] = ENABLED_COLOR
+        self.txt_description_sc['bg'] = ENABLED_COLOR
+        self.txt_access_sc['bg'] = ENABLED_COLOR
+        self.lbx_egroup['bg'] = ENABLED_COLOR
+        self.lbx_cgroup['bg'] = ENABLED_COLOR
+        self.lbx_egroup_pat['bg'] = ENABLED_COLOR
+        self.lbx_cgroup_pat['bg'] = ENABLED_COLOR
         self.frm_child_general_sc.grid_forget()
         self.frm_aux9.grid_forget() # Hide experimental group configuration
         self.frm_child_sc_list.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
@@ -1207,11 +1209,11 @@ class FormChildExperiment:
         # Fill available designers treeview
         for index, item in enumerate(self.av_designers_cgroup):
             self.trv_available_designers.insert('', 'end', text=item.id,
-                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
+                                                values=(index+1, summarize_text('{} {}'.format(item.name, item.surname), 200)))
         # Fill selected designers treeview
         for index, item in enumerate(self.experimental_scenario.control_group):
             self.trv_selected_designers.insert('', 'end', text=item.id,
-                                               values=(index+1, '{} {}'.format(item.name, item.surname)))
+                                               values=(index+1, summarize_text('{} {}'.format(item.name, item.surname), 200)))
         self.tlevel_designers.deiconify()
         self.tlevel_designers.grab_set()
         self.tlevel_designers_type = 2
@@ -1225,11 +1227,11 @@ class FormChildExperiment:
         # Fill available designers treeview
         for index, item in enumerate(self.av_designers_egroup):
             self.trv_available_designers.insert('', 'end', text=item.id,
-                                                values=(index+1, '{} {}'.format(item.name, item.surname)))
+                                                values=(index+1, summarize_text('{} {}'.format(item.name, item.surname), 200)))
         # Fill selected designers treeview
         for index, item in enumerate(self.experimental_scenario.experimental_group):
             self.trv_selected_designers.insert('', 'end', text=item.id,
-                                               values=(index+1, '{} {}'.format(item.name, item.surname)))
+                                               values=(index+1, summarize_text('{} {}'.format(item.name, item.surname), 200)))
         '''
         for col in self.trv_available_designers['columns']:
             self.trv_available_designers.heading(col, text=col, command=lambda:
@@ -1318,13 +1320,13 @@ class FormChildExperiment:
                     if item.id_visual == id_selected:
                         self.problem = item
                         break
-                self.txt_short_desc_prob['bg'] = self.disabled_color
-                self.txt_description_prob['bg'] = self.disabled_color
-                self.txt_annotations_esol['bg'] = self.disabled_color
-                self.lbx_patterns_esol['bg'] = self.disabled_color
+                self.txt_short_desc_prob['bg'] = DISABLED_COLOR
+                self.txt_description_prob['bg'] = DISABLED_COLOR
+                self.txt_annotations_esol['bg'] = DISABLED_COLOR
+                self.lbx_patterns_esol['bg'] = DISABLED_COLOR
                 self.txt_short_desc_prob.insert('1.0', self.problem.brief_description)
-                self.txt_description_prob.insert('1.0', wrap_text(self.problem.description, 40))
-                self.txt_annotations_esol.insert('1.0', wrap_text(self.problem.solution.annotations, 50))
+                self.txt_description_prob.insert('1.0', self.problem.description)
+                self.txt_annotations_esol.insert('1.0', self.problem.solution.annotations)
                 for item in self.problem.solution.patterns:
                     self.lbx_patterns_esol.insert(END, item.get_joined_main_s())
                 self.txt_short_desc_prob['state'] = DISABLED
@@ -1687,10 +1689,12 @@ class FormChildExperiment:
             self.trv_selected_patterns.delete(item)
         # Fill available patterns treeview
         for index, item in enumerate(self.av_patterns_esol):
-            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1,
+                                                                                summarize_text(item.get_joined_main_s(), 200)))
         # Fill selected patterns treeview
         for index, item in enumerate(self.problem.solution.patterns):
-            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1,
+                                                                               summarize_text(item.get_joined_main_s(), 200)))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
         self.tlevel_patterns_type = 3
@@ -1703,10 +1707,12 @@ class FormChildExperiment:
             self.trv_selected_patterns.delete(item)
         # Fill available patterns treeview
         for index, item in enumerate(self.av_patterns_cgroup):
-            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1,
+                                                                                summarize_text(item.get_joined_main_s(), 200)))
         # Fill selected patterns treeview
         for index, item in enumerate(self.experimental_scenario.cgroup_patterns):
-            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1,
+                                                                               summarize_text(item.get_joined_main_s(), 200)))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
         self.tlevel_patterns_type = 2
@@ -1719,10 +1725,12 @@ class FormChildExperiment:
             self.trv_selected_patterns.delete(item)
         # Fill available patterns treeview
         for index, item in enumerate(self.av_patterns_egroup):
-            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
+            self.trv_available_patterns.insert('', 'end', text=item.id, values=(index+1,
+                                                                                summarize_text(item.get_joined_main_s(), 200)))
         # Fill selected patterns treeview
         for index, item in enumerate(self.experimental_scenario.egroup_patterns):
-            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1, item.get_joined_main_s()))
+            self.trv_selected_patterns.insert('', 'end', text=item.id, values=(index+1,
+                                                                               summarize_text(item.get_joined_main_s(), 200)))
         self.tlevel_patterns.deiconify()
         self.tlevel_patterns.grab_set()
         self.tlevel_patterns_type = 1
@@ -1880,8 +1888,8 @@ class FormChildExperiment:
         self.cbx_dt_exp['state'] = NORMAL
         self.txt_name_exp.delete('1.0', 'end-1c')
         self.txt_description_exp.delete('1.0', 'end-1c')
-        self.txt_name_exp['bg'] = self.enabled_color
-        self.txt_description_exp['bg'] = self.enabled_color
+        self.txt_name_exp['bg'] = ENABLED_COLOR
+        self.txt_description_exp['bg'] = ENABLED_COLOR
         # Remove existing elements in the list
         for item in self.trv_available_sc.get_children():
             self.trv_available_sc.delete(item)
@@ -1927,10 +1935,10 @@ class FormChildExperiment:
         self.txt_description_prob['state'] = NORMAL
         self.txt_annotations_esol['state'] = NORMAL
         self.lbx_patterns_esol['state'] = NORMAL
-        self.txt_short_desc_prob['bg'] = self.enabled_color
-        self.txt_description_prob['bg'] = self.enabled_color
-        self.txt_annotations_esol['bg'] = self.enabled_color
-        self.lbx_patterns_esol['bg'] = self.enabled_color
+        self.txt_short_desc_prob['bg'] = ENABLED_COLOR
+        self.txt_description_prob['bg'] = ENABLED_COLOR
+        self.txt_annotations_esol['bg'] = ENABLED_COLOR
+        self.lbx_patterns_esol['bg'] = ENABLED_COLOR
         self.txt_short_desc_prob.delete('1.0', 'end-1c')
         self.txt_description_prob.delete('1.0', 'end-1c')
         self.txt_annotations_esol.delete('1.0', 'end-1c')

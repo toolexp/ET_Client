@@ -1,8 +1,7 @@
 from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Toplevel, Scrollbar, Canvas
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
-from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pattern, \
-    wrap_text, ExperimentalSC, File
+from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pattern, ExperimentalSC, File
 from PIL import ImageTk, Image
 from Modules.Config.Visual import *
 

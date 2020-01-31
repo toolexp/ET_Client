@@ -25,6 +25,13 @@ def verify_port(port):
         return True
 
 
+def summarize_text(string, lenght=90):
+    if len(string) > lenght/6:
+        return string[:int(lenght/6)-3] + '...'
+    else:
+        return string
+
+
 def wrap_text(string, lenght=90):
     return '\n'.join(textwrap.wrap(string, lenght))
 
