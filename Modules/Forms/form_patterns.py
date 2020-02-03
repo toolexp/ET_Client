@@ -291,7 +291,7 @@ class FormChildPattern:
                 if item.data_type == 'File':    # If pattern has an associated diagram
                     if item.diagram_id != 0:
                         self.btn_view_diagram.grid(row=0, column=2, padx=10, sticky=E)
-                        self.txt_summary.insert('end-1c', "{}:\nClick up button to see diagram >>\n\n".
+                        self.txt_summary.insert('end-1c', "{}:\nClick up button to see diagram ^\n\n".
                                                 format(item.name))
                         self.directive = Message(action=65, information=[item.diagram_id])  # Ask for the diagram of this section
                         self.connection = self.directive.send_directive(self.connection)

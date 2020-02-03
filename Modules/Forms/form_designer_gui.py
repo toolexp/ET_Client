@@ -42,7 +42,6 @@ class FormParentDesigner:
         self.incomplete_icon = PhotoImage(file=r"./Resources/incomplete.png")
         self.optional_icon = PhotoImage(file=r"./Resources/optional.png")
         self.refresh_icon = PhotoImage(file=r"./Resources/refresh.png")
-        defaultbg = self.frm_parent.cget('bg')
 
         # Initialize visual components for displaying available experiment scenarios
         lbl_title = Label(self.frm_parent, text='Experiments')
@@ -73,7 +72,7 @@ class FormParentDesigner:
         vsb_trv_av.grid(row=3, column=2, pady=20, sticky=NS)
         self.trv_available.configure(yscrollcommand=vsb_trv_av.set)
         self.txt_scenario_desc = Text(self.frm_parent, height=15, width=40)
-        self.txt_scenario_desc.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_scenario_desc.config(font=TEXT_FONT, bg=DISABLED_COLOR)
         self.txt_scenario_desc.grid(row=3, column=4, pady=20, sticky=W)
         vsb_txt_sc = Scrollbar(self.frm_parent, orient="vertical", command=self.txt_scenario_desc.yview)
         vsb_txt_sc.grid(row=3, column=5, pady=20, sticky=NS)
@@ -108,7 +107,7 @@ class FormParentDesigner:
         self.lbl_exp_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
         self.lbl_exp_title.grid(row=0, column=1, columnspan=5, pady=5, sticky=EW)
         self.txt_exp_desc = Text(self.frm_general, height=4, width=157)
-        self.txt_exp_desc.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_exp_desc.config(font=TEXT_FONT, bg=DISABLED_COLOR)
         self.txt_exp_desc.grid(row=1, column=1, pady=5, sticky=W)
         vsb_txt_expd = Scrollbar(self.frm_general, orient="vertical", command=self.txt_exp_desc.yview)
         vsb_txt_expd.grid(row=1, column=2, pady=5, sticky=NS)
@@ -126,7 +125,7 @@ class FormParentDesigner:
         self.lbl_prob_title.config(fg=TEXT_COLOR, font=SUBTITLE_FONT)
         self.lbl_prob_title.grid(row=3, column=1, columnspan=2, pady=5, sticky=W)
         self.txt_prob_desc = Text(self.frm_general, height=7, width=157)
-        self.txt_prob_desc.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_prob_desc.config(font=TEXT_FONT, bg=DISABLED_COLOR)
         self.txt_prob_desc.grid(row=4, column=1, pady=5, sticky=W)
         vsb_txt_probd = Scrollbar(self.frm_general, orient="vertical", command=self.txt_prob_desc.yview)
         vsb_txt_probd.grid(row=4, column=2, pady=5, sticky=NS)
@@ -168,10 +167,10 @@ class FormParentDesigner:
         self.lbx_av_patterns.configure(yscrollcommand=vsb_trv_avpat.set)
         lbl_sep8 = Label(self.tab_patterns)
         lbl_sep8.grid(row=0, column=7, padx=10, pady=10, rowspan=5)
-        self.btn_view_pd = Button(self.tab_patterns, text='View diagram', command=self.click_expand_pd)
+        self.btn_view_pd = Button(self.tab_patterns, text='View diagram >>', command=self.click_expand_pd)
         btn_view_pd_ttp = CreateToolTip(self.btn_view_pd, 'Pattern section diagram')
         self.txt_pattern_content = Text(self.tab_patterns, height=18, width=85)
-        self.txt_pattern_content.config(font=TEXT_FONT, bg=defaultbg)
+        self.txt_pattern_content.config(font=TEXT_FONT, bg=DISABLED_COLOR)
         self.txt_pattern_content.tag_configure("center", justify='center')
         self.txt_pattern_content.tag_add("center", 1.0, "end")
         self.txt_pattern_content.grid(row=1, column=8, sticky=W, columnspan=2, rowspan=4)
@@ -202,11 +201,9 @@ class FormParentDesigner:
         self.txt_solution_desc.grid(row=0, column=1, pady=20, sticky=W)
         vsb_txt_solution_desc = Scrollbar(self.tab_desc, orient="vertical", command=self.txt_solution_desc.yview)
         vsb_txt_solution_desc.grid(row=0, column=2, pady=20, sticky=NS)
-        self.lbx_av_patterns.configure(yscrollcommand=vsb_txt_solution_desc.set)
+        self.txt_solution_desc.configure(yscrollcommand=vsb_txt_solution_desc.set)
         lbl_sep14 = Label(self.tab_desc)
         lbl_sep14.grid(row=0, column=3, padx=10, pady=20)
-        #lbl_sep13 = Label(self.frm_general)
-        #lbl_sep13.grid(row=6, column=3, padx=10, pady=10, rowspan=2)
 
         self.tab_file = Frame(self.tab_control)
         self.tab_control.add(self.tab_file, text="File", padding=1, image=self.optional_icon, compound=RIGHT)
@@ -222,7 +219,6 @@ class FormParentDesigner:
         self.canvas_solution = Canvas(self.tab_file, width=350, height=350)
         self.canvas_solution.config(background='white', borderwidth=1)
         self.canvas_solution.grid(row=0, column=1, padx=10, pady=10, rowspan=10, sticky=NS)
-
         self.tab_control.grid(row=7, column=1, pady=10, sticky=W, columnspan=2)
 
         self.canvas_expanded = Canvas(self.tlevel_image_exp, width=500, height=500)
@@ -588,6 +584,8 @@ class FormParentDesigner:
         self.lbl_prob_title['text'] = 'Problem {} of {}: {}'.format(self.problems_counter + 1,
                                                                     len(self.experimental_scenario.problems),
                                                                     self.experimental_scenario.problems[self.problems_counter].brief_description)
+        self.txt_prob_desc['state'] = NORMAL
+        self.txt_prob_desc.delete('1.0', 'end-1c')
         self.txt_prob_desc.insert('1.0', self.experimental_scenario.problems[self.problems_counter].description)
         self.txt_prob_desc['state'] = DISABLED
         self.av_patterns_ids = []
@@ -596,12 +594,12 @@ class FormParentDesigner:
             self.av_patterns_ids.append(item.id)
             self.lbx_av_patterns.insert(END, item.get_joined_main_s())
         self.current_ideal_patterns = self.experimental_scenario.problems[self.problems_counter].solution.patterns_id  # Get the patterns of the ideal solution for current problem
-        self.btn_view_pd.grid_forget()
         # Make patterns visible if the patterns are available for current designer in current experimental scenario
         if self.pattern_decision:
             self.tab_control.select(0)
         else:
             self.tab_control.select(1)
+        self.btn_view_pd.grid_forget()
         self.time_thread = TimerClass()
         self.time_thread.begin()
         self.acquisition_start_date = datetime.now()
@@ -628,7 +626,7 @@ class FormParentDesigner:
                     self.connection = self.directive.send_directive(self.connection)
                     self.file_pd = File()
                     self.file_pd.write_file(self.connection.message.information[0], self.connection.message.information[1])
-                    self.btn_view_pd.grid(row=0, column=9, sticky=W)
+                    self.btn_view_pd.grid(row=0, column=9, sticky=E)
                     self.txt_pattern_content.insert('end-1c', "\nClick up button to see diagram ^\n\n")
 
                 else:

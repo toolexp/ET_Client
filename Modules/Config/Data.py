@@ -2,7 +2,7 @@ import textwrap
 import threading
 import time
 import datetime
-from tkinter import Toplevel, Label
+from tkinter import Label, Toplevel
 
 
 def verify_ip(ip):
@@ -254,6 +254,7 @@ class File:
         self.file.write(self.file_bytes)
         self.file.close()
         return path
+
 
 class Measurement:
     def __init__(self, id=0, value='', acquisition_start_date=None, acquisition_end_date=datetime.datetime.now(),
@@ -535,3 +536,4 @@ class TimerClass:
 
     def stop(self):
         self.stop_var = True
+
