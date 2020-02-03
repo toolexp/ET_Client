@@ -335,26 +335,26 @@ class WindowHome:
                             problem_id = self.frm_parent_designer_gui.experimental_scenario.problems[self.frm_parent_designer_gui.problems_counter].id
                             current_measurements = []
                             # Solution time
-                            measurement_1 = Measurement(value=None, id_metric=1,
+                            measurement_1 = Measurement(value=-2, id_metric=1,
                                                         acquisition_start_date=acquisition_end_date,
                                                         acquisition_end_date=acquisition_end_date,
                                                         id_designer=self.current_designer.id, id_problem=problem_id)
                             current_measurements.append(measurement_1)
                             if self.frm_parent_designer_gui.pattern_decision:
                                 # Selection time
-                                measurement_2 = Measurement(value=None, id_metric=2,
+                                measurement_2 = Measurement(value=-2, id_metric=2,
                                                             acquisition_start_date=acquisition_end_date,
                                                             acquisition_end_date=acquisition_end_date,
                                                             id_designer=self.current_designer.id, id_problem=problem_id)
                                 current_measurements.append(measurement_2)
                                 # Viewed patterns
-                                measurement_3 = Measurement(value=None, id_metric=3,
+                                measurement_3 = Measurement(value=-2, id_metric=3,
                                                             acquisition_start_date=acquisition_end_date,
                                                             acquisition_end_date=acquisition_end_date,
                                                             id_designer=self.current_designer.id, id_problem=problem_id)
                                 current_measurements.append(measurement_3)
                                 # Chosen patterns
-                                measurement_4 = Measurement(value=None, id_metric=4,
+                                measurement_4 = Measurement(value=-2, id_metric=4,
                                                             acquisition_start_date=acquisition_end_date,
                                                             acquisition_end_date=acquisition_end_date,
                                                             id_designer=self.current_designer.id, id_problem=problem_id)

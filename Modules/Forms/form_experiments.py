@@ -651,7 +651,7 @@ class FormChildExperiment:
                            command=self.click_experimental_simulation)
         btn_1_sim.grid(row=1, column=0, padx=20, pady=20, sticky=W)
         btn_2_sim = Button(self.tlevel_simulation, text='Control\ngroup', command=self.click_control_simulation)
-        btn_2_sim.grid(row=1, column=1, padx=20, pady=20, sticky=W)
+        btn_2_sim.grid(row=1, column=1, padx=20, pady=20, sticky=E)
 
     def retrieve_list_exp(self):
         """
@@ -808,7 +808,7 @@ class FormChildExperiment:
             self.directive = Message(action=93, information=[id_exp_selected, 'execution'])
             self.connection = self.directive.send_directive(self.connection)
             if self.connection.message.action == 5:  # An error ocurred while executing experiment
-                messagebox.showerror(parent=self.frm_child_exp_list, title='Can not execute experiment',
+                messagebox.showwarning(parent=self.frm_child_exp_list, title='Can not execute experiment',
                                      message=self.connection.message.information[0])
             self.retrieve_list_exp()
         else:
@@ -1208,11 +1208,11 @@ class FormChildExperiment:
                 self.experimental_scenario.access_code = self.txt_access_sc.get('1.0', 'end-1c')
                 if self.experimental_scenario.id == 0:  # New experimental scenario
                     # Ask if the new scenario turn into execution after creation
-                    estado_inicial = 'created'
+                    initial_state = 'created'
                     decision = messagebox.askyesno(parent=self.frm_child_general_sc, title='Execute scenario',
                                                    message='Do you want to execute the newly configured scenario?')
                     if decision:
-                        estado_inicial = 'execution'
+                        initial_state = 'execution'
                     # Create context diagram in DB (if exist)
                     id_diagram = None
                     if self.file_dd is not None:
@@ -1225,7 +1225,7 @@ class FormChildExperiment:
                     self.directive = Message(action=81,
                                              information=[self.experimental_scenario.title,
                                                           self.experimental_scenario.description,
-                                                          self.experimental_scenario.access_code, estado_inicial,
+                                                          self.experimental_scenario.access_code, initial_state,
                                                           id_diagram, self.experiment.id, [], [], [], []])
                     for item in self.experimental_scenario.experimental_group:
                         self.directive.information[6].append(item.id)

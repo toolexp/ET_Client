@@ -382,7 +382,9 @@ class FormParentDesigner:
             # Save measurements associated with patterns only when these are available for designer
             if self.pattern_decision:
                 # Selection time
-                measurement_2 = Measurement(value=str(self.selection_time), acquisition_start_date=self.acquisition_start_date,
+                # Getting average if more than one value for this metric
+                selection_time = 0 if len(self.selection_time) == 0 else sum(self.selection_time) / len(self.selection_time)
+                measurement_2 = Measurement(value=str(selection_time), acquisition_start_date=self.acquisition_start_date,
                                             acquisition_end_date=acquisition_end_date, id_metric=2,
                                             id_designer=self.current_designer.id, id_problem=problem_id)
                 current_measurements.append(measurement_2)
