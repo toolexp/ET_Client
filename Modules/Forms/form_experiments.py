@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar, Toplevel, Listbox, \
+from tkinter import Label, LabelFrame, Frame, Entry, Text, Button, messagebox, PhotoImage, Scrollbar, Toplevel, Listbox, \
     Canvas, StringVar, filedialog
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator, Combobox, Notebook, Style
@@ -153,8 +153,7 @@ class FormChildExperiment:
         lbl_design_type.grid(row=2, column=1, pady=10, sticky=W)
         lbl_sep25 = Label(self.frm_child_sc_list)
         lbl_sep25.grid(row=0, column=2, padx=10, pady=10, rowspan=3)
-        self.txt_name_exp = Text(self.frm_child_sc_list, height=1, width=79)
-        self.txt_name_exp.config(font=TEXT_FONT)
+        self.txt_name_exp = Entry(self.frm_child_sc_list, width=79, font=TEXT_FONT)
         self.txt_name_exp.grid(row=0, column=3, pady=10, sticky=W)
         self.txt_description_exp = Text(self.frm_child_sc_list, height=4, width=79)
         self.txt_description_exp.config(font=TEXT_FONT)
@@ -235,8 +234,7 @@ class FormChildExperiment:
         lbl_access_sc = Label(self.frm_child_general_sc, text='Access code*\t')
         lbl_access_sc.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_access_sc.grid(row=4, column=1, pady=10, sticky=W)
-        self.txt_title_sc = Text(self.frm_child_general_sc, height=1, width=50)
-        self.txt_title_sc.config(font=TEXT_FONT)
+        self.txt_title_sc = Entry(self.frm_child_general_sc, width=50, font=TEXT_FONT)
         self.txt_title_sc.grid(row=0, column=3, pady=10, columnspan=2, sticky=W)
         self.txt_description_sc = Text(self.frm_child_general_sc, height=6, width=50)
         self.txt_description_sc.config(font=TEXT_FONT)
@@ -254,8 +252,7 @@ class FormChildExperiment:
         btn_quit_dd_ttp = CreateToolTip(self.btn_quit_dd, 'Remove image')
         self.btn_view_dd = Button(self.frm_child_general_sc, image=self.view_icon, command=self.click_view_dd)
         btn_view_dd_ttp = CreateToolTip(self.btn_view_dd, 'View image')
-        self.txt_access_sc = Text(self.frm_child_general_sc, height=1, width=50)
-        self.txt_access_sc.config(font=TEXT_FONT)
+        self.txt_access_sc = Entry(self.frm_child_general_sc, width=50, font=TEXT_FONT)
         self.txt_access_sc.grid(row=4, column=3, pady=10, columnspan=2, sticky=W)
 
         self.tab_configuration = Notebook(self.frm_child_general_sc)
@@ -411,8 +408,7 @@ class FormChildExperiment:
         lbl_sep10.grid(row=0, column=2, rowspan=2, padx=10, pady=10)
         lbl_sep18 = Label(frm_aux1)
         lbl_sep18.grid(row=0, column=5, padx=10, pady=10, rowspan=2)
-        self.txt_short_desc_prob = Text(frm_aux1, height=1, width=100)
-        self.txt_short_desc_prob.config(font=TEXT_FONT)
+        self.txt_short_desc_prob = Entry(frm_aux1, width=100, font=TEXT_FONT)
         self.txt_short_desc_prob.grid(row=0, column=3, pady=10, sticky=W)
         self.txt_description_prob = Text(frm_aux1, height=10, width=100)
         self.txt_description_prob.config(font=TEXT_FONT)
@@ -721,7 +717,7 @@ class FormChildExperiment:
                                          design_type=int(self.connection.message.information[2]),
                                          state=self.connection.message.information[3])
             # Fill visual components with retrieved information
-            self.txt_name_exp.insert('1.0', self.experiment.name)
+            self.txt_name_exp.insert(0, self.experiment.name)
             self.txt_description_exp.insert('1.0', self.experiment.description)
             self.cbx_dt_exp.set('One group' if self.experiment.design_type == 1 else
                                 'Two groups')
@@ -757,7 +753,7 @@ class FormChildExperiment:
                                              design_type=int(self.connection.message.information[2]),
                                              state=self.connection.message.information[3])
                 # Fill visual components with retrieved information
-                self.txt_name_exp.insert('1.0', self.experiment.name)
+                self.txt_name_exp.insert(0, self.experiment.name)
                 self.txt_description_exp.insert('1.0', self.experiment.description)
                 self.cbx_dt_exp.set('One group' if self.experiment.design_type == 1 else
                                     'Two groups')
@@ -842,7 +838,7 @@ class FormChildExperiment:
         """
         if self.experiment.id == 0:  # Create an experiment
             if self.validate_exp_fields():
-                self.experiment.name = self.txt_name_exp.get('1.0', 'end-1c')
+                self.experiment.name = self.txt_name_exp.get()
                 self.experiment.description = self.txt_description_exp.get('1.0', 'end-1c')
                 self.experiment.design_type = 1 if self.cbx_dt_exp.get() == 'One group' else 2
                 self.directive = Message(action=91, information=[self.experiment.name, self.experiment.description,
@@ -874,7 +870,7 @@ class FormChildExperiment:
                     decision_aux = 0
             if decision_aux == 1:
                 if self.validate_exp_fields():
-                    self.experiment.name = self.txt_name_exp.get('1.0', 'end-1c')
+                    self.experiment.name = self.txt_name_exp.get()
                     self.experiment.description = self.txt_description_exp.get('1.0', 'end-1c')
                     self.experiment.design_type = design_type_aux
                     self.directive = Message(action=93, information=[self.experiment.id, self.experiment.name,
@@ -906,7 +902,7 @@ class FormChildExperiment:
             aux_d_type = 2
         else:
             aux_d_type = 0
-        if self.txt_name_exp.get('1.0', 'end-1c') != self.experiment.name or \
+        if self.txt_name_exp.get() != self.experiment.name or \
             self.txt_description_exp.get('1.0', 'end-1c') != self.experiment.description or \
                 aux_d_type != self.experiment.design_type:
             decision = messagebox.askyesno(parent=self.frm_child_sc_list, title='Cancel',
@@ -1013,12 +1009,12 @@ class FormChildExperiment:
             self.experimental_scenario.retrieve_patterns_groups(self.av_patterns)
             self.experimental_scenario.retrieve_problems(self.av_patterns)
             # Fill visual components
-            self.txt_title_sc.insert('1.0', self.experimental_scenario.title)
+            self.txt_title_sc.insert(0, self.experimental_scenario.title)
             self.txt_description_sc.insert('1.0', self.experimental_scenario.description)
             self.file_dd = self.experimental_scenario.description_diagram
             if self.file_dd is not None:
                 self.show_dd_file()
-            self.txt_access_sc.insert('1.0', self.experimental_scenario.access_code)
+            self.txt_access_sc.insert(0, self.experimental_scenario.access_code)
             for index, item in enumerate(self.experimental_scenario.experimental_group):
                 self.lbx_egroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
             for index, item in enumerate(self.experimental_scenario.control_group):
@@ -1084,12 +1080,12 @@ class FormChildExperiment:
                 self.reload_available()
                 self.cancel_sc_decision = False  # Decision changes when any changes in general sc configuration form is done
                 # Fill visual components
-                self.txt_title_sc.insert('1.0', self.experimental_scenario.title)
+                self.txt_title_sc.insert(0, self.experimental_scenario.title)
                 self.txt_description_sc.insert('1.0', self.experimental_scenario.description)
                 self.file_dd = self.experimental_scenario.description_diagram
                 if self.file_dd is not None:
                     self.show_dd_file()
-                self.txt_access_sc.insert('1.0', self.experimental_scenario.access_code)
+                self.txt_access_sc.insert(0, self.experimental_scenario.access_code)
                 for index, item in enumerate(self.experimental_scenario.experimental_group):
                     self.lbx_egroup.insert(END, '{}) {} {}'.format(index + 1, item.surname, item.name))
                 for index, item in enumerate(self.experimental_scenario.control_group):
@@ -1203,9 +1199,9 @@ class FormChildExperiment:
                     if decision:  # Cancel
                         patterns_decision = True
             if patterns_decision:
-                self.experimental_scenario.title = self.txt_title_sc.get('1.0', 'end-1c')
+                self.experimental_scenario.title = self.txt_title_sc.get()
                 self.experimental_scenario.description = self.txt_description_sc.get('1.0', 'end-1c')
-                self.experimental_scenario.access_code = self.txt_access_sc.get('1.0', 'end-1c')
+                self.experimental_scenario.access_code = self.txt_access_sc.get()
                 if self.experimental_scenario.id == 0:  # New experimental scenario
                     # Ask if the new scenario turn into execution after creation
                     initial_state = 'created'
@@ -1339,9 +1335,9 @@ class FormChildExperiment:
         to the 'Experimental scenarios list form'
         """
         decision = True
-        if self.txt_title_sc.get('1.0', 'end-1c') != self.experimental_scenario.title or \
+        if self.txt_title_sc.get() != self.experimental_scenario.title or \
                 self.txt_description_sc.get('1.0', 'end-1c') != self.experimental_scenario.description or \
-                self.txt_access_sc.get('1.0', 'end-1c') != self.experimental_scenario.access_code or \
+                self.txt_access_sc.get() != self.experimental_scenario.access_code or \
                 self.file_dd != self.experimental_scenario.description_diagram or self.cancel_sc_decision:
             decision = messagebox.askyesno(parent=self.tlevel_problem, title='Cancel',
                                            message='Are you sure you want to cancel?')
@@ -1372,7 +1368,7 @@ class FormChildExperiment:
         to the 'Experimental scenario configuration form'
         """
         decision = True
-        if self.txt_short_desc_prob.get('1.0', 'end-1c') != self.problem.brief_description or \
+        if self.txt_short_desc_prob.get() != self.problem.brief_description or \
                 self.txt_description_prob.get('1.0', 'end-1c') != self.problem.description or \
                 self.txt_annotations_esol.get('1.0', 'end-1c') != self.problem.solution.annotations or \
                 self.lbx_patterns_esol.size() != len(self.problem.solution.patterns_id):
@@ -1527,7 +1523,7 @@ class FormChildExperiment:
                 self.txt_description_prob['bg'] = DISABLED_COLOR
                 self.txt_annotations_esol['bg'] = DISABLED_COLOR
                 self.lbx_patterns_esol['bg'] = DISABLED_COLOR
-                self.txt_short_desc_prob.insert('1.0', self.problem.brief_description)
+                self.txt_short_desc_prob.insert(0, self.problem.brief_description)
                 self.txt_description_prob.insert('1.0', self.problem.description)
                 self.txt_annotations_esol.insert('1.0', self.problem.solution.annotations)
                 for item in self.problem.solution.patterns:
@@ -1561,7 +1557,7 @@ class FormChildExperiment:
                 if decision:
                     patterns_decision = True
             if patterns_decision:
-                self.problem.brief_description = self.txt_short_desc_prob.get('1.0', 'end-1c')
+                self.problem.brief_description = self.txt_short_desc_prob.get()
                 self.problem.description = self.txt_description_prob.get('1.0', 'end-1c')
                 self.problem.solution.annotations = self.txt_description_prob.get('1.0', 'end-1c')
                 self.problem.solution.diagram = self.file_esol
@@ -2092,7 +2088,7 @@ class FormChildExperiment:
         self.txt_name_exp['state'] = NORMAL
         self.txt_description_exp['state'] = NORMAL
         self.cbx_dt_exp['state'] = NORMAL
-        self.txt_name_exp.delete('1.0', 'end-1c')
+        self.txt_name_exp.delete(0, END)
         self.txt_description_exp.delete('1.0', 'end-1c')
         self.txt_name_exp['bg'] = ENABLED_COLOR
         self.txt_description_exp['bg'] = ENABLED_COLOR
@@ -2115,9 +2111,9 @@ class FormChildExperiment:
         self.lbx_cgroup['state'] = NORMAL
         self.lbx_egroup_pat['state'] = NORMAL
         self.lbx_cgroup_pat['state'] = NORMAL
-        self.txt_title_sc.delete('1.0', 'end-1c')
+        self.txt_title_sc.delete(0, END)
         self.txt_description_sc.delete('1.0', 'end-1c')
-        self.txt_access_sc.delete('1.0', 'end-1c')
+        self.txt_access_sc.delete(0, END)
         self.lbx_problems.delete(0, END)
         self.lbx_egroup.delete(0, END)
         self.lbx_cgroup.delete(0, END)
@@ -2145,7 +2141,7 @@ class FormChildExperiment:
         self.txt_description_prob['bg'] = ENABLED_COLOR
         self.txt_annotations_esol['bg'] = ENABLED_COLOR
         self.lbx_patterns_esol['bg'] = ENABLED_COLOR
-        self.txt_short_desc_prob.delete('1.0', 'end-1c')
+        self.txt_short_desc_prob.delete(0, END)
         self.txt_description_prob.delete('1.0', 'end-1c')
         self.txt_annotations_esol.delete('1.0', 'end-1c')
         self.lbx_patterns_esol.delete(0, END)
@@ -2160,7 +2156,7 @@ class FormChildExperiment:
         Validation of fullfilled mandatory visual visual components when creating or updating an experiment
         :return:
         """
-        if len(self.txt_name_exp.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_name_exp.get()) == 0:
             messagebox.showwarning(parent=self.frm_child_sc_list, title='Missing information',
                                    message='You must insert a name for the experiment')
             return False
@@ -2179,7 +2175,7 @@ class FormChildExperiment:
         Validation of fullfilled mandatory visual visual components when creating or updating a design problem
         :return:
         """
-        if len(self.txt_short_desc_prob.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_short_desc_prob.get()) == 0:
             messagebox.showwarning(parent=self.tlevel_problem, title='Missing information',
                                    message='You must insert a brief description for the problem')
             return False
@@ -2194,7 +2190,7 @@ class FormChildExperiment:
         Validation of fullfilled mandatory visual visual components when creating or updating an experimental scenario
         :return:
         """
-        if len(self.txt_title_sc.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_title_sc.get()) == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must insert a title for the scenario')
             return False
@@ -2202,7 +2198,7 @@ class FormChildExperiment:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must insert a description for the scenario')
             return False
-        if len(self.txt_access_sc.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_access_sc.get()) == 0:
             messagebox.showwarning(parent=self.frm_child_general_sc, title='Missing information',
                                    message='You must insert an access code for the scenario')
             return False

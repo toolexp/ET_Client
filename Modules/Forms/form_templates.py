@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoImage, Scrollbar
+from tkinter import Label, LabelFrame, Frame, Entry, Text, Button, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
 from Modules.Config.Data import Message, CreateToolTip, Template, summarize_text
@@ -114,8 +114,7 @@ class FormChildTemplate:
         lbl_description.grid(row=0, column=6, pady=25, sticky=NW)
         lbl_sep3 = Label(self.frm_child_crud)
         lbl_sep3.grid(row=0, column=2, padx=10, pady=25)
-        self.txt_name = Text(self.frm_child_crud, height=1, width=30)
-        self.txt_name.config(font=TEXT_FONT)
+        self.txt_name = Entry(self.frm_child_crud, width=30, font=TEXT_FONT)
         self.txt_name.grid(row=0, column=3, pady=25, sticky=NW)
         lbl_sep4 = Label(self.frm_child_crud)
         lbl_sep4.grid(row=0, column=7, padx=10, pady=25)
@@ -264,7 +263,7 @@ class FormChildTemplate:
             self.template = Template(id=self.id_selected, name=self.connection.message.information[0],
                                      description=self.connection.message.information[1],
                                      sections=self.connection.message.information[2])
-            self.txt_name.insert('1.0', self.template.name)
+            self.txt_name.insert(0, self.template.name)
             self.txt_description.insert('1.0', self.template.description)
             self.retrieve_sections(self.template.sections)
             self.txt_name.focus_set()
@@ -288,7 +287,7 @@ class FormChildTemplate:
                 self.template = Template(id=self.id_selected, name=self.connection.message.information[0],
                                          description=self.connection.message.information[1],
                                          sections=self.connection.message.information[2])
-                self.txt_name.insert('1.0', self.template.name)
+                self.txt_name.insert(0, self.template.name)
                 self.txt_description.insert('1.0', self.template.description)
                 self.retrieve_sections(self.template.sections)
                 self.txt_name.focus_set()
@@ -445,7 +444,7 @@ class FormChildTemplate:
 
     def click_save(self):
         if self.validate_fields():
-            self.template.name = self.txt_name.get('1.0', 'end-1c')
+            self.template.name = self.txt_name.get()
             self.template.description = self.txt_description.get('1.0', 'end-1c')
             if self.template.id == 0:  # Creating a template
                 self.directive = Message(action=36, information=[self.template.name, self.template.description, [], [],
@@ -476,7 +475,7 @@ class FormChildTemplate:
 
     def click_cancel(self):
         decision = True
-        if self.txt_name.get('1.0', 'end-1c') != self.template.name or \
+        if self.txt_name.get() != self.template.name or \
                 self.txt_description.get('1.0', 'end-1c') != self.template.description or \
                 len(self.trv_selected_sections.get_children()) != len(self.template.sections):
             decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
@@ -491,7 +490,7 @@ class FormChildTemplate:
 
     def validate_fields(self):
         text_section = False
-        if len(self.txt_name.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_name.get()) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must provide a name')
             return False
@@ -530,7 +529,7 @@ class FormChildTemplate:
         self.txt_description['state'] = NORMAL
         self.txt_name['bg'] = ENABLED_COLOR
         self.txt_description['bg'] = ENABLED_COLOR
-        self.txt_name.delete('1.0', 'end-1c')
+        self.txt_name.delete(0, END)
         self.txt_description.delete('1.0', 'end-1c')
         self.btn_save.grid_forget()
         self.btn_cancel.grid_forget()

@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Frame, Text, Button, Listbox, messagebox, PhotoImage, Scrollbar
+from tkinter import Label, LabelFrame, Frame, Entry, Text, Button, Listbox, messagebox, PhotoImage, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
 from Modules.Config.Data import Message, CreateToolTip, Section, summarize_text
@@ -97,7 +97,7 @@ class FormChildSection:
         self.cbx_data['values'] = ['Text', 'File', 'Classification']
         self.cbx_data.grid(row=0, column=2, pady=10, sticky=W)
         self.cbx_data.bind("<<ComboboxSelected>>", self.cbx_data_selected)
-        self.txt_name = Text(self.frm_aux1, height=1, width=50, font=TEXT_FONT)
+        self.txt_name = Entry(self.frm_aux1, width=50, font=TEXT_FONT)
         self.txt_name.grid(row=1, column=2, pady=10, sticky=W)
         lbl_sep2 = Label(self.frm_aux1)
         lbl_sep2.grid(row=0, column=1, rowspan=3, padx=10, pady=10)
@@ -177,7 +177,7 @@ class FormChildSection:
             self.section = Section(section_id=id_selected, name=self.connection.message.information[0],
                                    description=self.connection.message.information[1],
                                    data_type=self.connection.message.information[2])
-            self.txt_name.insert('1.0', self.section.name)
+            self.txt_name.insert(0, self.section.name)
             self.txt_description.insert('1.0', self.section.description)
             self.cbx_data.set(self.section.data_type)
             if self.section.data_type == 'Classification':
@@ -215,7 +215,7 @@ class FormChildSection:
                 self.section = Section(section_id=id_selected, name=self.connection.message.information[0],
                                        description=self.connection.message.information[1],
                                        data_type=self.connection.message.information[2])
-                self.txt_name.insert('1.0', self.section.name)
+                self.txt_name.insert(0, self.section.name)
                 self.txt_description.insert('1.0', self.section.description)
                 self.cbx_data.set(self.section.data_type)
                 if self.section.data_type == 'Classification':
@@ -252,7 +252,7 @@ class FormChildSection:
 
     def click_save(self):
         if self.validate_fields():
-            self.section.name = self.txt_name.get('1.0', 'end-1c')
+            self.section.name = self.txt_name.get()
             self.section.description = self.txt_description.get('1.0', 'end-1c')
             self.section.data_type = self.cbx_data.get()
             if self.section.section_id == 0:    # If creating a section
@@ -282,7 +282,7 @@ class FormChildSection:
 
     def click_cancel(self):
         decision = True
-        if self.txt_name.get('1.0', 'end-1c') != self.section.name or \
+        if self.txt_name.get() != self.section.name or \
                 self.txt_description.get('1.0', 'end-1c') != self.section.description or \
                 self.cbx_data.get() != self.section.data_type:
             decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
@@ -319,7 +319,7 @@ class FormChildSection:
             self.classifications.append(int(elements[0]))
 
     def validate_fields(self):
-        if len(self.txt_name.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_name.get()) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must insert a name for the section')
             return False
@@ -349,7 +349,7 @@ class FormChildSection:
         self.txt_name['bg'] = ENABLED_COLOR
         self.txt_description['bg'] = ENABLED_COLOR
         self.lbx_category['bg'] = ENABLED_COLOR
-        self.txt_name.delete('1.0', 'end-1c')
+        self.txt_name.delete(0, END)
         self.txt_description.delete('1.0', 'end-1c')
         self.cbx_data.set('')
         self.cbx_classification.set('')

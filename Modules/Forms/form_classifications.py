@@ -1,4 +1,4 @@
-from tkinter import Label, LabelFrame, Text, Button, messagebox, PhotoImage, Frame, Scrollbar
+from tkinter import Label, LabelFrame, Entry, Text, Button, messagebox, PhotoImage, Frame, Scrollbar
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Separator
 from Modules.Config.Data import Message, CreateToolTip, Classification, summarize_text
@@ -94,7 +94,7 @@ class FormChildClassification:
         lbl_categories.grid(row=2, column=0, pady=10, padx=20, sticky=NW)
         lbl_sep2 = Label(self.frm_child_crud)
         lbl_sep2.grid(row=2, column=1, padx=20, pady=10)
-        self.txt_name_class = Text(self.frm_child_crud, height=1, width=50, font=TEXT_FONT)
+        self.txt_name_class = Entry(self.frm_child_crud, width=50, font=TEXT_FONT)
         self.txt_name_class.grid(row=0, column=2, columnspan=2, pady=10, sticky=W)
         self.txt_categories = Text(self.frm_child_crud, height=10, width=50, font=TEXT_FONT)
         self.txt_categories.grid(row=2, column=2, pady=10, sticky=W)
@@ -151,7 +151,7 @@ class FormChildClassification:
             self.classification = Classification(id=id_selected, name=self.connection.message.information[0],
                                                  categories=self.connection.message.information[1])
             # Insert information into visual components
-            self.txt_name_class.insert('1.0', self.classification.name)
+            self.txt_name_class.insert(0, self.classification.name)
             # Section to insert categories in textbox
             length_string = 0
             for item in self.classification.categories:
@@ -181,7 +181,7 @@ class FormChildClassification:
             else:
                 self.classification = Classification(id=id_selected, name=self.connection.message.information[0],
                                                      categories=self.connection.message.information[1])
-                self.txt_name_class.insert('1.0', self.classification.name)
+                self.txt_name_class.insert(0, self.classification.name)
                 # Section to insert categories in textbox
                 length_string = 0
                 for item in self.classification.categories:
@@ -216,7 +216,7 @@ class FormChildClassification:
 
     def click_save(self):
         if self.validate_fields():
-            self.classification.name = self.txt_name_class.get('1.0', 'end-1c')
+            self.classification.name = self.txt_name_class.get()
             if self.classification.id == 0:     # Creating a new classification
                 self.directive = Message(action=66, information=[self.classification.name])
                 self.connection = self.directive.send_directive(self.connection)
@@ -249,7 +249,7 @@ class FormChildClassification:
         decision = True
         categories_aux = len(self.txt_categories.get('1.0', 'end-1c').split('\n'))
         categories_aux = categories_aux - 1 if self.classification.id == 0 else categories_aux
-        if self.txt_name_class.get('1.0', 'end-1c') != self.classification.name or \
+        if self.txt_name_class.get() != self.classification.name or \
                 categories_aux != len(self.classification.categories):
             decision = messagebox.askyesno(parent=self.frm_child_crud, title='Cancel',
                                            message='Are you sure you want to cancel?')
@@ -257,7 +257,7 @@ class FormChildClassification:
             self.click_back()
 
     def validate_fields(self):
-        if len(self.txt_name_class.get('1.0', 'end-1c')) == 0:
+        if len(self.txt_name_class.get()) == 0:
             messagebox.showwarning(parent=self.frm_child_crud, title='Missing information',
                                    message='You must insert a name for the classification')
             return False
@@ -283,5 +283,5 @@ class FormChildClassification:
         self.txt_categories['state'] = NORMAL
         self.txt_name_class['bg'] = ENABLED_COLOR
         self.txt_categories['bg'] = ENABLED_COLOR
-        self.txt_name_class.delete('1.0', 'end-1c')
+        self.txt_name_class.delete(0, END)
         self.txt_categories.delete('1.0', 'end-1c')

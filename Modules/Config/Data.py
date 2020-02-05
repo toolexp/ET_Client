@@ -141,7 +141,7 @@ class ExperimentalSC:
     def __init__(self, id=0, title='', description='', access_code='', state='', availability=True,
                  id_experiment=None, experiment=None, id_description_diagram=None, description_diagram=None,
                  control_group=None, experimental_group=None, cgroup_patterns=None, egroup_patterns=None,
-                 problems=None, connection=None):
+                 problems=None, connection=None, info_designers=None):
         self.id = id
         self.title = title
         self.description = description
@@ -152,6 +152,7 @@ class ExperimentalSC:
         self.id_description_diagram = id_description_diagram
         self.experiment = experiment
         self.description_diagram = description_diagram
+        self.info_designers = info_designers
         if experimental_group is None:
             self.experimental_group = []
         if control_group is None:

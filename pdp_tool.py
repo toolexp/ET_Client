@@ -71,6 +71,7 @@ class WindowHome:
         self.txt_email.grid(row=2, column=1, pady=10, padx=30, columnspan=2, sticky=NW)
         self.txt_passwd = Entry(frm_parent, width=28, show="*")
         self.txt_passwd.grid(row=3, column=1, pady=10, padx=30, columnspan=2, sticky=NW)
+        self.txt_passwd.bind('<Return>', self.click_login)
         btn_access = Button(frm_parent, text='Login', command=self.click_login, font=SUBTITLE2_FONT, fg=TEXT_COLOR)
         btn_access.grid(row=4, column=1, padx=30, pady=15)
         btn_exit = Button(frm_parent, text='Exit', command=self.click_log_out, font=SUBTITLE2_FONT, fg=TEXT_COLOR)
@@ -82,7 +83,7 @@ class WindowHome:
         self.tlevel_login.deiconify()
         self.tlevel_login.grab_set()
 
-    def click_login(self):
+    def click_login(self, event=None):
         if len(self.txt_email.get()) != 0 and len(self.txt_passwd.get()) != 0 and len(
                 self.cbx_role.get()) != 0:  # validate empty fileds in login form
             if self.cbx_role.get() == 'Experimenter':  # directive (action) changes in accordance of the role
