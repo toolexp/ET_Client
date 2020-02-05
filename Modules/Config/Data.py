@@ -258,7 +258,7 @@ class File:
 
 
 class Measurement:
-    def __init__(self, id=0, value='', acquisition_start_date=None, acquisition_end_date=datetime.datetime.now(),
+    def __init__(self, id=0, value=0, acquisition_start_date=None, acquisition_end_date=datetime.datetime.now(),
                  id_metric=None, id_designer=None, id_problem=None, metric=None, designer=None, problem=None,
                  connection=None):
         self.id = id

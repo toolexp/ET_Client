@@ -375,7 +375,7 @@ class FormParentDesigner:
             problem_id = self.experimental_scenario.problems[self.problems_counter].id
             current_measurements = []
             # Solution time
-            measurement_1 = Measurement(value=str(self.solution_time), acquisition_start_date=self.acquisition_start_date,
+            measurement_1 = Measurement(value=float(self.solution_time), acquisition_start_date=self.acquisition_start_date,
                                         acquisition_end_date=acquisition_end_date, id_metric=1,
                                         id_designer=self.current_designer.id, id_problem=problem_id)
             current_measurements.append(measurement_1)
@@ -384,18 +384,18 @@ class FormParentDesigner:
                 # Selection time
                 # Getting average if more than one value for this metric
                 selection_time = 0 if len(self.selection_time) == 0 else sum(self.selection_time) / len(self.selection_time)
-                measurement_2 = Measurement(value=str(selection_time), acquisition_start_date=self.acquisition_start_date,
+                measurement_2 = Measurement(value=float(selection_time), acquisition_start_date=self.acquisition_start_date,
                                             acquisition_end_date=acquisition_end_date, id_metric=2,
                                             id_designer=self.current_designer.id, id_problem=problem_id)
                 current_measurements.append(measurement_2)
                 # Viewed patterns
-                measurement_3 = Measurement(value=str(len(self.av_patterns_seen)),
+                measurement_3 = Measurement(value=float(len(self.av_patterns_seen)),
                                             acquisition_start_date=self.acquisition_start_date,
                                             acquisition_end_date=acquisition_end_date, id_metric=3,
                                             id_designer=self.current_designer.id, id_problem=problem_id)
                 current_measurements.append(measurement_3)
                 # Chosen patterns
-                measurement_4 = Measurement(value=str(self.lbx_sel_patterns.size()),
+                measurement_4 = Measurement(value=float(self.lbx_sel_patterns.size()),
                                             acquisition_start_date=self.acquisition_start_date,
                                             acquisition_end_date=acquisition_end_date, id_metric=4,
                                             id_designer=self.current_designer.id, id_problem=problem_id)
