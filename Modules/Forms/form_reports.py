@@ -5,6 +5,7 @@ from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pat
     summarize_text
 from PIL import ImageTk, Image
 from Modules.Config.Visual import *
+import pandas
 
 
 class FormParentReport:
@@ -318,6 +319,7 @@ class FormChildReport:
             # Ask to server for dataframe of the measurements for the designers of selected problem
             self.directive = Message(action=107, information=[id_selected_prob, 'problem'])
             self.connection = self.directive.send_directive(self.connection)
+            pass
 
     def click_view_experiment(self):
         """
