@@ -26,8 +26,8 @@ def verify_port(port):
 
 
 def summarize_text(string, lenght=90):
-    if len(string) > lenght/6:
-        return string[:int(lenght/6)-3] + '...'
+    if len(string) > lenght / 6:
+        return string[:int(lenght / 6) - 3] + '...'
     else:
         return string
 
@@ -46,7 +46,17 @@ def treeview_sort_column(tv, col, reverse):
 
     # reverse sort next time
     tv.heading(col, command=lambda: \
-               treeview_sort_column(tv, col, not reverse))
+        treeview_sort_column(tv, col, not reverse))
+
+
+def get_mean_value(df=None):
+    designers_column = df['designer']
+    designers_column.append('MEAN', ignore_index=False, inplace=True)
+    df.drop(columns=['designer'], inplace=True)
+    df_mean = df.mean(axis=0, skipna=True)
+    df.append(df_mean, inplace=True)
+    designers_column.join(df)
+    return designers_column
 
 
 class Category:
@@ -537,4 +547,3 @@ class TimerClass:
 
     def stop(self):
         self.stop_var = True
-

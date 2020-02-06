@@ -2,7 +2,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoIma
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
 from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pattern, ExperimentalSC, File, \
-    summarize_text
+    summarize_text, get_mean_value
 from PIL import ImageTk, Image
 from Modules.Config.Visual import *
 import pandas
@@ -319,6 +319,7 @@ class FormChildReport:
             # Ask to server for dataframe of the measurements for the designers of selected problem
             self.directive = Message(action=107, information=[id_selected_prob, 'problem'])
             self.connection = self.directive.send_directive(self.connection)
+            final_df = get_mean_value(self.connection.message.information[0])
             pass
 
     def click_view_experiment(self):
