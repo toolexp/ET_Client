@@ -2,7 +2,7 @@ from tkinter import Label, LabelFrame, Frame, Text, Button, messagebox, PhotoIma
 from tkinter.constants import *
 from tkinter.ttk import Treeview, Combobox, Separator
 from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pattern, ExperimentalSC, File, \
-    summarize_text, get_mean_value
+    summarize_text, get_mean_value, Solution
 from PIL import ImageTk, Image
 from Modules.Config.Visual import *
 import pandas
@@ -116,7 +116,8 @@ class FormChildReport:
         sep_aux1 = Separator(self.frm_child_report, orient=VERTICAL)
         sep_aux1.grid(row=0, column=5, sticky=NS, rowspan=7, padx=30)
         # Detailed selection section
-        self.trv_detail_sc = Treeview(self.frm_child_report, height=8, columns=('N', 'Scenario', 'M1', 'M2', 'M3', 'M4'))
+        self.trv_detail_sc = Treeview(self.frm_child_report, height=8,
+                                      columns=('N', 'Scenario', 'M1', 'M2', 'M3', 'M4'))
         self.trv_detail_sc.heading('#0', text='ID', anchor=CENTER)
         self.trv_detail_sc.heading('#1', text='N', anchor=CENTER)
         self.trv_detail_sc.heading('#2', text='Scenario', anchor=CENTER)
@@ -126,16 +127,17 @@ class FormChildReport:
         self.trv_detail_sc.heading('#6', text='M4', anchor=CENTER)
         self.trv_detail_sc.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_detail_sc.column('#1', width=20, minwidth=20, stretch=NO)
-        self.trv_detail_sc.column('#2', width=200, minwidth=200, stretch=NO)
-        self.trv_detail_sc.column('#3', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_sc.column('#4', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_sc.column('#5', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_sc.column('#6', width=40, minwidth=40, stretch=NO)
+        self.trv_detail_sc.column('#2', width=250, minwidth=250, stretch=NO)
+        self.trv_detail_sc.column('#3', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_sc.column('#4', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_sc.column('#5', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_sc.column('#6', width=55, minwidth=55, stretch=NO)
         self.trv_detail_sc.grid(row=0, column=6, rowspan=2, sticky=W, pady=10)
         vsb_trv_detsc = Scrollbar(self.frm_child_report, orient="vertical", command=self.trv_detail_sc.yview)
         vsb_trv_detsc.grid(row=0, column=7, rowspan=2, pady=10, sticky=NS)
         self.trv_detail_sc.configure(yscrollcommand=vsb_trv_detsc.set)
-        self.trv_detail_prob = Treeview(self.frm_child_report, height=8, columns=('N', 'Problem', 'M1', 'M2', 'M3', 'M4'))
+        self.trv_detail_prob = Treeview(self.frm_child_report, height=8,
+                                        columns=('N', 'Problem', 'M1', 'M2', 'M3', 'M4'))
         self.trv_detail_prob.heading('#0', text='ID', anchor=CENTER)
         self.trv_detail_prob.heading('#1', text='N', anchor=CENTER)
         self.trv_detail_prob.heading('#2', text='Problem', anchor=CENTER)
@@ -145,11 +147,11 @@ class FormChildReport:
         self.trv_detail_prob.heading('#6', text='M4', anchor=CENTER)
         self.trv_detail_prob.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_detail_prob.column('#1', width=20, minwidth=20, stretch=NO)
-        self.trv_detail_prob.column('#2', width=200, minwidth=200, stretch=NO)
-        self.trv_detail_prob.column('#3', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_prob.column('#4', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_prob.column('#5', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_prob.column('#6', width=40, minwidth=40, stretch=NO)
+        self.trv_detail_prob.column('#2', width=250, minwidth=250, stretch=NO)
+        self.trv_detail_prob.column('#3', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_prob.column('#4', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_prob.column('#5', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_prob.column('#6', width=55, minwidth=55, stretch=NO)
         self.trv_detail_prob.grid(row=2, column=6, rowspan=2, sticky=W, pady=10)
         vsb_trv_detprob = Scrollbar(self.frm_child_report, orient="vertical", command=self.trv_detail_prob.yview)
         vsb_trv_detprob.grid(row=2, column=7, rowspan=2, pady=10, sticky=NS)
@@ -165,19 +167,20 @@ class FormChildReport:
         self.trv_detail_designer.heading('#6', text='M4', anchor=CENTER)
         self.trv_detail_designer.column('#0', width=0, minwidth=50, stretch=NO)
         self.trv_detail_designer.column('#1', width=20, minwidth=20, stretch=NO)
-        self.trv_detail_designer.column('#2', width=200, minwidth=200, stretch=NO)
-        self.trv_detail_designer.column('#3', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_designer.column('#4', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_designer.column('#5', width=40, minwidth=40, stretch=NO)
-        self.trv_detail_designer.column('#6', width=40, minwidth=40, stretch=NO)
+        self.trv_detail_designer.column('#2', width=250, minwidth=250, stretch=NO)
+        self.trv_detail_designer.column('#3', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_designer.column('#4', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_designer.column('#5', width=55, minwidth=55, stretch=NO)
+        self.trv_detail_designer.column('#6', width=55, minwidth=55, stretch=NO)
         self.trv_detail_designer.bind("<Double-1>", self.view_detailed_solution)
         self.trv_detail_designer.grid(row=4, column=6, rowspan=2, sticky=W, pady=10)
         vsb_trv_detdesig = Scrollbar(self.frm_child_report, orient="vertical", command=self.trv_detail_designer.yview)
         vsb_trv_detdesig.grid(row=4, column=7, rowspan=2, pady=10, sticky=NS)
         self.trv_detail_designer.configure(yscrollcommand=vsb_trv_detdesig.set)
-        lbl_notes = Label(self.frm_child_report, text='NOTE:\tDouble click on a designer to see\n\this solution for a '
-                                                      'problem.\n')
-        lbl_notes.config(fg=TEXT_COLOR, font=LABEL_FONT, justify=LEFT)
+        lbl_notes = Label(self.frm_child_report, text='NOTE:\tDouble click on a designer to see\tLEGEND:\tM1=Solution '
+                                                      'time | M3=Viewed patterns\n\this solution for a problem ^.\t\t\t'
+                                                      'M2=Selection time | M4=Chosen patterns\n')
+        lbl_notes.config(fg=TEXT_COLOR, font=NOTE_FONT, justify=LEFT)
         lbl_notes.grid(row=6, column=6, pady=10, sticky=W)
         lbl_sep2 = Label(self.frm_child_report)
         lbl_sep2.grid(row=0, column=8, padx=10, pady=10, rowspan=7)
@@ -193,6 +196,24 @@ class FormChildReport:
         self.txt_detail_component.configure(yscrollcommand=vsb_txt_detcomp.set)
         lbl_sep4 = Label(self.tlevel_comp_detail)
         lbl_sep4.grid(row=0, column=3, padx=10, pady=20)
+
+        # Components of expanded detailed sent solution
+        lbl_sep5 = Label(self.tlevel_sol_detail)
+        lbl_sep5.grid(row=0, column=0, padx=10, pady=20, rowspan=3)
+        lbl_sep6 = Label(self.tlevel_sol_detail)
+        lbl_sep6.grid(row=0, column=1, pady=10)
+        self.btn_detail_sol = Button(self.tlevel_sol_detail, text='View diagram >>',
+                                     command=self.click_view_diagram_sol)
+        self.txt_detail_solution = Text(self.tlevel_sol_detail, height=25, width=60)
+        self.txt_detail_solution.config(font=TEXT_FONT, bg=DISABLED_COLOR)
+        self.txt_detail_solution.grid(row=1, column=1, sticky=W, columnspan=2)
+        vsb_txt_detsol = Scrollbar(self.tlevel_sol_detail, orient="vertical", command=self.txt_detail_solution.yview)
+        vsb_txt_detsol.grid(row=1, column=3, sticky=NS)
+        self.txt_detail_solution.configure(yscrollcommand=vsb_txt_detsol.set)
+        lbl_sep7 = Label(self.tlevel_sol_detail)
+        lbl_sep7.grid(row=0, column=4, padx=10, pady=20, rowspan=3)
+        lbl_sep8 = Label(self.tlevel_sol_detail)
+        lbl_sep8.grid(row=2, column=1, pady=10, columnspan=2)
 
         # Components of expanded sent solution diagram
         self.canvas_expanded = Canvas(self.tlevel_diagram, width=500, height=500)
@@ -225,7 +246,7 @@ class FormChildReport:
         if len(self.connection.message.information) != 0:
             for index, item in enumerate(self.connection.message.information):
                 elements = item.split('¥')
-                self.trv_available_exp.insert('', 'end', text=elements[0], values=(index+1, elements[1]))
+                self.trv_available_exp.insert('', 'end', text=elements[0], values=(index + 1, elements[1]))
             self.available_patterns = Pattern.get_available_patterns(self.connection)
             '''if len(self.trv_available_exp.get_children()) != 0:
                 self.trv_available_exp.selection_set(self.trv_available_exp.get_children()[0])
@@ -243,7 +264,7 @@ class FormChildReport:
             self.trv_available_sc.delete(item)
         for index, item in enumerate(scenarios):
             elements = item.split('¥')
-            self.trv_available_sc.insert('', 'end', text=elements[0], values=(index+1, elements[1]))
+            self.trv_available_sc.insert('', 'end', text=elements[0], values=(index + 1, elements[1]))
         '''if len(self.trv_available_sc.get_children()) != 0:
             self.trv_available_sc.selection_set(self.trv_available_sc.get_children()[0])
             self.select_scenario()'''
@@ -257,7 +278,7 @@ class FormChildReport:
             self.trv_available_prob.delete(item)
         for index, item in enumerate(problems):
             elements = item.split('¥')
-            self.trv_available_prob.insert('', 'end', text=elements[0], values=(index+1, elements[1]))
+            self.trv_available_prob.insert('', 'end', text=elements[0], values=(index + 1, elements[1]))
         '''if len(self.trv_available_prob.get_children()) != 0:
             self.trv_available_prob.selection_set(self.trv_available_prob.get_children()[0])
             self.select_problem()'''
@@ -269,7 +290,8 @@ class FormChildReport:
         """
         if len(self.trv_available_exp.selection()) == 1:
             self.clear_components(3)
-            id_selected_exp = int(self.trv_available_exp.item(self.trv_available_exp.selection())['text'])  # Retrieve id of selected item from TreeView
+            id_selected_exp = int(self.trv_available_exp.item(self.trv_available_exp.selection())[
+                                      'text'])  # Retrieve id of selected item from TreeView
             self.directive = Message(action=95, information=[id_selected_exp])
             self.connection = self.directive.send_directive(self.connection)
             self.experiment = Experiment(id=id_selected_exp, name=self.connection.message.information[0],
@@ -283,6 +305,10 @@ class FormChildReport:
             # Ask to server for dataframe of the measurements for the scenarios of selected experiment
             self.directive = Message(action=107, information=[id_selected_exp, 'experiment'])
             self.connection = self.directive.send_directive(self.connection)
+            final_df = get_mean_value(self.connection.message.information[0])
+            for index, row in final_df.iterrows():
+                self.trv_detail_sc.insert('', 'end', text=row.id, values=(index + 1, row.variable, row.m1, row.m2,
+                                                                          row.m3, row.m4))
 
     def select_scenario_general(self, event=None):
         """
@@ -290,7 +316,8 @@ class FormChildReport:
         """
         if len(self.trv_available_sc.selection()) == 1:
             self.clear_components(2)
-            id_selected_sc = int(self.trv_available_sc.item(self.trv_available_sc.selection())['text'])  # Retrieve id of selected item from TreeView
+            id_selected_sc = int(self.trv_available_sc.item(self.trv_available_sc.selection())[
+                                     'text'])  # Retrieve id of selected item from TreeView
             self.directive = Message(action=85, information=[id_selected_sc, 'report', 1])
             self.connection = self.directive.send_directive(self.connection)
             self.scenario = ExperimentalSC(id=id_selected_sc, title=self.connection.message.information[0],
@@ -301,15 +328,19 @@ class FormChildReport:
             # Ask to server for dataframe of the measurements for the problems of selected scenario
             self.directive = Message(action=107, information=[id_selected_sc, 'scenario'])
             self.connection = self.directive.send_directive(self.connection)
+            final_df = get_mean_value(self.connection.message.information[0])
+            for index, row in final_df.iterrows():
+                self.trv_detail_prob.insert('', 'end', text=row.id, values=(index + 1, row.variable, row.m1, row.m2,
+                                                                            row.m3, row.m4))
 
     def select_problem_general(self, event=None):
         """
-        Function activated when a scenario is selecteded
+        Function activated when a scenario is selected
         """
         if len(self.trv_available_prob.selection()) == 1:
             self.clear_components(1)
             id_selected_prob = int(self.trv_available_prob.item(self.trv_available_prob.selection())[
-                                     'text'])  # Retrieve id of selected item from TreeView
+                                       'text'])  # Retrieve id of selected item from TreeView
             self.directive = Message(action=55, information=[id_selected_prob])
             self.connection = self.directive.send_directive(self.connection)
             self.problem = Problem(id=id_selected_prob, brief_description=self.connection.message.information[0],
@@ -321,9 +352,8 @@ class FormChildReport:
             self.connection = self.directive.send_directive(self.connection)
             final_df = get_mean_value(self.connection.message.information[0])
             for index, row in final_df.iterrows():
-                self.trv_detail_designer.insert('', 'end', text=row.id_designer, values=(index + 1, row.designer,
-                                                                                         row.m1, row.m2, row.m3,
-                                                                                         row.m4))
+                self.trv_detail_designer.insert('', 'end', text=row.id, values=(index + 1, row.variable, row.m1,
+                                                                                row.m2, row.m3, row.m4))
 
     def click_view_experiment(self):
         """
@@ -396,7 +426,8 @@ class FormChildReport:
                                                     'EXPECTED SOLUTION PATTERNS\n{}'.
                                              format(self.problem.brief_description,
                                                     self.problem.description,
-                                                    self.problem.solution.annotations, aux_patterns))
+                                                    self.problem.solution.annotations,
+                                                    'No patterns configured' if aux_patterns == '' else aux_patterns))
             self.txt_detail_component['state'] = DISABLED
             self.tlevel_comp_detail.deiconify()
             self.tlevel_comp_detail.grab_set()
@@ -404,14 +435,14 @@ class FormChildReport:
             messagebox.showwarning(parent=self.frm_child_report, title='No selection',
                                    message='You must select one item')
 
-    def click_view_desc_diagram(self):
+    def click_view_diagram_sol(self):
         # Fill summary problem canvas with retrieved image
-        load = Image.open(self.scenario.description_diagram.filename)
+        load = Image.open(self.solution.diagram.filename)
         load = load.resize((500, 500), Image.ANTIALIAS)
-        self.render_dd_exp = ImageTk.PhotoImage(load)
+        self.render = ImageTk.PhotoImage(load)
         self.canvas_expanded.delete()
-        self.scenario.description_diagram.image = self.canvas_expanded.create_image(0, 0, anchor='nw',
-                                                                                    image=self.render_dd_exp)  # and display new image
+        self.solution.diagram.image = self.canvas_expanded.create_image(0, 0, anchor='nw',
+                                                                        image=self.render)  # and display new image
         self.tlevel_diagram.deiconify()
         self.tlevel_diagram.grab_set()
 
@@ -432,15 +463,67 @@ class FormChildReport:
     def view_detailed_solution(self, event=None):
         if len(self.trv_detail_designer.selection()) == 1:
             id_selected_desig = self.trv_detail_designer.item(self.trv_detail_designer.selection())[
-                                     'text']  # Retrieve id of selected item from TreeView
-            if id_selected_desig is not None and self.trv_detail_designer.item(self.trv_detail_designer.selection())[
-                                     'values'][2] != 'X':
-                # Here asks for the sent solution of specific designer
-                self.directive = Message(action=105, information=[int(id_selected_desig), self.problem.id])
-                self.connection = self.directive.send_directive(self.connection)
+                'text']  # Retrieve id of selected item from TreeView
+            if id_selected_desig != 'X':
+                if self.trv_detail_designer.item(self.trv_detail_designer.selection())['values'][2] != 'X':
+                    # Here asks for the sent solution of specific designer
+                    self.directive = Message(action=105, information=[int(id_selected_desig), self.problem.id])
+                    self.connection = self.directive.send_directive(self.connection)
+                    # Getting assigned patterns in current experimental scenario (the same for all problems in one scenario)
+                    assigned_patterns = []
+                    for item in self.connection.message.information[4]:
+                        for pattern in self.available_patterns:
+                            if item == pattern.id:
+                                assigned_patterns.append(pattern)
+                    chosen_patterns = []
+                    # Getting patterns of sent solution
+                    for item in self.connection.message.information[2]:
+                        id_pattern = int(item.split('¥')[0])
+                        for pattern in self.available_patterns:
+                            if id_pattern == pattern.id:
+                                chosen_patterns.append(pattern)
+                    self.solution = Solution(annotations=self.connection.message.information[0],
+                                             patterns=chosen_patterns,
+                                             diagram_id=self.connection.message.information[1],
+                                             connection=self.connection)
+                    # Adjust visual components depending on the sent solution
+                    self.btn_detail_sol.grid_forget()
+                    if self.solution.diagram_id is not None:
+                        self.btn_detail_sol.grid(row=0, column=2, pady=10, sticky=E)
+                    aux_patterns_assign = ''
+                    for item in assigned_patterns:
+                        aux_patterns_assign += '- {}\n'.format(item.get_joined_main_s())
+                    aux_patterns_sent_sol = ''
+                    for item in self.solution.patterns:
+                        aux_patterns_sent_sol += '- {}\n'.format(item.get_joined_main_s())
+                    self.txt_detail_solution['state'] = NORMAL
+                    self.txt_detail_solution.delete('1.0', 'end-1c')
+                    self.txt_detail_solution.insert('1.0', 'CURRENT PROBLEM\n{}\n\n'
+                                                           'CURRENT DESIGNER\n{}\n\n'
+                                                           'ASSIGNED GROUP\n{}\n\n'
+                                                           'SENT SOLUTION NOTES\n{}\n\n'
+                                                           'SENT SOLUTION DIAGRAM\n{}\n\n'
+                                                           'ASSIGNED PATTERNS\n{}\n\n'
+                                                           'CHOSEN PATTERNS\n{}'.
+                                                    format(self.problem.brief_description,
+                                                           self.trv_detail_designer.item(
+                                                               self.trv_detail_designer.selection())['values'][1],
+                                                           'Control group' if self.connection.message.information[
+                                                                                  3] == 1 else 'Experimental group',
+                                                           self.solution.annotations,
+                                                           'No diagram in solution' if self.solution.diagram_id is None else 'Click up button to see diagram ^',
+                                                           'No patterns configured' if aux_patterns_assign == '' else aux_patterns_assign,
+                                                           'No patterns chosen' if aux_patterns_sent_sol == '' else aux_patterns_sent_sol))
+                    self.txt_detail_solution['state'] = DISABLED
+                    self.tlevel_sol_detail.deiconify()
+                    self.tlevel_sol_detail.grab_set()
+                else:
+                    messagebox.showwarning(parent=self.frm_child_report, title='Wrong selection',
+                                           message='The selected designer does not have a solution for the current '
+                                                   'problem')
 
     def clear_components(self, decision=4):
-        if decision > 0:    # When selecting an problem form general list
+        if decision > 0:  # When selecting an problem form general list
             for item in self.trv_detail_designer.get_children():
                 self.trv_detail_designer.delete(item)
             if decision > 1:  # When selecting a scenario form general list
@@ -453,7 +536,7 @@ class FormChildReport:
                         self.trv_available_sc.delete(item)
                     for item in self.trv_detail_sc.get_children():
                         self.trv_detail_sc.delete(item)
-                    if decision > 3:    # Clearing information from all the treeviews
+                    if decision > 3:  # Clearing information from all the treeviews
                         for item in self.trv_available_exp.get_children():
                             self.trv_available_exp.delete(item)
 

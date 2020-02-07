@@ -51,13 +51,14 @@ def treeview_sort_column(tv, col, reverse):
 
 
 def get_mean_value(df=None):
-    df_designers = df[['id_designer', 'designer']]
-    df_designers = df_designers.append(pd.DataFrame({'id_designer': None, 'designer': 'MEAN'}, index=[0]), ignore_index=True)
-    df.drop(columns=['id_designer', 'designer'], inplace=True)
+    df_designers = df[['id', 'variable']]
+    df_designers = df_designers.append(pd.DataFrame({'id': None, 'variable': 'AVERAGE'}, index=[0]),
+                                       ignore_index=True)
+    df.drop(columns=['id', 'variable'], inplace=True)
     df_mean = df.mean(axis=0, skipna=True)
     df = df.append(df_mean, ignore_index=True)
+    df = df.round(decimals=3)
     df = df_designers.join(df)
-    #df.insert(0, 'designer', ser_designers)
     df.fillna('X', inplace=True)
     return df
 
@@ -440,12 +441,8 @@ class Problem:
         if self.id_solution is not None:
             self.directive = Message(action=60, information=[self.id_solution])
             self.connection = self.directive.send_directive(self.connection)
-            if self.connection.message.information[1] is None:
-                id_diagram = 0
-            else:
-                id_diagram = self.connection.message.information[1]
             self.solution = Solution(id=self.id_solution, annotations=self.connection.message.information[0],
-                                     diagram_id=id_diagram,
+                                     diagram_id=self.connection.message.information[1],
                                      patterns_id=self.connection.message.information[2], connection=self.connection)
             current_ids = []
             for item in self.solution.patterns_id:
@@ -514,7 +511,7 @@ class Solution:
 
     def retrieve_components(self):
         # Retrieve diagram for the solution
-        if self.diagram_id != 0:
+        if self.diagram_id is not None:
             self.directive = Message(action=65, information=[self.diagram_id])
             self.connection = self.directive.send_directive(self.connection)
             self.diagram = File()
