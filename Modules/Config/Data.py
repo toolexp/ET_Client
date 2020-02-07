@@ -3,6 +3,7 @@ import threading
 import time
 import datetime
 from tkinter import Label, Toplevel
+import pandas as pd
 
 
 def verify_ip(ip):
@@ -50,13 +51,15 @@ def treeview_sort_column(tv, col, reverse):
 
 
 def get_mean_value(df=None):
-    designers_column = df['designer']
-    designers_column.append('MEAN', ignore_index=False, inplace=True)
-    df.drop(columns=['designer'], inplace=True)
+    df_designers = df[['id_designer', 'designer']]
+    df_designers = df_designers.append(pd.DataFrame({'id_designer': None, 'designer': 'MEAN'}, index=[0]), ignore_index=True)
+    df.drop(columns=['id_designer', 'designer'], inplace=True)
     df_mean = df.mean(axis=0, skipna=True)
-    df.append(df_mean, inplace=True)
-    designers_column.join(df)
-    return designers_column
+    df = df.append(df_mean, ignore_index=True)
+    df = df_designers.join(df)
+    #df.insert(0, 'designer', ser_designers)
+    df.fillna('X', inplace=True)
+    return df
 
 
 class Category:

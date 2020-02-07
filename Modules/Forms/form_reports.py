@@ -203,8 +203,8 @@ class FormChildReport:
         """
         Displays the home list of the 'Experiments' form
         """
-        self.retrieve_experiments()
         self.frm_child_report.grid(row=1, column=0, columnspan=9, rowspan=8, pady=10, padx=10)
+        self.retrieve_experiments()
 
     def hide_frm(self):
         """
@@ -320,7 +320,10 @@ class FormChildReport:
             self.directive = Message(action=107, information=[id_selected_prob, 'problem'])
             self.connection = self.directive.send_directive(self.connection)
             final_df = get_mean_value(self.connection.message.information[0])
-            pass
+            for index, row in final_df.iterrows():
+                self.trv_detail_designer.insert('', 'end', text=row.id_designer, values=(index + 1, row.designer,
+                                                                                         row.m1, row.m2, row.m3,
+                                                                                         row.m4))
 
     def click_view_experiment(self):
         """
@@ -426,8 +429,15 @@ class FormChildReport:
             messagebox.showwarning(parent=self.frm_child_report, title='No selection',
                                    message='You must select one item')
 
-    def view_detailed_solution(self):
-        pass
+    def view_detailed_solution(self, event=None):
+        if len(self.trv_detail_designer.selection()) == 1:
+            id_selected_desig = self.trv_detail_designer.item(self.trv_detail_designer.selection())[
+                                     'text']  # Retrieve id of selected item from TreeView
+            if id_selected_desig is not None and self.trv_detail_designer.item(self.trv_detail_designer.selection())[
+                                     'values'][2] != 'X':
+                # Here asks for the sent solution of specific designer
+                self.directive = Message(action=105, information=[int(id_selected_desig), self.problem.id])
+                self.connection = self.directive.send_directive(self.connection)
 
     def clear_components(self, decision=4):
         if decision > 0:    # When selecting an problem form general list
