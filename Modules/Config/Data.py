@@ -46,8 +46,7 @@ def treeview_sort_column(tv, col, reverse):
         tv.move(k, '', index)
 
     # reverse sort next time
-    tv.heading(col, command=lambda: \
-        treeview_sort_column(tv, col, not reverse))
+    tv.heading(col, command=lambda: treeview_sort_column(tv, col, not reverse))
 
 
 def get_mean_value(df=None):

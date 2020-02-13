@@ -5,7 +5,6 @@ from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pat
     summarize_text, get_mean_value, Solution
 from PIL import ImageTk, Image
 from Modules.Config.Visual import *
-import pandas
 
 
 class FormParentReport:
@@ -246,7 +245,8 @@ class FormChildReport:
         if len(self.connection.message.information) != 0:
             for index, item in enumerate(self.connection.message.information):
                 elements = item.split('¥')
-                self.trv_available_exp.insert('', 'end', text=elements[0], values=(index + 1, elements[1]))
+                self.trv_available_exp.insert('', 'end', text=elements[0], values=(index + 1,
+                                                                                   summarize_text(elements[1], 250)))
             self.available_patterns = Pattern.get_available_patterns(self.connection)
             '''if len(self.trv_available_exp.get_children()) != 0:
                 self.trv_available_exp.selection_set(self.trv_available_exp.get_children()[0])
@@ -264,7 +264,8 @@ class FormChildReport:
             self.trv_available_sc.delete(item)
         for index, item in enumerate(scenarios):
             elements = item.split('¥')
-            self.trv_available_sc.insert('', 'end', text=elements[0], values=(index + 1, elements[1]))
+            self.trv_available_sc.insert('', 'end', text=elements[0], values=(index + 1,
+                                                                              summarize_text(elements[1], 250)))
         '''if len(self.trv_available_sc.get_children()) != 0:
             self.trv_available_sc.selection_set(self.trv_available_sc.get_children()[0])
             self.select_scenario()'''
@@ -278,7 +279,8 @@ class FormChildReport:
             self.trv_available_prob.delete(item)
         for index, item in enumerate(problems):
             elements = item.split('¥')
-            self.trv_available_prob.insert('', 'end', text=elements[0], values=(index + 1, elements[1]))
+            self.trv_available_prob.insert('', 'end', text=elements[0], values=(index + 1,
+                                                                                summarize_text(elements[1], 250)))
         '''if len(self.trv_available_prob.get_children()) != 0:
             self.trv_available_prob.selection_set(self.trv_available_prob.get_children()[0])
             self.select_problem()'''
@@ -307,8 +309,8 @@ class FormChildReport:
             self.connection = self.directive.send_directive(self.connection)
             final_df = get_mean_value(self.connection.message.information[0])
             for index, row in final_df.iterrows():
-                self.trv_detail_sc.insert('', 'end', text=row.id, values=(index + 1, row.variable, row.m1, row.m2,
-                                                                          row.m3, row.m4))
+                self.trv_detail_sc.insert('', 'end', text=row.id, values=(index + 1, summarize_text(row.variable, 250),
+                                                                          row.m1, row.m2, row.m3, row.m4))
 
     def select_scenario_general(self, event=None):
         """
@@ -330,8 +332,9 @@ class FormChildReport:
             self.connection = self.directive.send_directive(self.connection)
             final_df = get_mean_value(self.connection.message.information[0])
             for index, row in final_df.iterrows():
-                self.trv_detail_prob.insert('', 'end', text=row.id, values=(index + 1, row.variable, row.m1, row.m2,
-                                                                            row.m3, row.m4))
+                self.trv_detail_prob.insert('', 'end', text=row.id, values=(index + 1,
+                                                                            summarize_text(row.variable, 250), row.m1,
+                                                                            row.m2, row.m3, row.m4))
 
     def select_problem_general(self, event=None):
         """
@@ -352,8 +355,9 @@ class FormChildReport:
             self.connection = self.directive.send_directive(self.connection)
             final_df = get_mean_value(self.connection.message.information[0])
             for index, row in final_df.iterrows():
-                self.trv_detail_designer.insert('', 'end', text=row.id, values=(index + 1, row.variable, row.m1,
-                                                                                row.m2, row.m3, row.m4))
+                self.trv_detail_designer.insert('', 'end', text=row.id, values=(index + 1,
+                                                                                summarize_text(row.variable, 250),
+                                                                                row.m1, row.m2, row.m3, row.m4))
 
     def click_view_experiment(self):
         """
