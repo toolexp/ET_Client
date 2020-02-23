@@ -7,7 +7,7 @@ from tkinter.ttk import Combobox, Style
 from tkinter.constants import *
 from datetime import datetime
 from Modules.Config.Connection import Connection
-from Modules.Config.Data import Message, Designer, Measurement
+from Modules.Config.Data import Message, Designer, Measurement, verify_ip, verify_port
 from Modules.Config.Visual import *
 
 from Modules.Forms.form_AED import FormParentAED
@@ -334,7 +334,8 @@ class WindowHome:
                         acquisition_end_date = datetime.now()
                         # Saving NULL values of measurements for designer in remaining problems
                         while True:
-                            problem_id = self.frm_parent_designer_gui.experimental_scenario.problems[self.frm_parent_designer_gui.problems_counter].id
+                            problem_id = self.frm_parent_designer_gui.experimental_scenario.problems[
+                                self.frm_parent_designer_gui.problems_counter].id
                             current_measurements = []
                             # Solution time
                             measurement_1 = Measurement(value=float(-2), id_metric=1,
@@ -369,7 +370,7 @@ class WindowHome:
                                 self.connection = self.directive.send_directive(self.connection)
                             self.frm_parent_designer_gui.problems_counter += 1
                             if self.frm_parent_designer_gui.problems_counter == len(
-                                self.frm_parent_designer_gui.experimental_scenario.problems):  # If no more problems available
+                                    self.frm_parent_designer_gui.experimental_scenario.problems):  # If no more problems available
                                 # Finish experimental scenario if this was the las designer executing it
                                 self.directive = Message(action=83,
                                                          information=['finished', self.frm_parent_designer_gui. \
@@ -394,12 +395,18 @@ if __name__ == '__main__':
     connection = Connection()
     try:
         try:
-            connection.create_connection(HOST, PORT)
-        except: # Issue when connection with server can not be established
+            if verify_ip(HOST) and verify_port(PORT):
+                connection.create_connection(HOST, PORT)
+            else:
+                messagebox.showerror(title='Socket error',
+                                     message='Check the ip address and port number from main configuration file.')
+                exit(0)
+        except:  # Issue when connection with server can not be established
             messagebox.showerror(title='Failed connection',
                                  message='Can not connect with the server. Please check that your device and the '
                                          'server are connected to the same network, and that the server is accessible '
-                                         'from your device')
+                                         'from your device. You may also check the ip address and port number from'
+                                         'main configuration file.')
             exit(0)
         app = WindowHome(connection)
         app.window.mainloop()

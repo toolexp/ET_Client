@@ -14,7 +14,7 @@ class FormParentClassification:
     def initialize_components(self):
         lbl_title = Label(self.frm_parent, text='Classifications')
         lbl_title.config(fg=TEXT_COLOR, font=TITLE_FONT)
-        lbl_title.grid(row=0, column=0, pady=20)
+        lbl_title.grid(row=0, column=0, pady=20, padx=20)
 
     def show_frm(self):
         self.frm_parent.grid(row=0, column=0)

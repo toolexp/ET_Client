@@ -7,6 +7,14 @@ import pandas as pd
 
 
 def verify_ip(ip):
+    """
+    Verifies that the format of an IP address is correct
+
+    :param ip: ip address
+    :type ip: str
+    :return: success or not depending on the validation
+    :rtype: bool
+    """
     try:
         digits = ip.split('.')
         for item in digits:
@@ -20,10 +28,17 @@ def verify_ip(ip):
 
 
 def verify_port(port):
-    if not port.isdigit():
-        return False
-    else:
-        return True
+    """
+    Verifies that the format of a port number is correct (range)
+
+    :param port: port number
+    :type port: int
+    :return: success or not depending on the validation
+    :rtype: bool
+    """
+    if 1023 < int(port) <= 65535:
+            return True
+    return False
 
 
 def summarize_text(string, lenght=90):
@@ -308,8 +323,27 @@ class Measurement:
 
 
 class Message:
+    """
+    A class used to represent the message that is exchanged between server and client. This message is like the
+    communication protocol handled by both endpoints of the communication. A message object has attributes:
+
+    :param action: number that indicates an specific action.
+    When message is sent from server to client, possible options for this parameters are:
+        - 2: means that the requested action by the client was done successfully
+        - 5: means that the requested action by the client was not completed
+    When message is sent from client to server, possible options are listed in ET_Server project >
+    Modules.Config.protocol
+    :type action: int
+    :param comment: additional information that may be useful for any of the endpoints
+    :type comment: str
+    :param information: list of parameters with important information associated with the action of the message
+    :type information: list
+    """
 
     def __init__(self, action=0, comment='', information=None):
+        """
+        Constructor of the class
+        """
         if information is None:
             information = []
         self.action = action
@@ -317,6 +351,15 @@ class Message:
         self.information = information
 
     def send_directive(self, connection):
+        """
+        In this function the client exchanges information with the server (sends message and waits to receive response
+        from the server)
+
+        :param connection: active connection object with the server
+        :type connection: Modules.Config.Connection.Connection
+        :return connection: active connection object with server an with new changes (new message)
+        :rtype connection: Modules.Config.Connection.Connection
+        """
         connection.create_message(self)
         connection.send_message()
         connection.receive_message()
