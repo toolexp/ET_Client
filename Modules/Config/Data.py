@@ -300,26 +300,6 @@ class Measurement:
         self.designer = designer
         self.problem = problem
         self.connection = connection
-        '''if self.connection is not None:
-            self.retrieve_components()'''
-
-    '''def retrieve_components(self):
-        if self.id_metric is not None:
-            self.directive = Message(action=95, information=[self.id_metric])
-            self.connection = self.directive.send_directive(self.connection)
-            self.metric = Metric(id=self.id_metric, name=self.connection.message.information[0],
-                                 description=self.connection.message.information[1])
-        if self.id_designer is not None:
-            self.directive = Message(action=30, information=[self.id_designer])
-            self.connection = self.directive.send_directive(self.connection)
-            self.control_group = Designer(id=self.id_designer, name=self.connection.message.information[0],
-                                                description=self.connection.message.information[1])
-        if self.id_scenario_comp is not None:
-            self.directive = Message(action=30, information=[self.id_experimental_group])
-            self.connection = self.directive.send_directive(self.connection)
-            self.experimental_group = DesignersGroup(id=self.id_experimental_group,
-                                                     name=self.connection.message.information[0],
-                                                     description=self.connection.message.information[1])'''
 
 
 class Message:
@@ -329,8 +309,9 @@ class Message:
 
     :param action: number that indicates an specific action.
     When message is sent from server to client, possible options for this parameters are:
-        - 2: means that the requested action by the client was done successfully
+        - 2: means that the requested action by the client was completed successfully
         - 5: means that the requested action by the client was not completed
+        - 6: means that the requested action by the client was completed but with a warning
     When message is sent from client to server, possible options are listed in ET_Server project >
     Modules.Config.protocol
     :type action: int

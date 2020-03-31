@@ -312,11 +312,13 @@ class FormChildSection:
         self.lbx_category.delete(0, END)
         self.directive = Message(action=67)
         self.connection = self.directive.send_directive(self.connection)
-        self.cbx_classification['values'] = []
+        classifications = []
         for item in self.connection.message.information:
             elements = item.split('¥')
-            self.cbx_classification['values'] += ('{}'.format(elements[1]),)
+            classifications.append(elements[1])
             self.classifications.append(int(elements[0]))
+        self.cbx_classification['values'] = []
+        self.cbx_classification['values'] = classifications
 
     def validate_fields(self):
         if len(self.txt_name.get()) == 0:

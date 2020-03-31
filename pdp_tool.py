@@ -1,5 +1,4 @@
 import os
-import time
 import shutil
 import hashlib
 from tkinter import Tk, Menu, Toplevel, LabelFrame, Label, Entry, Button, messagebox
@@ -32,13 +31,13 @@ class WindowHome:
         self.role = 1
         self.window = Tk()
         self.window.protocol("WM_DELETE_WINDOW", self.click_log_out)
-        # w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
+        #w, h = self.window.winfo_screenwidth(), self.window.winfo_screenheight()
         # self.window.geometry('%dx%d+0+0' % (1024, 778))
         # self.window.geometry('%dx%d+0+0' % (1500, 778))
         # self.window.geometry('%dx%d+0+0' % (w, h))
         # Place window on top left corner
         self.window.geometry('+%d+%d' % (0, 0))
-        self.window.resizable(0, 0)
+        #self.window.resizable(0, 0)
         self.window.title('Tool for experimenting')
         self.window.withdraw()
         self.create_login()
@@ -101,32 +100,19 @@ class WindowHome:
                 messagebox.showerror(parent=self.tlevel_login, title='E-mail',
                                      message=self.connection.message.information[0])
             else:  # block to validate the inserted password
-                if self.role == 2:
-                    self.current_designer = Designer(id=self.connection.message.information[0],
-                                                     name=self.connection.message.information[1],
-                                                     surname=self.connection.message.information[2],
-                                                     user=self.connection.message.information[3],
-                                                     password=self.connection.message.information[4],
-                                                     connection=self.connection)
-                    if self.current_designer.password == hashlib.sha1(self.txt_passwd.get().encode()).hexdigest():
-                        self.access_system()
-                    else:
-                        messagebox.showerror(parent=self.tlevel_login, title='Password',
-                                             message='The password you provided is wrong, retry')
-                elif self.role == 1:
-                    if self.connection.message.information[4] == hashlib.sha1(
-                            self.txt_passwd.get().encode()).hexdigest():
-                        self.access_system()
-                    else:
-                        messagebox.showerror(parent=self.tlevel_login, title='Password',
-                                             message='The password you provided is wrong, retry')
-                elif self.role == 3:
-                    if self.connection.message.information[4] == hashlib.sha1(
-                            self.txt_passwd.get().encode()).hexdigest():
-                        self.access_system()
-                    else:
-                        messagebox.showerror(parent=self.tlevel_login, title='Password',
-                                             message='The password you provided is wrong, retry')
+                if self.connection.message.information[4] == hashlib.sha1(
+                        self.txt_passwd.get().encode()).hexdigest():
+                    if self.role == 2:
+                        self.current_designer = Designer(id=self.connection.message.information[0],
+                                                         name=self.connection.message.information[1],
+                                                         surname=self.connection.message.information[2],
+                                                         user=self.connection.message.information[3],
+                                                         password=self.connection.message.information[4],
+                                                         connection=self.connection)
+                    self.access_system()
+                else:
+                    messagebox.showerror(parent=self.tlevel_login, title='Password',
+                                         message='The password you provided is wrong, retry')
         else:
             messagebox.showwarning(parent=self.tlevel_login, title='Missing information', message='Fill all the fields')
 

@@ -133,7 +133,7 @@ class FormChildPattern:
         self.frm_aux2 = Frame(self.frm_child_crud)  # Frame that contains components for sections configuration
         sep_aux1 = Separator(self.frm_aux2, orient=HORIZONTAL)
         sep_aux1.grid(row=0, column=0, sticky=EW, columnspan=7)
-        lbl_section = Label(self.frm_aux2, text='2)Select a section')
+        lbl_section = Label(self.frm_aux2, text='2)Select a section ↓')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(row=1, column=1, pady=10, sticky=NW)
         lbl_sep5 = Label(self.frm_aux2)
@@ -156,7 +156,7 @@ class FormChildPattern:
         self.trv_summary.configure(yscrollcommand=vsb_trv_sum.set)
         lbl_sep6 = Label(self.frm_aux2)
         lbl_sep6.grid(row=2, column=3, padx=20, pady=10)
-        lbl_desc_section = Label(self.frm_aux2, text='Description')
+        lbl_desc_section = Label(self.frm_aux2, text='3)Here ↓ is the description of the selected section')
         lbl_desc_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_desc_section.grid(row=1, column=4, pady=10, sticky=NW)
         self.txt_desc_section = Text(self.frm_aux2, height=4, width=60)
@@ -167,7 +167,7 @@ class FormChildPattern:
         self.txt_desc_section.configure(yscrollcommand=vsb_txt_desc.set)
         lbl_sep7 = Label(self.frm_aux2)
         lbl_sep7.grid(row=2, column=6, padx=20, pady=10)
-        lbl_section = Label(self.frm_aux2, text='3)Content')
+        lbl_section = Label(self.frm_aux2, text='4)Fill the content for selected section ↓')
         lbl_section.config(fg=TEXT_COLOR, font=LABEL_FONT)
         lbl_section.grid(row=3, column=4, pady=10, sticky=NW)
         # Frame for section of text data type
@@ -338,9 +338,11 @@ class FormChildPattern:
                 child.configure(state=DISABLED)
             except:
                 pass
-        self.cbx_template['values'] = []
+        templates = []
         for item in self.templates:
-            self.cbx_template['values'] += ('{}: {}'.format(item.name, item.description),)
+            templates.append('{}: {}'.format(item.name, item.description))
+        self.cbx_template['values'] = []
+        self.cbx_template['values'] = templates
         self.frm_child_list.grid_forget()
         self.btn_save.grid(row=0, column=2, padx=20, pady=5)
         self.btn_cancel.grid(row=1, column=2, padx=20, pady=5)
@@ -764,9 +766,11 @@ class FormChildPattern:
             elements = item.split('¥')
             category_aux = Category(int(elements[0]), elements[1], int(elements[2]))
             self.categories.append(category_aux)
-        self.cbx_category['values'] = []
+        categories = []
         for item in self.categories:
-            self.cbx_category['values'] += ('{}'.format(item.name),)
+            categories.append('{}'.format(item.name))
+        self.cbx_category['values'] = []
+        self.cbx_category['values'] = categories
 
     def cbx_category_selected(self, event):
         id_section = self.selected_section.temp_section_id

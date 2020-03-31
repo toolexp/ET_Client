@@ -241,9 +241,10 @@ class FormParentDesigner:
         # Remove existing elements in the list
         for item in self.trv_available.get_children():
             self.trv_available.delete(item)
-        # Remove text from annotation
+        # Retrieve scenario for current designer
         self.directive = Message(action=82, information=['my scenarios', self.current_designer.id])
         self.connection = self.directive.send_directive(self.connection)
+        # Set visual components with retrieved scenarios
         for item in self.connection.message.information:
             elements = item.split('¥')
             self.trv_available.insert('', 'end', text=elements[0], values=(summarize_text(elements[1], 400),))
@@ -440,7 +441,7 @@ class FormParentDesigner:
                 return False
         if len(self.txt_solution_desc.get('1.0', 'end-1c')) == 0:
             messagebox.showwarning(parent=self.frm_general, title='Missing information',
-                                   message='You must add annotations to your solution')
+                                   message='You must add notes to your solution')
             return False
         return True
 

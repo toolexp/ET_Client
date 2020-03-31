@@ -473,7 +473,7 @@ class FormChildReport:
                     # Here asks for the sent solution of specific designer
                     self.directive = Message(action=105, information=[int(id_selected_desig), self.problem.id])
                     self.connection = self.directive.send_directive(self.connection)
-                    # Getting assigned patterns in current experimental scenario (the same for all problems in one scenario)
+                    # Getting assigned patterns in current experimental scenario
                     assigned_patterns = []
                     for item in self.connection.message.information[4]:
                         for pattern in self.available_patterns:
