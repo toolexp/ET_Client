@@ -486,6 +486,9 @@ class FormChildReport:
                         for pattern in self.available_patterns:
                             if id_pattern == pattern.id:
                                 chosen_patterns.append(pattern)
+                    # Getting current group for the designer
+                    current_group = self.connection.message.information[3]
+                    # Creating the auxiliar solution
                     self.solution = Solution(annotations=self.connection.message.information[0],
                                              patterns=chosen_patterns,
                                              diagram_id=self.connection.message.information[1],
@@ -512,8 +515,7 @@ class FormChildReport:
                                                     format(self.problem.brief_description,
                                                            self.trv_detail_designer.item(
                                                                self.trv_detail_designer.selection())['values'][1],
-                                                           'Control group' if self.connection.message.information[
-                                                                                  3] == 1 else 'Experimental group',
+                                                           'Control group' if current_group == 1 else 'Experimental group',
                                                            self.solution.annotations,
                                                            'No diagram in solution' if self.solution.diagram_id is None else 'Click up button to see diagram ^',
                                                            'No patterns configured' if aux_patterns_assign == '' else aux_patterns_assign,
