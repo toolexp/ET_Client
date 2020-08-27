@@ -5,6 +5,7 @@ from Modules.Config.Data import Message, Experiment, CreateToolTip, Problem, Pat
     summarize_text, get_mean_value, Solution
 from PIL import ImageTk, Image
 from Modules.Config.Visual import *
+from tkinter.filedialog import askdirectory
 
 
 class FormParentReport:
@@ -178,7 +179,7 @@ class FormChildReport:
         self.trv_detail_designer.configure(yscrollcommand=vsb_trv_detdesig.set)
         lbl_notes = Label(self.frm_child_report, text='NOTE:\tDouble click on a designer to see\tLEGEND:\tM1=Solution '
                                                       'time | M3=Viewed patterns\n\this solution for a problem ^.\t\t\t'
-                                                      'M2=Selection time | M4=Chosen patterns\n')
+                                                      'M2=Selection time | M4=Selection efficiency\n')
         lbl_notes.config(fg=TEXT_COLOR, font=NOTE_FONT, justify=LEFT)
         lbl_notes.grid(row=6, column=6, pady=10, sticky=W)
         lbl_sep2 = Label(self.frm_child_report)
@@ -453,13 +454,16 @@ class FormChildReport:
     def click_csv(self):
         if len(self.trv_available_exp.selection()) == 1:
             # Get report in .zip (temporarly)
-            self.directive = Message(action=106, information=[self.experiment.id])
-            self.connection = self.directive.send_directive(self.connection)
-            report_file = File()
-            path = report_file.write_permanent_file(self.connection.message.information[0],
-                                                    self.connection.message.information[1])
-            messagebox.showinfo(parent=self.frm_child_report, title='Report created',
-                                message='Zipped report created in app main folder')
+            path = askdirectory(title='Select destination folder')  # shows dialog box and return the path
+            if path:
+                # Retrieve zip file and create into the selected folder
+                self.directive = Message(action=106, information=[self.experiment.id])
+                self.connection = self.directive.send_directive(self.connection)
+                report_file = File()
+                report_file.write_permanent_file(self.connection.message.information[0],
+                                                 self.connection.message.information[1], path)
+                messagebox.showinfo(parent=self.frm_child_report, title='Report created',
+                                    message='Zipped report created: "{}"'.format(report_file.filename))
         else:
             messagebox.showwarning(parent=self.frm_child_report, title='No selection',
                                    message='You must select one item')

@@ -65,6 +65,8 @@ def treeview_sort_column(tv, col, reverse):
 
 
 def get_mean_value(df=None):
+    # First obtain the fourth metric (selection efficiency) and replace in the selected patterns column
+    df['m4'] = df.apply(lambda row: row['m4']/row['m3'] if row['m4'] is not None else None, axis=1)
     df_designers = df[['id', 'variable']]
     df_designers = df_designers.append(pd.DataFrame({'id': None, 'variable': 'AVERAGE'}, index=[0]),
                                        ignore_index=True)
@@ -274,15 +276,13 @@ class File:
         self.file.write(self.file_bytes)
         self.file.close()
 
-    def write_permanent_file(self, name, file_bytes):
+    def write_permanent_file(self, name, file_bytes, path):
         self.name = name
         self.file_bytes = file_bytes
-        path = './'
-        self.filename = path + name
+        self.filename = path + '/' + name
         self.file = open(self.filename, 'wb')
         self.file.write(self.file_bytes)
         self.file.close()
-        return path
 
 
 class Measurement:
